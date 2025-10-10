@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Profil Bilgileri{% endblock %}
+{% block content %}
+<div style="max-width:700px;margin:50px auto;background:#fff;padding:2.5rem 3rem;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,.08);">
+  <h2 style="color:#00205B;font-weight:700;margin-bottom:1rem;">👤 Profil Bilgileri</h2>
+
+  <p><strong>Kullanıcı Adı:</strong> {{ user.username }}</p>
+  <p><strong>E-posta:</strong> {{ user.email }}</p>
+  <p><strong>Üniversite:</strong> {{ user.university|default:"-" }}</p>
+
+  <hr style="margin:1.5rem 0;">
+
+  <p><strong>Yüklenen Notlar:</strong> {{ uploaded_notes.count }}</p>
+  <p><strong>Toplam İndirme:</strong> {{ total_downloads }}</p>
+</div>
+{% endblock %}

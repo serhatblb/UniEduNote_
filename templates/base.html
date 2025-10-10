@@ -1,0 +1,368 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}UniEduNote{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* === GENEL === */
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #f8fafc;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #1e2a44;
+    }
+
+    /* === SIDEBAR === */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #1a2b6b 0%, #0f172a 100%);
+      color: #fff;
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      box-shadow: 6px 0 20px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 2.5rem;
+      color: #e0e7ff;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: linear-gradient(to right, #60a5fa, #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: #bfdbfe;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.9rem 1.2rem;
+      border-radius: 12px;
+      margin-bottom: 0.6rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .nav-links a:hover::before {
+      left: 100%;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      transform: translateX(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* === ANA İÇERİK === */
+    .main {
+      flex: 1;
+      margin-left: 300px;
+      padding: 3rem 3.5rem;
+      min-height: 100vh;
+      background: #f8fafc;
+      transition: margin-left 0.3s ease;
+      border-top-left-radius: 30px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* === RESPONSIVE TASARIM === */
+    @media(max-width: 992px) {
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        padding: 1.2rem 1.5rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .main {
+        margin-left: 0;
+        padding: 2rem;
+      }
+      .sidebar h2 {
+        font-size: 1.4rem;
+        margin: 0;
+      }
+      .nav-links {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+      .nav-links a {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* === LANDING SAYFASI === */
+    .landing {
+      background: linear-gradient(145deg, #1e3a8a, #3b82f6, #7dd3fc);
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: #fff;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 1.8s ease-out;
+    }
+
+    .landing::before {
+      content: "";
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+      border-radius: 50%;
+      top: -300px;
+      left: -300px;
+      filter: blur(50px);
+      animation: float 8s ease-in-out infinite alternate;
+    }
+
+    .landing::after {
+      content: "";
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      border-radius: 50%;
+      bottom: -200px;
+      right: -200px;
+      filter: blur(40px);
+      animation: float 10s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(20px, 30px) scale(1.05); }
+    }
+
+    .landing h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      margin-bottom: 1.2rem;
+      z-index: 1;
+      background: linear-gradient(to right, #e0e7ff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      animation: slideUp 1s ease-out;
+    }
+
+    .landing p {
+      font-size: 1.2rem;
+      max-width: 680px;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+      z-index: 1;
+      color: #e0e7ff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      animation: slideUp 1.2s ease-out 0.2s;
+    }
+
+    .icon-row {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      z-index: 1;
+      animation: slideUp 1.4s ease-out 0.4s;
+    }
+
+    .icon-row span {
+      transition: transform 0.3s ease;
+    }
+
+    .icon-row span:hover {
+      transform: scale(1.2) rotate(10deg);
+    }
+
+    .landing-buttons a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      margin: 0 0.8rem;
+      transition: all 0.3s ease;
+      z-index: 1;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .landing-buttons a:first-child {
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      color: #fff;
+    }
+
+    .landing-buttons a:last-child {
+      background: transparent;
+      color: #e0e7ff;
+      border: 2px solid #60a5fa;
+    }
+
+    .landing-buttons a:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      background: linear-gradient(90deg, #2563eb, #3b82f6);
+      border-color: #93c5fd;
+    }
+
+    .landing-buttons a:last-child:hover {
+      background: #60a5fa;
+      color: #fff;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* === İSTATİSTİK BÖLÜMÜ === */
+    .stats-container {
+      margin-top: 4rem;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      z-index: 1;
+      animation: slideUp 1.6s ease-out 0.6s;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 1.5rem 2.5rem;
+      border-radius: 16px;
+      min-width: 200px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-box h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin: 0;
+      color: #e0e7ff;
+    }
+
+    .stat-box p {
+      margin: 0.5rem 0 0;
+      font-size: 1rem;
+      color: #bfdbfe;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- === SIDEBAR === -->
+  <div class="sidebar">
+    <div>
+      <h2>UniEduNote</h2>
+      <div class="nav-links">
+        <a href="/">🏠 Ana Sayfa</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'note_list' %}">📚 Notlar</a>
+          <a href="{% url 'upload_note' %}">📄 Not Yükle</a>
+          <a href="{% url 'profile' %}">👤 Profil</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="nav-links">
+      {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}">🚪 Çıkış Yap</a>
+      {% else %}
+        <a href="{% url 'login' %}">🔑 Giriş</a>
+        <a href="{% url 'register' %}">🧾 Kayıt</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- === ANA ALAN === -->
+  <div class="main">
+    {% block content %}
+      {% if not user.is_authenticated %}
+        <div class="landing">
+          <div class="icon-row">
+            <span>📚</span><span>💡</span><span>🎯</span><span>🎓</span><span>🌟</span>
+          </div>
+          <h1>UniEduNote’a Hoşgeldin!</h1>
+          <p>
+            Üniversite notlarını paylaş, arkadaşlarının notlarını indir ve katkı sağladıkça puan kazan!
+            Akademik topluluğun bir parçası ol, bilgi paylaşmanın gücünü keşfet. 🌟
+          </p>
+          <div class="landing-buttons">
+            <a href="{% url 'register' %}">🚀 Kayıt Ol</a>
+            <a href="{% url 'login' %}">🔑 Giriş Yap</a>
+          </div>
+
+          <!-- İSTATİSTİK BÖLÜMÜ -->
+          <div class="stats-container">
+            <div class="stat-box">
+              <h2>🧑‍🎓 1.200+</h2>
+              <p>Kayıtlı Öğrenci</p>
+            </div>
+            <div class="stat-box">
+              <h2>📄 5.800+</h2>
+              <p>Yüklenen Not</p>
+            </div>
+            <div class="stat-box">
+              <h2>🎯 32.000+</h2>
+              <p>Toplam İndirme</p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endblock %}
+  </div>
+</body>
+</html>

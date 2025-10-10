@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }}{% endblock %}
+{% block content %}
+<style>
+  .note-detail-card {
+    max-width: 760px;
+    margin: 80px auto;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(243, 244, 246, 0.9));
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    animation: slideUp 1s ease-out;
+    backdrop-filter: blur(10px);
+  }
+  .note-detail-card::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+    filter: blur(30px);
+    animation: float 6s ease-in-out infinite alternate;
+  }
+  .note-detail-card h2 {
+    color: #1e3a8a;
+    font-weight: 800;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(to right, #1e3a8a, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    animation: slideUp 1.2s ease-out 0.2s;
+  }
+  .note-detail-card p {
+    font-size: 1.1rem;
+    color: #4b5563;
+    margin: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+    animation: slideUp 1.4s ease-out 0.4s;
+  }
+  .note-detail-card p:hover {
+    background: rgba(59, 130, 246, 0.1);
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  }
+  .note-detail-card p strong {
+    color: #1e3a8a;
+    font-weight: 600;
+  }
+  .note-detail-card a {
+    display: inline-block;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    animation: slideUp 1.6s ease-out 0.6s;
+  }
+  .note-detail-card a:hover {
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes float {
+    from { transform: translate(0, 0); }
+    to { transform: translate(-10px, -15px); }
+  }
+</style>
+
+<div class="note-detail-card">
+  <h2>{{ note.title }}</h2>
+  <p><strong>Ders:</strong> {{ note.course.name }}</p>
+  <p><strong>Dönem:</strong> {{ note.semester }}</p>
+  <p><strong>Açıklama:</strong> {{ note.description|default:"-" }}</p>
+  <p><strong>Yükleyen:</strong> {{ note.user.username }}</p>
+  <p><strong>İndirilmeler:</strong> {{ note.download_count }}</p>
+  <a href="{% url 'download_note' note.pk %}">📥 Notu İndir</a>
+</div>
+{% endblock %}

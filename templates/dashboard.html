@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<style>
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+    padding: 1.8rem;
+    text-align: center;
+    transition: transform .2s;
+  }
+  .card:hover { transform: translateY(-5px); }
+  .card h3 {
+    color: #001540;
+    font-weight: 700;
+    margin-bottom: .5rem;
+  }
+  .card p {
+    color: #555;
+    font-size: 15px;
+  }
+  .btn-main {
+    display:inline-block;
+    background: linear-gradient(135deg, #00205B, #001540);
+    color:#fff;
+    padding:10px 20px;
+    border-radius:10px;
+    font-weight:600;
+    text-decoration:none;
+    margin-top:1rem;
+  }
+  .btn-main:hover{opacity:.9;}
+</style>
+
+<h2 style="color:#001540;">🎓 Hoşgeldin, {{ user.username|title }}</h2>
+<p style="color:#555;margin-bottom:2rem;">Buradan not yükleyebilir, notlara göz atabilir veya profil bilgilerini görüntüleyebilirsin.</p>
+
+<div class="dashboard">
+  <div class="card">
+    <h3>📄 Yeni Not Yükle</h3>
+    <p>Ders notlarını PDF, Word veya görsel olarak yükle ve katkı puanı kazan.</p>
+    <a href="{% url 'upload_note' %}" class="btn-main">Not Yükle</a>
+  </div>
+
+  <div class="card">
+    <h3>📚 Notları Keşfet</h3>
+    <p>Üniversitelere, bölümlere ve derslere göre paylaşılan notlara göz at.</p>
+    <a href="{% url 'note_list' %}" class="btn-main">Notları Gör</a>
+  </div>
+
+  <div class="card">
+    <h3>🏆 Profil ve Puanlar</h3>
+    <p>Puan durumunu, katkı seviyeni ve yüklediğin notları buradan incele.</p>
+    <a href="{% url 'profile' %}" class="btn-main">Profili Gör</a>
+  </div>
+</div>
+{% endblock %}
