@@ -3,51 +3,111 @@
 {% block title %}Kayıt Ol{% endblock %}
 {% block content %}
 <style>
-  body { background: #f4f6fa; }
-  .register-card {
-    max-width: 480px;
-    margin: 70px auto;
+  .auth-container {
+    max-width: 420px;
+    margin: 60px auto;
     background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     padding: 2.5rem 2rem;
-  }
-  .register-card h2 {
-    color: #00205B;
     text-align: center;
-    font-weight: 700;
-    margin-bottom: 2rem;
+    animation: fadeIn 0.8s ease;
   }
-  form input {
-    width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+  h2 {
+    color: #00205B;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+  .form-group {
+    text-align:left;
+    margin-bottom:1rem;
+  }
+  label {
+    font-weight:600;
+    display:block;
+    margin-bottom:4px;
+    color:#001540;
+  }
+  input {
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:15px;
+  }
+  input:focus {
+    border-color:#00205B;
+    outline:none;
+    box-shadow:0 0 0 2px rgba(0,32,91,0.15);
   }
   button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #00205B, #001540);
-    color: #fff;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
+    width:100%;
+    background:linear-gradient(135deg,#00205B,#001540);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:10px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
   }
+  button:hover { opacity:.9; }
+  .bottom-text { margin-top:1rem; font-size:14px; }
+  .bottom-text a { color:#00205B; font-weight:600; text-decoration:none; }
+  .msg { margin-top:1rem; font-size:15px; }
 </style>
 
-<div class="register-card">
+<div class="auth-container">
   <h2>🧾 Kayıt Ol</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Kaydı Tamamla</button>
+  <form id="registerForm">
+    <div class="form-group">
+      <label for="username">Kullanıcı Adı</label>
+      <input type="text" id="username" required>
+    </div>
+    <div class="form-group">
+      <label for="email">E-posta</label>
+      <input type="email" id="email" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Şifre</label>
+      <input type="password" id="password" required>
+    </div>
+    <button type="submit">Kayıt Ol</button>
   </form>
-  <p style="text-align:center;margin-top:1rem;">
-    Zaten hesabın var mı?
-    <a href="{% url 'login' %}" style="color:#00205B;">Giriş yap</a>
-  </p>
+  <p class="bottom-text">Zaten hesabın var mı? <a href="{% url 'login' %}">Giriş Yap</a></p>
+  <p id="msg" class="msg"></p>
 </div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const msg = document.getElementById('msg');
+  msg.style.color = '#555';
+  msg.innerText = '⏳ Kayıt yapılıyor...';
+
+  try {
+    const res = await fetch('/api/auth/register/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ username, email, password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      msg.style.color = 'green';
+      msg.innerText = '✅ Kayıt başarılı! Aktivasyon maili gönderildi.';
+      e.target.reset();
+    } else {
+      msg.style.color = 'red';
+      msg.innerText = '⚠️ ' + (data.detail || Object.values(data)[0]);
+    }
+  } catch (err) {
+    msg.style.color = 'red';
+    msg.innerText = '⚠️ Sunucu hatası, tekrar deneyin.';
+  }
+});
+</script>
 {% endblock %}

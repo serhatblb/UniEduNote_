@@ -3,115 +3,102 @@
 {% block title %}Giriş Yap{% endblock %}
 {% block content %}
 <style>
-  body {
-    background: #f8fafc;
-  }
-  .login-container {
-    max-width: 440px;
+  .auth-container {
+    max-width: 400px;
     margin: 80px auto;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(243, 244, 246, 0.9));
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    padding: 2.5rem;
-    position: relative;
-    overflow: hidden;
-    animation: slideUp 1s ease-out;
-    backdrop-filter: blur(10px);
-  }
-  .login-container::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    right: -50px;
-    width: 150px;
-    height: 150px;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
-    filter: blur(30px);
-    animation: float 6s ease-in-out infinite alternate;
-  }
-  .login-container h2 {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #1e3a8a;
-    font-weight: 800;
-    font-size: 2rem;
-    background: linear-gradient(to right, #1e3a8a, #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    animation: slideUp 1.2s ease-out 0.2s;
-  }
-  .login-container input {
-    width: 100%;
-    padding: 0.9rem 1rem;
-    margin-bottom: 1.2rem;
-    border: 1px solid #bfdbfe;
-    border-radius: 12px;
-    font-size: 1rem;
     background: #fff;
-    color: #1e2a44;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    animation: slideUp 1.4s ease-out 0.4s;
-  }
-  .login-container input:focus {
-    border-color: #3b82f6;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-  }
-  .login-container button {
-    width: 100%;
-    padding: 1rem;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
-    color: #fff;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    animation: slideUp 1.6s ease-out 0.6s;
-  }
-  .login-container button:hover {
-    background: linear-gradient(90deg, #2563eb, #3b82f6);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  }
-  .login-container p {
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 2.5rem 2rem;
     text-align: center;
-    margin-top: 1.5rem;
-    color: #4b5563;
-    font-size: 1rem;
-    animation: slideUp 1.8s ease-out 0.8s;
+    animation: fadeIn 0.8s ease;
   }
-  .login-container a {
-    color: #3b82f6;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+  h2 { color:#00205B; font-weight:700; margin-bottom:1.5rem; }
+  .form-group { text-align:left; margin-bottom:1rem; }
+  label { font-weight:600; display:block; margin-bottom:4px; color:#001540; }
+  input {
+    width:100%; padding:10px 12px; border:1px solid #ccc;
+    border-radius:8px; font-size:15px;
   }
-  .login-container a:hover {
-    color: #2563eb;
+  input:focus {
+    border-color:#00205B; outline:none;
+    box-shadow:0 0 0 2px rgba(0,32,91,0.15);
   }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  button {
+    width:100%; background:linear-gradient(135deg,#00205B,#001540);
+    color:#fff; border:none; border-radius:8px;
+    padding:10px; font-weight:600; cursor:pointer; transition:.3s;
   }
-  @keyframes float {
-    from { transform: translate(0, 0); }
-    to { transform: translate(-10px, -15px); }
-  }
+  button:hover { opacity:.9; }
+  .bottom-text { margin-top:1rem; font-size:14px; }
+  .bottom-text a { color:#00205B; font-weight:600; text-decoration:none; }
+  .msg { margin-top:1rem; font-size:15px; }
 </style>
 
-<div class="login-container">
-  <h2>Giriş Yap</h2>
-  <form method="post">
-    {% csrf_token %}
-    <input type="text" name="username" placeholder="Kullanıcı adı" required>
-    <input type="password" name="password" placeholder="Şifre" required>
-    <button type="submit">Giriş</button>
+<div class="auth-container">
+  <h2>🔑 Giriş Yap</h2>
+  <form id="loginForm">
+    <div class="form-group">
+      <label for="username">Kullanıcı Adı</label>
+      <input type="text" id="username" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Şifre</label>
+      <input type="password" id="password" required>
+    </div>
+    <button type="submit">Giriş Yap</button>
   </form>
-  <p>Hesabın yok mu? <a href="/register/">Kayıt ol</a></p>
+  <p class="bottom-text">
+    Hesabın yok mu? <a href="{% url 'register' %}">Kayıt Ol</a> <br>
+    <a href="#">Şifremi Unuttum</a>
+  </p>
+  <p id="msg" class="msg"></p>
 </div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const msg = document.getElementById('msg');
+  msg.style.color = '#555';
+  msg.innerText = '⏳ Giriş yapılıyor...';
+
+  try {
+    const res = await fetch('/api/auth/token/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      // Token’ları kaydet
+      localStorage.setItem('access', data.access);
+      localStorage.setItem('refresh', data.refresh);
+
+      // Session başlatmak için backend’e sinyal gönder
+      await fetch('/api/auth/session-login/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ username, password })
+});
+
+
+
+      msg.style.color = 'green';
+      msg.innerText = '✅ Giriş başarılı! Yönlendiriliyorsunuz...';
+      setTimeout(()=>window.location.href='/dashboard/',1500);
+    } else {
+      msg.style.color = 'red';
+      msg.innerText = '⚠️ ' + (data.detail || 'Bilgiler hatalı veya hesap aktif değil.');
+    }
+  } catch (err) {
+    msg.style.color = 'red';
+    msg.innerText = '⚠️ Sunucu hatası, tekrar deneyin.';
+  }
+});
+</script>
+
 {% endblock %}

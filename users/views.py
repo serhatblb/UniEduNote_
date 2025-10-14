@@ -1,16 +1,16 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-
-from uniedunote import settings
-from .forms import RegisterForm
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.contrib.sites.shortcuts import get_current_site
+from uniedunote import settings
+from .forms import RegisterForm
 from .tokens import account_activation_token
 from django.contrib.auth.models import User
+
 
 def register_view(request):
     if request.method == "POST":
@@ -53,17 +53,19 @@ def activate_account(request, uidb64, token):
     else:
         messages.error(request, "Aktivasyon bağlantısı geçersiz veya süresi dolmuş.")
         return redirect("register")
+
+
 def login_view(request):
     if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.POST.get("username")
+        password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
-        if user is not None:
+        if user and user.is_active:
             login(request, user)
-            return redirect("home")
+            return redirect("dashboard")  # ✅
         else:
             messages.error(request, "Kullanıcı adı veya şifre hatalı.")
-    return render(request, "users/login.html")  # ✅
+    return render(request, "users/login.html")
 
 def logout_view(request):
     logout(request)

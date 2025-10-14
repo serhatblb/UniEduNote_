@@ -65,3 +65,6 @@ def download_note(request, pk):
         return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=file_name)
     except FileNotFoundError:
         raise Http404("Dosya sunucuda bulunamadı.")
+@login_required(login_url='/login/')
+def dashboard(request):
+    return render(request, 'dashboard.html')

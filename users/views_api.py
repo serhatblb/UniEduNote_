@@ -1,83 +1,134 @@
-from django.contrib.auth import get_user_model
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.core.mail import send_mail
-from django.conf import settings
 from django.template.loader import render_to_string
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import (
-    RegisterSerializer, MyTokenObtainPairSerializer,
-    PasswordResetRequestSerializer, PasswordResetConfirmSerializer
-)
+from uniedunote import settings
 from .tokens import account_activation_token
+from .serializers import UserSerializer
+from django.views.decorators.csrf import csrf_exempt
 
+
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
+import json
 User = get_user_model()
 
+
 class RegisterAPIView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
-        ser = RegisterSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        user = ser.save()
-        domain = get_current_site(request).domain
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = account_activation_token.make_token(user)
-        activation_link = f"http://{domain}/api/auth/activate/{uid}/{token}/"
-        subject = "UniEduNote hesap aktivasyonu"
-        message = f"Merhaba {user.username},\nHesabını aktifleştir: {activation_link}"
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-        return Response({"detail":"Kayıt alındı. Aktivasyon maili gönderildi."}, status=201)
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save(is_active=False)
+
+            current_site = get_current_site(request)
+            subject = "UniEduNote Hesap Aktivasyonu"
+            message = render_to_string("users/activation_email.html", {
+                "user": user,
+                "domain": current_site.domain,
+                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                "token": account_activation_token.make_token(user),
+            })
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+            return Response({"message": "Kayıt başarılı! Aktivasyon e-postası gönderildi."}, status=201)
+        return Response(serializer.errors, status=400)
+
 
 class ActivateAPIView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request, uidb64, token):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
-        except Exception:
-            return Response({"detail":"Geçersiz bağlantı."}, status=400)
-        if account_activation_token.check_token(user, token):
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and account_activation_token.check_token(user, token):
             user.is_active = True
             user.save()
-            return Response({"detail":"Hesap aktifleştirildi."}, status=200)
-        return Response({"detail":"Token geçersiz veya süresi dolmuş."}, status=400)
+            return Response({"message": "Hesap başarıyla aktifleştirildi."})
+        return Response({"error": "Aktivasyon bağlantısı geçersiz."}, status=400)
+
 
 class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
+    """Kullanıcı girişinde JWT döner."""
+    pass
+
 
 class PasswordResetRequestAPIView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
-        ser = PasswordResetRequestSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        email = ser.validated_data['email']
+        email = request.data.get("email")
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            # Bilgi sızdırmamak için her durumda success döneriz.
-            return Response({"detail":"Eğer kayıtlıysanız mail gönderdik."}, status=200)
-        domain = get_current_site(request).domain
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = account_activation_token.make_token(user)  # PasswordResetTokenGenerator ile aynı mantık
-        link = f"http://{domain}/reset-password/confirm?uidb64={uid}&token={token}"
-        send_mail("Şifre sıfırlama", f"Bağlantı: {link}", settings.DEFAULT_FROM_EMAIL, [email])
-        return Response({"detail":"Eğer kayıtlıysanız mail gönderdik."}, status=200)
+            return Response({"error": "Bu e-posta adresi kayıtlı değil."}, status=400)
+
+        current_site = get_current_site(request)
+        subject = "UniEduNote Şifre Sıfırlama"
+        message = render_to_string("users/password_reset_email.html", {
+            "user": user,
+            "domain": current_site.domain,
+            "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+            "token": account_activation_token.make_token(user),
+        })
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+        return Response({"message": "Şifre sıfırlama e-postası gönderildi."})
+
 
 class PasswordResetConfirmAPIView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
-        ser = PasswordResetConfirmSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        uidb64 = ser.validated_data['uidb64']
-        token = ser.validated_data['token']
-        new_pw = ser.validated_data['new_password']
+        uidb64 = request.data.get("uid")
+        token = request.data.get("token")
+        password = request.data.get("password")
+
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
         except Exception:
-            return Response({"detail":"Geçersiz bağlantı."}, status=400)
+            return Response({"error": "Geçersiz bağlantı."}, status=400)
+
         if account_activation_token.check_token(user, token):
-            user.set_password(new_pw)
+            user.set_password(password)
             user.save()
-            return Response({"detail":"Şifre güncellendi."}, status=200)
-        return Response({"detail":"Token geçersiz veya süresi dolmuş."}, status=400)
+            return Response({"message": "Şifre başarıyla güncellendi."})
+        return Response({"error": "Token geçersiz veya süresi dolmuş."}, status=400)
+
+
+
+@csrf_exempt
+def session_login(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+        except:
+            return JsonResponse({"error": "JSON bekleniyor"}, status=400)
+
+        username = data.get("username")
+        password = data.get("password")
+
+        if not username or not password:
+            return JsonResponse({"error": "Kullanıcı adı ve şifre zorunlu"}, status=400)
+
+        user = authenticate(request, username=username, password=password)
+        if user and user.is_active:
+            login(request, user)
+            return JsonResponse({"message": "Login başarılı", "username": user.username})
+        else:
+            return JsonResponse({"error": "Geçersiz kullanıcı adı veya şifre"}, status=401)
+
+    return JsonResponse({"error": "Yalnızca POST isteği destekleniyor"}, status=405)
