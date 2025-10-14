@@ -1,15 +1,18 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.utils.encoding import force_str
-from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str, force_bytes
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from uniedunote import settings
 from .forms import RegisterForm
 from .tokens import account_activation_token
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+# 🚀 Özel kullanıcı modelini çağırıyoruz
+User = get_user_model()
 
 
 def register_view(request):
@@ -20,7 +23,7 @@ def register_view(request):
             user.is_active = False
             user.save()
 
-            # Aktivasyon maili
+            # Aktivasyon maili gönder
             current_site = get_current_site(request)
             subject = "UniEduNote Hesap Aktivasyonu"
             message = render_to_string("users/activation_email.html", {
@@ -60,12 +63,14 @@ def login_view(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
+
         if user and user.is_active:
             login(request, user)
-            return redirect("dashboard")  # ✅
+            return redirect("dashboard")  # ✅ Giriş sonrası dashboard’a yönlendirme
         else:
-            messages.error(request, "Kullanıcı adı veya şifre hatalı.")
+            messages.error(request, "Kullanıcı adı veya şifre hatalı ya da hesap aktif değil.")
     return render(request, "users/login.html")
+
 
 def logout_view(request):
     logout(request)
