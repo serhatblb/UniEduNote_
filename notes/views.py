@@ -13,7 +13,7 @@ def upload_note(request):
         form = NoteForm(request.POST, request.FILES)
         if form.is_valid():
             note = form.save(commit=False)
-            note.uploader = request.user
+            note.user = request.user
             note.save()
             return redirect('note_list')
     else:

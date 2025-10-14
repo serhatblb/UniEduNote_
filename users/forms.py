@@ -1,18 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User
-from categories.models import University
+from .models import User  # özel kullanıcı modelin
 
 class RegisterForm(UserCreationForm):
-    email = forms.EmailField()
-    university = forms.ModelChoiceField(queryset=University.objects.none())
-
+    email = forms.EmailField(label="E-posta", required=True)
 
     class Meta:
         model = User
-        fields = ("username","email","password1","password2","university")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        from categories.models import University
-        self.fields['university'].queryset = University.objects.all()
+        fields = ["username", "email", "password1", "password2"]

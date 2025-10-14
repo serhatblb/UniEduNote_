@@ -5,18 +5,30 @@
 <style>
   body {
     background: #f8fafc;
+    overflow: hidden;
+  }
+  .main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 0;
+    overflow: hidden;
   }
   .upload-card {
-    max-width: 760px;
-    margin: 80px auto;
+    max-width: 900px;
+    width: 95%;
+    max-height: 95vh;
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(243, 244, 246, 0.9));
     border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    padding: 3rem 2.5rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    padding: 2rem 2.5rem;
     position: relative;
-    overflow: hidden;
     animation: slideUp 1s ease-out;
     backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
   .upload-card::before {
     content: '';
@@ -28,43 +40,85 @@
     background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
     filter: blur(30px);
     animation: float 6s ease-in-out infinite alternate;
+    z-index: 0;
   }
   .upload-card h2 {
     text-align: center;
     color: #1e3a8a;
     font-weight: 800;
     font-size: 2rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.2rem;
     background: linear-gradient(to right, #1e3a8a, #60a5fa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     animation: slideUp 1.2s ease-out 0.2s;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+  .form-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.5rem;
+  }
+  .form-wrapper::-webkit-scrollbar {
+    width: 6px;
+  }
+  .form-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .form-wrapper::-webkit-scrollbar-thumb {
+    background: #bfdbfe;
+    border-radius: 3px;
+  }
+  .form-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #93c5fd;
   }
   .upload-card form {
     display: grid;
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+    padding-bottom: 0.5rem;
+    padding-right: 0.3rem;
+  }
+  .form-grid-content {
+    display: contents;
+  }
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-width: 0;
   }
   .upload-card label {
     font-weight: 600;
     color: #1e2a44;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     display: block;
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
   .upload-card input,
   .upload-card select,
   .upload-card textarea {
-    width: 100%;
-    padding: 0.9rem 1rem;
-    border: 1px solid #bfdbfe;
-    border-radius: 12px;
-    font-size: 1rem;
-    background: #fff;
-    color: #1e2a44;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0.65rem 0.9rem !important;
+    border: 1px solid #bfdbfe !important;
+    border-radius: 12px !important;
+    font-size: 0.92rem !important;
+    background: #fff !important;
+    color: #1e2a44 !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
     animation: slideUp 1.4s ease-out 0.4s;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box !important;
+    margin: 0 !important;
   }
   .upload-card input:focus,
   .upload-card select:focus,
@@ -72,14 +126,43 @@
     border-color: #3b82f6;
     outline: none;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    z-index: 2;
   }
   .upload-card textarea {
-    min-height: 120px;
-    resize: vertical;
+    min-height: 70px;
+    resize: none;
+    font-family: inherit;
   }
-  .upload-card button {
+  .upload-card input[type="file"] {
+    padding: 0.65rem 0.5rem;
+    cursor: pointer;
+  }
+  .upload-card input[type="file"]::file-selector-button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 0.8rem;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+  }
+  .upload-card input[type="file"]::file-selector-button:hover {
+    background: #2563eb;
+  }
+  .full-width {
+    grid-column: span 2;
+  }
+  .button-wrapper {
+    flex-shrink: 0;
+    padding-top: 0.8rem;
+    position: relative;
+    z-index: 1;
+  }
+  .upload-card button[type="submit"] {
     width: 100%;
-    padding: 1rem;
+    padding: 0.85rem;
     border: none;
     border-radius: 12px;
     background: linear-gradient(90deg, #3b82f6, #60a5fa);
@@ -91,10 +174,60 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     animation: slideUp 1.6s ease-out 0.6s;
   }
-  .upload-card button:hover {
+  .upload-card button[type="submit"]:hover {
     background: linear-gradient(90deg, #2563eb, #3b82f6);
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  @media (max-width: 992px) {
+    .main {
+      margin-left: 0;
+    }
+    .upload-card {
+      width: 95%;
+      padding: 1.8rem 1.5rem;
+    }
+    .upload-card h2 {
+      font-size: 1.7rem;
+      margin-bottom: 1rem;
+    }
+    .upload-card form {
+      gap: 0.9rem;
+    }
+  }
+  @media (max-width: 768px) {
+    .upload-card {
+      padding: 1.5rem;
+      max-height: 96vh;
+    }
+    .upload-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.9rem;
+    }
+    .upload-card form {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+    .full-width,
+    .form-field {
+      grid-column: span 1 !important;
+    }
+    .upload-card input,
+    .upload-card select,
+    .upload-card textarea {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.88rem;
+    }
+    .upload-card textarea {
+      min-height: 65px;
+    }
+    .upload-card button[type="submit"] {
+      padding: 0.75rem;
+      font-size: 0.95rem;
+    }
+    .button-wrapper {
+      padding-top: 0.5rem;
+    }
   }
   @keyframes slideUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -108,50 +241,55 @@
 
 <div class="upload-card">
   <h2>📄 Yeni Not Yükle</h2>
-  <form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-
-    <div>
-      <label for="id_university">Üniversite</label>
-      {{ form.university }}
-    </div>
-
-    <div>
-      <label for="id_faculty">Fakülte</label>
-      {{ form.faculty }}
-    </div>
-
-    <div>
-      <label for="id_department">Bölüm</label>
-      {{ form.department }}
-    </div>
-
-    <div>
-      <label for="id_semester">Dönem</label>
-      {{ form.semester }}
-    </div>
-
-    <div>
-      <label for="id_course">Ders</label>
-      {{ form.course }}
-    </div>
-
-    <div>
-      <label for="id_title">Not Başlığı</label>
-      {{ form.title }}
-    </div>
-
-    <div>
-      <label for="id_description">Açıklama</label>
-      {{ form.description }}
-    </div>
-
-    <div>
-      <label for="id_file">PDF / Word / Görsel Dosya</label>
-      {{ form.file }}
-    </div>
-
-    <button type="submit">Yükle</button>
-  </form>
+  <div class="form-wrapper">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-grid-content">
+        <div class="form-field">
+          <label for="id_university">Üniversite</label>
+          {{ form.university }}
+        </div>
+        <div class="form-field">
+          <label for="id_faculty">Fakülte</label>
+          {{ form.faculty }}
+        </div>
+        <div class="form-field">
+          <label for="id_department">Bölüm</label>
+          {{ form.department }}
+        </div>
+        <div class="form-field">
+          <label for="id_semester">Dönem</label>
+          {{ form.semester }}
+        </div>
+        <div class="form-field">
+          <label for="id_course">Ders</label>
+          {{ form.course }}
+        </div>
+        <div class="form-field full-width">
+          <label for="id_title">Not Başlığı</label>
+          {{ form.title }}
+        </div>
+        <div class="form-field full-width">
+          <label for="id_description">Açıklama</label>
+          {{ form.description }}
+        </div>
+        <div class="form-field full-width">
+          <label for="id_file">PDF / Word / Görsel Dosya</label>
+          {{ form.file }}
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="button-wrapper">
+    <button type="submit" form="id_upload_form">Yükle</button>
+  </div>
 </div>
+
+<script>
+  // Form submit için düzenleme
+  document.querySelector('.button-wrapper button').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelector('form').submit();
+  });
+</script>
 {% endblock %}

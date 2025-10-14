@@ -1,0 +1,7 @@
+Merhaba {{ user.username }},
+
+UniEduNote hesabını aktifleştirmek için aşağıdaki bağlantıya tıkla:
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+Eğer bu isteği sen yapmadıysan, bu maili dikkate alma.
