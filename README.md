@@ -1,153 +1,95 @@
 # 🎓 UniEduNote — Akademik Not Paylaşım Platformu
 
 ## 📘 Proje Özeti
-
-**UniEduNote**, üniversite öğrencilerinin ders notlarını, ödev çözümlerini ve sınav içeriklerini paylaşabileceği, katkı sağladıkça puan ve ödül kazanabileceği bir **akademik topluluk platformudur.**
-
-Platformun hedefi, öğrenciler arasında bilgi paylaşımını kolaylaştırmak, kaliteli notların öne çıkmasını sağlamak ve katkı sağlayan kullanıcıları ödüllendirmektir.
+**UniEduNote**, öğrencilerin ders notlarını paylaşabileceği, katkı sağladıkça puan ve ödül kazandığı bir akademik topluluk platformudur.
 
 ---
 
 ## 🧱 Teknoloji Yığını
-
 | Katman | Teknoloji |
 |:--|:--|
 | **Backend** | Django 5.2 + Django ORM |
-| **Frontend** | HTML5, CSS3 (Tailwind tarzı modern sade tasarım) |
-| **Veritabanı** | SQLite (geliştirme) → PostgreSQL (production) |
+| **Frontend** | HTML5, CSS3 (modern sade tasarım) |
+| **Veritabanı** | SQLite (dev) → PostgreSQL (prod) |
 | **API** | Django REST Framework + JWT (SimpleJWT) |
-| **Kimlik Doğrulama** | Django Auth + JWT + E-posta Aktivasyonu |
-| **Depolama** | Django FileField (PDF, Word, Image dosyaları) |
-| **Mail Servisi** | Gmail SMTP (şu anda console backend ile test) |
+| **Auth** | Django Auth + JWT + E-posta aktivasyonu |
+| **Depolama** | FileField (PDF, Word, Image) |
+| **Mail** | Gmail SMTP (şimdilik console backend) |
 
 ---
 
-## ✨ Şu Ana Kadar Tamamlanan Özellikler
-
+## ✨ Tamamlanan Özellikler
 ### 🧍 Kullanıcı Sistemi
-- Modern ve responsive **Kayıt / Giriş ekranları**
-- JWT tabanlı **API login** + Django **session entegrasyonu**
-- **E-posta aktivasyonu:**  
-  - Yeni kayıt olan kullanıcıya doğrulama linki gönderiliyor  
-  - Aktivasyon yapılmadan giriş yapılamıyor
-- **Sidebar menü**: kullanıcı giriş durumuna göre dinamik olarak değişiyor
-- **Session login sistemi:**  
-  - JWT token alınır  
-  - Ardından Django session başlatılarak web tarafında oturum açılır  
-  - Tarayıcıda `sessionid` cookie oluşur
-- Logout ve yönlendirme mekanizmaları (dashboard / ana sayfa geçişleri)
+- JWT + Session tabanlı kimlik doğrulama
+- E-posta aktivasyon sistemi
+- Modern kayıt / giriş ekranları
+- Logout ve dashboard yönlendirmeleri
+- Şifre sıfırlama akışı (e-posta bağlantısı ile)
+- Profil görüntüleme ve düzenleme ekranı  
+  - Şifre değişimi destekleniyor  
+  - E-posta değişimi geçici olarak kısıtlandı (gelecekte doğrulama eklenecek)
+
+### 🔒 Güvenlik & Erişim
+- Giriş yapmadan `/dashboard/`, `/upload/`, `/notes/`, `/profile/` erişimi engellendi  
+- JWT zorunluluğu getirildi (API’lerde `IsAuthenticated`)  
+- `@login_required` ile tüm web view’lar koruma altında
 
 ---
 
-### 📂 Not Yönetimi
-- Not yükleme formu  
-  > Üniversite → Fakülte → Bölüm → Dönem → Ders zinciri seçimi  
-  > Başlık, açıklama, dosya (PDF, Word, Image) alanları  
-- Not listeleme ekranı  
-  > Kart görünümü + indirme butonu + dinamik filtreleme  
-- Not detay ekranı  
-  > Açıklama, yükleyen kullanıcı, indirme sayısı  
-- İndirme sayısı otomatik artış sistemi
+## 🔧 Geliştirme Aşamasında
+| Özellik | Durum |
+|:--|:--|
+| Şifre sıfırlama akışı | ✅ Tamamlandı |
+| Profil düzenleme | ✅ Tamamlandı |
+| E-posta değişiklik doğrulama | 🔜 Eklenecek |
+| Şifre geçmişi / tekrar kullanımı engelleme | 🔜 Eklenecek |
+| Erişim kontrolü ve JWT entegrasyonu | ✅ Tamamlandı |
 
 ---
 
-### 👤 Profil & Dashboard
-- Dashboard: Not yükleme, not keşfetme, profil erişimi kartları  
-- Profil sayfası: Kullanıcı bilgileri, yüklenen notlar ve toplam indirme sayısı  
-- Sidebar üzerinden profil ve dashboard geçişleri
+## 🏅 Planlanan Özellikler
+### 🌟 Puan & Ödül Sistemi
+- Not yükleme, indirme, beğeni, şikayet ile puan kazanma  
+- Puan bazlı seviye sistemi (⭐ → ⭐⭐⭐⭐)  
+- İlerleme çubuğu ve seviye ikonları  
+- `signals.py` üzerinden otomatik puan hesaplama  
 
----
-
-## 🔐 Şu Anda Geliştirme Aşamasında Olanlar
-
-### 🔒 Kullanıcı Doğrulama & Güvenlik Sistemi
-- [✅] **E-posta aktivasyon sistemi**  
-- [✅] **Session tabanlı login (JWT + Django session birleşimi)**  
-- [⏳] **Şifre sıfırlama (e-posta ile)**  
-- [🔜] **Profil bilgilerini düzenleme (mail, şifre, üniversite, vs.)**  
-- [🔜] **Login validation (sadece aktif kullanıcı erişebilir)**  
-- [🔜] **Login olmadan not indirme/yükleme engeli**
-
----
-
-## 🏅 Planlanan Özellikler (Sonraki Fazlar)
-
-### 🌟 Puan ve Ödül Sistemi (Gamification)
-- Puan kazanma:
-  - +10 → Not yükleme  
-  - +2 → Not indirildiğinde  
-  - +5 → Beğeni  
-  - −10 → Şikayet onaylandığında
-- Puan bazlı seviye sistemi:
-  | Puan | Seviye | Ünvan |
-  |------|---------|--------|
-  | 0–49 | ⭐ | Başlangıç |
-  | 50–149 | ⭐⭐ | Katkıcı |
-  | 150–299 | ⭐⭐⭐ | Güvenilir Katılımcı |
-  | 300+ | ⭐⭐⭐⭐ | Elit Akademisyen |
-- Ödül tablosu, ilerleme çubuğu, seviye ikonları  
-- Otomatik puan hesaplama (`signals.py`)
-
----
-
-### 💬 Topluluk & Etkileşim Modülü
-- Not yorum sistemi  
-- “Beğen” ve “Şikayet Et” butonları  
-- Chat sistemi (not sahibine mesaj gönderimi)  
-- Bildirim ikonu (🔔) ile etkileşim uyarıları  
-
----
+### 💬 Topluluk Modülü
+- Not yorumları ve beğeniler  
+- Şikayet ve bildirim sistemi  
+- Sohbet (chat) özelliği
 
 ### 🖥️ Dashboard Geliştirmeleri
-- Haftalık en çok indirilen notlar  
-- Yeni katılan üyeler listesi  
-- XP ilerleme çubuğu  
-- Grafiklerle katkı istatistikleri
+- En çok indirilen notlar  
+- Yeni üyeler listesi  
+- İstatistik grafikleri ve XP barı
 
----
-
-### 🤖 Gelecek Modüller (AI & Mobil)
-- PDF OCR + içerik arama  
+### 🤖 Gelecek Faz
 - AI destekli not özetleme  
-- Mobil uygulama (Flutter) → REST API entegrasyonu  
-- Üniversite e-postasıyla doğrulanan “Akademisyen Rozeti”
+- PDF OCR ve içerik arama  
+- Mobil uygulama (Flutter)  
+- Akademisyen rozet sistemi  
 
 ---
 
-## 🗺️ Geliştirme Yol Haritası
-
+## 📅 Geliştirme Yol Haritası
 | Sıra | Modül | Durum |
 |------|--------|--------|
-| 1️⃣ | JWT + E-posta aktivasyon sistemi | ✅ Tamamlandı |
-| 2️⃣ | Şifre sıfırlama / Profil düzenleme | ⏳ Başlayacak |
-| 3️⃣ | Erişim validation ve güvenlik kontrolleri | 🔜 |
-| 4️⃣ | Puan / seviye / ödül sistemi | 🔜 |
-| 5️⃣ | Dashboard grafik ve istatistik | 🔜 |
-| 6️⃣ | Topluluk (yorum / beğeni / mesajlaşma) | 🔜 |
-| 7️⃣ | Mobil API + AI entegrasyonu | 🚧 Uzun vadeli |
+| 1️⃣ | JWT + E-posta aktivasyon | ✅ |
+| 2️⃣ | Şifre sıfırlama / Profil düzenleme | ✅ |
+| 3️⃣ | Erişim ve güvenlik (JWT validation) | ✅ |
+| 4️⃣ | Puan / ödül sistemi | 🔜 |
+| 5️⃣ | Dashboard istatistikleri | 🔜 |
+| 6️⃣ | Yorum / Beğeni / Chat | 🔜 |
+| 7️⃣ | Mobil + AI entegrasyonu | 🚧 |
 
 ---
 
-## 👨‍💻 Geliştirici Notu
-
-Kod yapısı modüler şekilde ayrılmıştır:  
-- `users/` → kullanıcı, kimlik doğrulama, profil  
-- `notes/` → not yükleme, listeleme, detay  
-- `categories/` → üniversite, fakülte, bölüm, ders modelleri  
-- `rewards/` → puan ve ödül sistemi (gelecek faz)  
-- `chat/` → mesajlaşma modülü (gelecek faz)
-
-> Proje, Django’nun hem klasik web hem modern REST altyapısını birleştirerek ölçeklenebilir, kurumsal düzeyde bir akademik paylaşım platformu oluşturmayı hedefliyor.
+## 🧩 Geliştirici Notları
+- E-posta değişiklik doğrulaması **ilerleyen aşamada eklenecek**
+- Şifre tekrar kullanımı ve geçmiş kontrolü **veritabanı fazında uygulanacak**
 
 ---
-
-## 📧 İletişim
 
 **Geliştirici:** Serhat Bülbül  
-📍 Türkiye  
 🔗 GitHub: [https://github.com/serhatblb](https://github.com/serhatblb)
-
----
-
-> “Bilgi paylaştıkça çoğalır.”  
-> — UniEduNote Ekibi
