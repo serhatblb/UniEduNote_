@@ -91,5 +91,13 @@
 
 ---
 
+## 📧 İletişim
+
 **Geliştirici:** Serhat Bülbül  
+📍 Türkiye  
 🔗 GitHub: [https://github.com/serhatblb](https://github.com/serhatblb)
+
+---
+
+> “Bilgi paylaştıkça çoğalır.”  
+> — UniEduNote Ekibi
