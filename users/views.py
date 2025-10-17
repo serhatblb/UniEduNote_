@@ -10,9 +10,8 @@ from uniedunote import settings
 from .forms import RegisterForm
 from .tokens import account_activation_token
 from django.contrib.auth import get_user_model
-
 from django.contrib.auth.decorators import login_required
-# 🚀 Özel kullanıcı modelini çağırıyoruz
+
 User = get_user_model()
 
 
@@ -24,7 +23,6 @@ def register_view(request):
             user.is_active = False
             user.save()
 
-            # Aktivasyon maili gönder
             current_site = get_current_site(request)
             subject = "UniEduNote Hesap Aktivasyonu"
             message = render_to_string("users/activation_email.html", {
@@ -67,7 +65,7 @@ def login_view(request):
 
         if user and user.is_active:
             login(request, user)
-            return redirect("dashboard")  # ✅ Giriş sonrası dashboard’a yönlendirme
+            return redirect("dashboard")
         else:
             messages.error(request, "Kullanıcı adı veya şifre hatalı ya da hesap aktif değil.")
     return render(request, "users/login.html")
@@ -77,17 +75,34 @@ def logout_view(request):
     logout(request)
     return redirect("home")
 
+
+# 🔐 Şifre sıfırlama sayfaları
 def password_reset_page(request):
     return render(request, "users/password_reset.html")
-
 
 def password_reset_done_page(request):
     return render(request, "users/password_reset_done.html")
 
-
 def password_reset_confirm_page(request):
     return render(request, "users/password_reset_confirm.html")
 
-
 def password_reset_complete_page(request):
     return render(request, "users/password_reset_complete.html")
+
+
+# 🔒 Giriş gerektiren sayfalar
+@login_required(login_url="/login/")
+def dashboard(request):
+    return render(request, "dashboard.html")
+
+@login_required(login_url="/login/")
+def profile(request):
+    return render(request, "profile.html")
+
+@login_required(login_url="/login/")
+def upload_note(request):
+    return render(request, "upload_note.html")
+
+@login_required(login_url="/login/")
+def note_list(request):
+    return render(request, "note_list.html")

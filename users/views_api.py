@@ -8,21 +8,18 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from uniedunote import settings
 from .tokens import account_activation_token
 from .serializers import UserSerializer
 from django.views.decorators.csrf import csrf_exempt
-
-
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import authenticate, login
-from django.http import JsonResponse
 import json
+
 User = get_user_model()
 
 
+# ✅ Kullanıcı Kaydı
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -30,7 +27,6 @@ class RegisterAPIView(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save(is_active=False)
-
             current_site = get_current_site(request)
             subject = "UniEduNote Hesap Aktivasyonu"
             message = render_to_string("users/activation_email.html", {
@@ -44,6 +40,7 @@ class RegisterAPIView(APIView):
         return Response(serializer.errors, status=400)
 
 
+# ✅ Hesap Aktivasyonu
 class ActivateAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -61,11 +58,13 @@ class ActivateAPIView(APIView):
         return Response({"error": "Aktivasyon bağlantısı geçersiz."}, status=400)
 
 
+# ✅ JWT Token
 class MyTokenObtainPairView(TokenObtainPairView):
     """Kullanıcı girişinde JWT döner."""
     pass
 
 
+# ✅ Şifre sıfırlama (istek)
 class PasswordResetRequestAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -88,6 +87,7 @@ class PasswordResetRequestAPIView(APIView):
         return Response({"message": "Şifre sıfırlama e-postası gönderildi."})
 
 
+# ✅ Şifre sıfırlama (doğrulama)
 class PasswordResetConfirmAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -109,7 +109,21 @@ class PasswordResetConfirmAPIView(APIView):
         return Response({"error": "Token geçersiz veya süresi dolmuş."}, status=400)
 
 
+# ✅ Profil Bilgileri (JWT zorunlu)
+class UserProfileAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        user = request.user
+        data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+        }
+        return Response(data)
+
+
+# ✅ JWT + Session entegrasyonu
 @csrf_exempt
 def session_login(request):
     if request.method == "POST":
@@ -132,3 +146,40 @@ def session_login(request):
             return JsonResponse({"error": "Geçersiz kullanıcı adı veya şifre"}, status=401)
 
     return JsonResponse({"error": "Yalnızca POST isteği destekleniyor"}, status=405)
+
+# ✅ Profil Güncelleme (JWT zorunlu)
+class UserProfileUpdateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        data = request.data
+
+        username = data.get("username", "").strip()
+        email = data.get("email", "").strip()
+        university = data.get("university", "").strip()
+        password = data.get("password", "").strip()
+
+        # E-posta veya kullanıcı adı boş olamaz
+        if not username or not email:
+            return Response({"error": "Kullanıcı adı ve e-posta zorunludur."}, status=400)
+
+        # Mevcut şifreyle aynı olmasın (şimdilik basit kontrol)
+        if password and user.check_password(password):
+            return Response({"error": "Yeni şifre eskiyle aynı olamaz."}, status=400)
+
+        user.username = username
+        user.email = email
+        if email != user.email:
+            return Response({"error": "E-posta değişikliği e-posta doğrulaması gerektirir."}, status=400)
+
+        # Üniversite alanı backend modelinde varsa kaydet
+        if hasattr(user, "university") and university:
+            user.university = university
+
+        # Şifre değişikliği istenmişse uygula
+        if password:
+            user.set_password(password)
+
+        user.save()
+        return Response({"message": "Profil başarıyla güncellendi."})

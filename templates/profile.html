@@ -1,16 +1,133 @@
 {% extends "base.html" %}
 {% block title %}Profil Bilgileri{% endblock %}
 {% block content %}
-<div style="max-width:700px;margin:50px auto;background:#fff;padding:2.5rem 3rem;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,.08);">
-  <h2 style="color:#00205B;font-weight:700;margin-bottom:1rem;">👤 Profil Bilgileri</h2>
+<style>
+.profile-box{
+  max-width:700px;margin:50px auto;background:#fff;padding:2.5rem 3rem;
+  border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+h2{color:#00205B;font-weight:700;margin-bottom:1.5rem;}
+.info p{margin:.5rem 0;font-size:16px;}
+button{
+  background:linear-gradient(135deg,#00205B,#001540);color:#fff;border:none;
+  border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;
+  transition:.3s;margin-top:1rem;
+}
+button:hover{opacity:.9;}
+.form-group{margin-bottom:1rem;}
+label{display:block;font-weight:600;margin-bottom:6px;color:#001540;}
+input,select{
+  width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:8px;font-size:15px;
+}
+input:focus,select:focus{border-color:#00205B;outline:none;box-shadow:0 0 0 2px rgba(0,32,91,0.15);}
+.msg{margin-top:1rem;font-size:15px;}
+</style>
 
-  <p><strong>Kullanıcı Adı:</strong> {{ user.username }}</p>
-  <p><strong>E-posta:</strong> {{ user.email }}</p>
-  <p><strong>Üniversite:</strong> {{ user.university|default:"-" }}</p>
+<div class="profile-box">
+  <h2>👤 Profil Bilgileri</h2>
 
-  <hr style="margin:1.5rem 0;">
+  <!-- Görüntüleme Modu -->
+  <div id="view-mode" class="info">
+    <p><strong>Kullanıcı Adı:</strong> {{ user.username }}</p>
+    <p><strong>E-posta:</strong> {{ user.email }}</p>
+    <p><strong>Üniversite:</strong> {{ user.university|default:"-" }}</p>
+    <p><strong>Yüklenen Notlar:</strong> {{ uploaded_notes.count }}</p>
+    <p><strong>Toplam İndirme:</strong> {{ total_downloads }}</p>
+    <button type="button" id="editBtn">Bilgileri Düzenle</button>
+  </div>
 
-  <p><strong>Yüklenen Notlar:</strong> {{ uploaded_notes.count }}</p>
-  <p><strong>Toplam İndirme:</strong> {{ total_downloads }}</p>
+  <!-- Düzenleme Modu -->
+  <div id="edit-mode" style="display:none;">
+    <form id="profileForm">
+      <div class="form-group">
+        <label for="username">Kullanıcı Adı</label>
+        <input type="text" id="username" value="{{ user.username }}" required>
+      </div>
+      <div class="form-group">
+        <label for="email">E-posta</label>
+        <input type="email" id="email" value="{{ user.email }}" required>
+      </div>
+      <div class="form-group">
+        <label for="university">Üniversite</label>
+        <select id="university"></select>
+      </div>
+      <div class="form-group">
+        <label for="password">Yeni Şifre (isteğe bağlı)</label>
+        <input type="password" id="password" placeholder="Yeni şifre gir (opsiyonel)">
+      </div>
+      <button type="submit">Kaydet</button>
+      <button type="button" id="cancelBtn" style="background:#ccc;color:#000;margin-left:8px;">İptal</button>
+    </form>
+    <p id="msg" class="msg"></p>
+  </div>
 </div>
+
+<script>
+const viewMode=document.getElementById('view-mode');
+const editMode=document.getElementById('edit-mode');
+const editBtn=document.getElementById('editBtn');
+const cancelBtn=document.getElementById('cancelBtn');
+
+editBtn.addEventListener('click',()=>{
+  viewMode.style.display='none';
+  editMode.style.display='block';
+  loadUniversities();
+});
+cancelBtn.addEventListener('click',()=>{
+  editMode.style.display='none';
+  viewMode.style.display='block';
+});
+
+async function loadUniversities(){
+  const select=document.getElementById('university');
+  select.innerHTML='<option>Yükleniyor...</option>';
+  try{
+    const res=await fetch('/api/categories/universities/');
+    const data=await res.json();
+    select.innerHTML='<option value="">Üniversite Seç</option>';
+    data.forEach(u=>{
+      const opt=document.createElement('option');
+      opt.value=u.id;
+      opt.textContent=u.name;
+      if('{{ user.university.id|default:"" }}'==u.id) opt.selected=true;
+      select.appendChild(opt);
+    });
+  }catch{
+    select.innerHTML='<option>Liste alınamadı</option>';
+  }
+}
+
+document.getElementById('profileForm').addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  const msg=document.getElementById('msg');
+  msg.style.color="#555";msg.innerText="⏳ Güncelleniyor...";
+  const data={
+    username:document.getElementById('username').value.trim(),
+    email:document.getElementById('email').value.trim(),
+    university:document.getElementById('university').value,
+    password:document.getElementById('password').value
+  };
+  try{
+    const res=await fetch('/api/auth/profile/update/',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+localStorage.getItem('access')
+      },
+      body:JSON.stringify(data)
+    });
+    const result=await res.json();
+    if(res.ok){
+      msg.style.color="green";
+      msg.innerText="✅ Profil güncellendi.";
+      setTimeout(()=>location.reload(),1000);
+    }else{
+      msg.style.color="red";
+      msg.innerText="⚠️ "+(result.error||'Hata oluştu.');
+    }
+  }catch{
+    msg.style.color="red";msg.innerText="⚠️ Sunucu hatası.";
+  }
+});
+</script>
 {% endblock %}
