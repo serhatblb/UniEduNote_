@@ -4,10 +4,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render, redirect
 
-from users.views import register_view, login_view, logout_view, activate_account
 from notes.views import upload_note, note_list, note_detail, download_note
 
-
+from users.views import (
+    register_view, login_view, logout_view, activate_account,
+    password_reset_page, password_reset_done_page,
+    password_reset_confirm_page, password_reset_complete_page
+)
 def home(request):
     """Giriş yapmamış kullanıcılar için ana sayfa (landing page)"""
     if request.user.is_authenticated:
@@ -58,6 +61,13 @@ urlpatterns = [
 
     # API’ler
     path('api/auth/', include('users.urls')),
+
+# Şifre sıfırlama sayfaları
+path("password-reset/", password_reset_page, name="password_reset"),
+path("password-reset/done/", password_reset_done_page, name="password_reset_done"),
+path("password-reset/confirm/", password_reset_confirm_page, name="password_reset_confirm"),
+path("password-reset/complete/", password_reset_complete_page, name="password_reset_complete"),
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

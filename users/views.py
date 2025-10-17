@@ -11,6 +11,7 @@ from .forms import RegisterForm
 from .tokens import account_activation_token
 from django.contrib.auth import get_user_model
 
+from django.contrib.auth.decorators import login_required
 # 🚀 Özel kullanıcı modelini çağırıyoruz
 User = get_user_model()
 
@@ -75,3 +76,18 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect("home")
+
+def password_reset_page(request):
+    return render(request, "users/password_reset.html")
+
+
+def password_reset_done_page(request):
+    return render(request, "users/password_reset_done.html")
+
+
+def password_reset_confirm_page(request):
+    return render(request, "users/password_reset_confirm.html")
+
+
+def password_reset_complete_page(request):
+    return render(request, "users/password_reset_complete.html")
