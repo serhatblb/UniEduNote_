@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Notu Düzenle{% endblock %}
+{% block content %}
+<div style="max-width:640px;margin:60px auto;background:#fff;padding:2rem 2.5rem;border-radius:16px;box-shadow:0 8px 25px rgba(0,0,0,.08);">
+  <h2 style="color:#1e3a8a;font-weight:800;margin-bottom:1rem;">✏️ Notu Düzenle</h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label>Başlık</label>
+    <input type="text" name="title" value="{{ note.title }}" required
+      style="width:100%;padding:.7rem;border:1px solid #d1d5db;border-radius:10px;margin:.4rem 0 1rem;">
+
+    <label>Açıklama</label>
+    <textarea name="description"
+      style="width:100%;padding:.7rem;border:1px solid #d1d5db;border-radius:10px;margin:.4rem 0 1rem;">{{ note.description }}</textarea>
+
+    <label>Yeni Dosya (opsiyonel)</label>
+    <input type="file" name="file" style="margin:.4rem 0 1rem;">
+
+    <div style="display:flex;gap:.6rem;">
+      <button type="submit"
+        style="background:linear-gradient(90deg,#3b82f6,#60a5fa);color:#fff;border:none;border-radius:10px;padding:.7rem 1.2rem;font-weight:700;">
+        Kaydet
+      </button>
+      <a href="{% url 'note_detail' note.id %}"
+        style="background:#e5e7eb;color:#1e3a8a;border:none;border-radius:10px;padding:.7rem 1.2rem;text-decoration:none;font-weight:700;">
+        İptal
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

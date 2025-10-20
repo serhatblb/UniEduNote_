@@ -2,97 +2,138 @@
 {% block title %}{{ note.title }}{% endblock %}
 {% block content %}
 <style>
-  .note-detail-card {
-    max-width: 760px;
-    margin: 80px auto;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(243, 244, 246, 0.9));
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    padding: 3rem 2.5rem;
-    position: relative;
-    overflow: hidden;
-    animation: slideUp 1s ease-out;
-    backdrop-filter: blur(10px);
-  }
-  .note-detail-card::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    right: -50px;
-    width: 150px;
-    height: 150px;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
-    filter: blur(30px);
-    animation: float 6s ease-in-out infinite alternate;
-  }
-  .note-detail-card h2 {
-    color: #1e3a8a;
-    font-weight: 800;
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    background: linear-gradient(to right, #1e3a8a, #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    animation: slideUp 1.2s ease-out 0.2s;
-  }
-  .note-detail-card p {
-    font-size: 1.1rem;
-    color: #4b5563;
-    margin: 1rem 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.8rem 1rem;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.5);
-    transition: all 0.3s ease;
-    animation: slideUp 1.4s ease-out 0.4s;
-  }
-  .note-detail-card p:hover {
-    background: rgba(59, 130, 246, 0.1);
-    transform: translateX(5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  }
-  .note-detail-card p strong {
-    color: #1e3a8a;
-    font-weight: 600;
-  }
-  .note-detail-card a {
-    display: inline-block;
-    padding: 1rem 2rem;
-    border-radius: 12px;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
-    color: #fff;
-    font-weight: 600;
-    font-size: 1rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    animation: slideUp 1.6s ease-out 0.6s;
-  }
-  .note-detail-card a:hover {
-    background: linear-gradient(90deg, #2563eb, #3b82f6);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes float {
-    from { transform: translate(0, 0); }
-    to { transform: translate(-10px, -15px); }
-  }
+  .note-detail-card{max-width:760px;margin:60px auto;background:#fff;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.08);padding:2rem 2.5rem;}
+  h2{color:#1e3a8a;font-weight:800;margin-bottom:1rem;}
+  .note-meta p{margin:.4rem 0;color:#374151;}
+  .btn{padding:.6rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;border:none}
+  .btn-download{background:linear-gradient(90deg,#3b82f6,#60a5fa);color:#fff}
+  .btn-like{background:#f3f4f6;color:#1e3a8a;border:1px solid #d1d5db}
+  .btn-back{background:#e5e7eb;color:#1e3a8a;margin-bottom:1rem}
+  .comment{border-bottom:1px solid #f3f4f6;padding:.8rem 0}
+  .comment-actions{margin-top:.3rem}
+  .comment-actions button{background:none;border:none;color:#1e3a8a;font-size:.85rem;cursor:pointer;margin-right:.6rem}
+  textarea{width:100%;padding:.8rem;border:1px solid #ccc;border-radius:8px;margin-top:.8rem}
 </style>
 
 <div class="note-detail-card">
+  <a class="btn btn-back" href="{{ request.session.last_notes_list_url|default:'/notes/' }}">⬅️ Geri Dön</a>
+
+
   <h2>{{ note.title }}</h2>
-  <p><strong>Ders:</strong> {{ note.course.name }}</p>
-  <p><strong>Dönem:</strong> {{ note.semester }}</p>
-  <p><strong>Açıklama:</strong> {{ note.description|default:"-" }}</p>
-  <p><strong>Yükleyen:</strong> {{ note.user.username }}</p>
-  <p><strong>İndirilmeler:</strong> {{ note.download_count }}</p>
-  <a href="{% url 'download_note' note.pk %}">📥 Notu İndir</a>
+  <div class="note-meta">
+    <p><strong>Ders:</strong> {{ note.course.name }}</p>
+    <p><strong>Dönem:</strong> {{ note.semester }}</p>
+    <p><strong>Açıklama:</strong> {{ note.description|default:"-" }}</p>
+    <p><strong>Yükleyen:</strong> {{ note.user.username }}</p>
+    <p><strong>İndirilmeler:</strong> {{ note.download_count }}</p>
+  </div>
+
+  <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;">
+    <a href="{% url 'download_note' note.pk %}" class="btn btn-download">📥 Notu İndir</a>
+    <button id="likeBtn" class="btn btn-like">❤️ Beğen</button>
+    <span id="likeCount" style="align-self:center;color:#1e3a8a;font-weight:600;">{{ note.likes }}</span>
+
+    {% if note.user.id == request.user.id %}
+  <form action="{% url 'delete_note' note.id %}" method="post" style="display:inline" onsubmit="return confirm('Bu not silinecek. Emin misin?');">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-like" style="background:#fee2e2;border-color:#fecaca;color:#991b1b">🗑 Sil</button>
+  </form>
+  <a href="{% url 'edit_note' note.id %}" class="btn btn-like">✏️ Düzenle</a>
+{% endif %}
+
+  </div>
+
+  <div class="comments">
+    <h3 style="color:#1e3a8a;margin-top:2rem;">💬 Yorumlar</h3>
+    <div id="commentList"></div>
+    <textarea id="commentText" placeholder="Yorumunuzu yazın..."></textarea>
+    <button class="btn btn-download" id="sendComment">Gönder</button>
+  </div>
 </div>
+
+<script>
+const noteId={{ note.id }};
+const token=localStorage.getItem('access');
+
+// Beğeni durumunu ilk yüklemede getir
+async function checkLikeStatus(){
+  try{
+    const res=await fetch(`/api/notes/${noteId}/like/`,{headers:{'Authorization':'Bearer '+token}});
+    if(!res.ok) return;
+    const data=await res.json();
+    document.getElementById('likeCount').innerText=data.total_likes;
+    document.getElementById('likeBtn').innerText=data.liked?'💔 Beğeniyi Geri Al':'❤️ Beğen';
+  }catch{}
+}
+
+document.getElementById('likeBtn').addEventListener('click', async()=>{
+  try{
+    const res=await fetch(`/api/notes/${noteId}/like/`,{method:'POST',headers:{'Authorization':'Bearer '+token}});
+    const data=await res.json();
+    document.getElementById('likeCount').innerText=data.total_likes;
+    document.getElementById('likeBtn').innerText=data.liked?'💔 Beğeniyi Geri Al':'❤️ Beğen';
+  }catch{ alert('Beğeni hatası'); }
+});
+
+// Yorum listele/ekle/düzenle/sil
+async function loadComments(){
+  const list=document.getElementById('commentList');
+  list.innerHTML='Yükleniyor...';
+  try{
+    const res=await fetch(`/api/notes/${noteId}/comments/`,{headers:{'Authorization':'Bearer '+token}});
+    const data=await res.json();
+    list.innerHTML= data.length ? data.map(c=>`
+      <div class='comment' data-id='${c.id}'>
+        <strong>${c.user}</strong> <small>${c.created_at}</small>
+        <p class='content'>${c.content}</p>
+        ${c.user_id=={{ request.user.id }}?`
+          <div class='comment-actions'>
+            <button onclick='editComment(${c.id},"${c.content.replace(/"/g,'&quot;')}")'>✏️ Düzenle</button>
+            <button onclick='deleteComment(${c.id})'>🗑 Sil</button>
+          </div>`:''}
+      </div>`).join('') : "<p>Henüz yorum yok.</p>";
+  }catch{ list.innerHTML='Yorumlar alınamadı.'; }
+}
+
+document.getElementById('sendComment').addEventListener('click', async()=>{
+  const text=document.getElementById('commentText').value.trim();
+  if(!text) return;
+  await fetch(`/api/notes/${noteId}/comments/`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify({content:text})
+  });
+  document.getElementById('commentText').value='';
+  loadComments();
+});
+
+async function editComment(id,content){
+  const div=document.querySelector(`.comment[data-id='${id}']`);
+  div.innerHTML=`<textarea id='edit-${id}'>${content}</textarea>
+  <button class="btn btn-download" onclick="saveEdit(${id})">Kaydet</button>
+  <button class="btn btn-like" onclick="loadComments()">İptal</button>`;
+}
+async function saveEdit(id){
+  const newText=document.getElementById(`edit-${id}`).value.trim();
+  if(!newText) return;
+  await fetch(`/api/notes/${noteId}/comments/`,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify({id,content:newText})
+  });
+  loadComments();
+}
+async function deleteComment(id){
+  if(!confirm('Yorumu silmek istiyor musun?')) return;
+  await fetch(`/api/notes/${noteId}/comments/`,{
+    method:'DELETE',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify({id})
+  });
+  loadComments();
+}
+
+checkLikeStatus();
+loadComments();
+</script>
 {% endblock %}

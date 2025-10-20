@@ -1,12 +1,15 @@
+import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import FileResponse, Http404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Note
 from .forms import NoteForm
 from categories.models import University, Department, Course
-import os
+from django.views.decorators.http import require_POST
 
 
+# 📤 Not yükleme
 @login_required
 def upload_note(request):
     if request.method == 'POST':
@@ -21,6 +24,7 @@ def upload_note(request):
     return render(request, 'notes/upload_note.html', {'form': form})
 
 
+# 📋 Not listesi (filtreli)
 def note_list(request):
     notes = Note.objects.all().order_by('-uploaded_at')
 
@@ -45,14 +49,17 @@ def note_list(request):
         'departments': departments,
         'courses': courses,
     }
+    request.session['last_notes_list_url'] = request.get_full_path()
     return render(request, 'notes/note_list.html', context)
 
 
+# 🔍 Not detay
 def note_detail(request, pk):
     note = get_object_or_404(Note, pk=pk)
     return render(request, 'notes/note_detail.html', {'note': note})
 
 
+# 📥 Not indirme
 @login_required
 def download_note(request, pk):
     note = get_object_or_404(Note, pk=pk)
@@ -65,6 +72,34 @@ def download_note(request, pk):
         return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=file_name)
     except FileNotFoundError:
         raise Http404("Dosya sunucuda bulunamadı.")
+
+
+# 🏠 Dashboard
 @login_required(login_url='/login/')
 def dashboard(request):
     return render(request, 'dashboard.html')
+
+
+# ✏️ Not düzenleme
+@login_required(login_url="/login/")
+def edit_note(request, pk):
+    note = get_object_or_404(Note, pk=pk, user=request.user)
+    if request.method == "POST":
+        note.title = request.POST.get("title")
+        note.description = request.POST.get("description")
+        if "file" in request.FILES:
+            note.file = request.FILES["file"]
+        note.save()
+        messages.success(request, "Not başarıyla güncellendi.")
+        return redirect("note_detail", pk=note.pk)
+    return render(request, "notes/edit_note.html", {"note": note})
+
+# ✏ Not silme
+@login_required(login_url='/login/')
+@require_POST
+def delete_note(request, pk):
+    note = get_object_or_404(Note, pk=pk, user=request.user)
+    note.delete()
+    messages.success(request, "Not silindi.")
+    redirect_url = request.session.get('last_notes_list_url', '/notes/')
+    return redirect(redirect_url)

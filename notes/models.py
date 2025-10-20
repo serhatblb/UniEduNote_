@@ -26,3 +26,27 @@ class Note(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.course})"
+
+
+# 💬 Yorum Modeli
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.note.title}"
+
+
+# ❤️ Beğeni Modeli
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name='likes_set')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'note')  # aynı kullanıcı aynı notu iki kez beğenemez
+
+    def __str__(self):
+        return f"{self.user.username} → {self.note.title}"

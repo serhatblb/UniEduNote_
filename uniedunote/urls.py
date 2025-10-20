@@ -4,7 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render, redirect
 
-from notes.views import upload_note, note_list, note_detail, download_note
+from notes.views import upload_note, note_list, note_detail, download_note, edit_note, delete_note
+
 
 from users.views import (
     register_view, login_view, logout_view, activate_account,
@@ -58,9 +59,12 @@ urlpatterns = [
     path('notes/', note_list, name='note_list'),
     path('notes/<int:pk>/', note_detail, name='note_detail'),
     path('notes/<int:pk>/download/', download_note, name='download_note'),
+    path('notes/<int:pk>/edit/', edit_note, name='edit_note'),
+    path('notes/<int:pk>/delete/', delete_note, name='delete_note'),
 
     # API’ler
     path('api/auth/', include('users.urls')),
+    path("api/notes/", include("notes.urls")),
 
 # Şifre sıfırlama sayfaları
 path("password-reset/", password_reset_page, name="password_reset"),
