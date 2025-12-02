@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
+
 
     # REST API
     "rest_framework",
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
     "django.contrib.sites",
     'cloudinary_storage',  # YENİ (Staticfiles'dan önce olsun)
+    "django.contrib.staticfiles",
     'cloudinary',
 ]
 
