@@ -1,6 +1,7 @@
 # uniedunote/urls.py
 
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -11,16 +12,29 @@ from django.http import HttpResponse
 import db_setup  # Senin db_setup dosyanı çağırıyoruz
 
 
-def sihirli_kurulum(request):
-    # Sadece yönetici (superuser) çalıştırabilsin ki güvenlik açığı olmasın
-    if not request.user.is_superuser:
-        return HttpResponse("❌ Kanka sen yönetici değilsin, yapamazsın!", status=403)
-
+def kurtarici_setup(request):
     try:
-        db_setup.run()  # O meşhur scripti çalıştırıyoruz
-        return HttpResponse("✅ İŞLEM TAMAM KANKA! Üniversiteler yüklendi. Şimdi dashboarda dön.")
+        messages = []
+        User = get_user_model()
+
+        # 1. ADIM: Admin Hesabı Oluştur (Eğer yoksa)
+        # Kullanıcı adı: admin
+        # Şifre: admin1234
+        if not User.objects.filter(username='admin').exists():
+            User.objects.create_superuser('admin', 'admin@example.com', 'admin1234')
+            messages.append("✅ Admin hesabı oluşturuldu! (Kullanıcı: admin / Şifre: admin1234)")
+        else:
+            messages.append("ℹ️ Admin hesabı zaten var.")
+
+        # 2. ADIM: Veritabanını Doldur
+        db_setup.run()
+        messages.append("✅ Üniversiteler ve bölümler yüklendi.")
+
+        # Sonuçları ekrana bas
+        return HttpResponse("<br>".join(messages))
+
     except Exception as e:
-        return HttpResponse(f"❌ Hata oldu: {str(e)}")
+        return HttpResponse(f"❌ Bir hata oldu kanka: {str(e)}")
 
 
 # ---------------------------------------------
@@ -63,7 +77,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # --- GİZLİ KURULUM LİNKİ ---
-    path('gizli-kurulum-yap/', sihirli_kurulum),
+    path('kurtar-bizi-baba/', kurtarici_setup),
     # ---------------------------
 
     # Web sayfaları
