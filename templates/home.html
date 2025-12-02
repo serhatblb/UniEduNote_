@@ -2,8 +2,9 @@
 {% block title %}Ana Sayfa{% endblock %}
 {% block content %}
 <style>
+  /* === HOME BOX CONTAINER === */
   .home-box {
-    background: #fff;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(243, 244, 246, 0.9));
     padding: 3.5rem 2.5rem;
     border-radius: 20px;
     text-align: center;
@@ -14,7 +15,6 @@
     overflow: hidden;
     animation: slideUp 1s ease-out;
     backdrop-filter: blur(10px);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(243, 244, 246, 0.9));
   }
 
   .home-box::before {
@@ -29,7 +29,8 @@
     animation: float 6s ease-in-out infinite alternate;
   }
 
-  h1 {
+  /* === TEXT STYLES === */
+  .home-box h1 {
     color: #1e3a8a;
     font-weight: 800;
     font-size: 2.5rem;
@@ -39,21 +40,32 @@
     -webkit-text-fill-color: transparent;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     animation: slideUp 1.2s ease-out 0.2s;
+    animation-fill-mode: both;
+    position: relative;
+    z-index: 1;
   }
 
-  p {
+  .home-box p {
     color: #4b5563;
     font-size: 1.1rem;
     line-height: 1.7;
     margin-bottom: 2.5rem;
     animation: slideUp 1.4s ease-out 0.4s;
+    animation-fill-mode: both;
+    position: relative;
+    z-index: 1;
   }
 
+  /* === BUTTON STYLES === */
   .home-btns {
     display: flex;
     justify-content: center;
     gap: 1rem;
+    flex-wrap: wrap;
     animation: slideUp 1.6s ease-out 0.6s;
+    animation-fill-mode: both;
+    position: relative;
+    z-index: 1;
   }
 
   .home-btns a {
@@ -66,28 +78,230 @@
     font-size: 1rem;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
   }
 
   .home-btns a:hover {
     background: linear-gradient(90deg, #2563eb, #3b82f6);
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    opacity: 1;
   }
 
+  .home-btns a:active {
+    transform: translateY(-1px);
+  }
+
+  /* === ANIMATIONS === */
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   @keyframes float {
-    from { transform: translate(0, 0); }
-    to { transform: translate(10px, 15px); }
+    from {
+      transform: translate(0, 0);
+    }
+    to {
+      transform: translate(10px, 15px);
+    }
+  }
+
+  /* === RESPONSIVE DESIGN === */
+
+  /* Tablet ve orta ekranlar (992px ve altı) */
+  @media (max-width: 992px) {
+    .home-box {
+      padding: 3rem 2rem;
+      margin: 1.5rem auto;
+      max-width: 90%;
+    }
+
+    .home-box h1 {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .home-box p {
+      font-size: 1.05rem;
+      margin-bottom: 2rem;
+    }
+
+    .home-btns {
+      gap: 0.8rem;
+    }
+
+    .home-btns a {
+      padding: 0.9rem 1.8rem;
+      font-size: 0.95rem;
+      min-width: 130px;
+    }
+  }
+
+  /* Mobil cihazlar (768px ve altı) */
+  @media (max-width: 768px) {
+    .home-box {
+      padding: 2.5rem 1.5rem;
+      margin: 1rem;
+      border-radius: 16px;
+    }
+
+    .home-box::before {
+      width: 100px;
+      height: 100px;
+      top: -30px;
+      left: -30px;
+    }
+
+    .home-box h1 {
+      font-size: 1.9rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .home-box p {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1.8rem;
+    }
+
+    .home-btns {
+      flex-direction: column;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .home-btns a {
+      width: 100%;
+      max-width: 280px;
+      padding: 0.9rem 1.5rem;
+      font-size: 0.95rem;
+    }
+  }
+
+  /* Küçük mobil cihazlar (480px ve altı) */
+  @media (max-width: 480px) {
+    .home-box {
+      padding: 2rem 1.2rem;
+      margin: 0.8rem;
+      border-radius: 14px;
+    }
+
+    .home-box h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .home-box p {
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .home-btns a {
+      padding: 0.8rem 1.3rem;
+      font-size: 0.9rem;
+      max-width: 250px;
+    }
+  }
+
+  /* Çok küçük mobil cihazlar (360px ve altı) */
+  @media (max-width: 360px) {
+    .home-box {
+      padding: 1.5rem 1rem;
+      margin: 0.5rem;
+      border-radius: 12px;
+    }
+
+    .home-box::before {
+      width: 80px;
+      height: 80px;
+      top: -20px;
+      left: -20px;
+    }
+
+    .home-box h1 {
+      font-size: 1.4rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .home-box p {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+
+    .home-btns {
+      gap: 0.6rem;
+    }
+
+    .home-btns a {
+      padding: 0.7rem 1.2rem;
+      font-size: 0.85rem;
+      min-width: 120px;
+      max-width: 100%;
+    }
+  }
+
+  /* Geniş ekranlar için optimizasyon */
+  @media (min-width: 1200px) {
+    .home-box {
+      padding: 4rem 3rem;
+      max-width: 750px;
+    }
+
+    .home-box h1 {
+      font-size: 2.8rem;
+    }
+
+    .home-box p {
+      font-size: 1.15rem;
+    }
+
+    .home-btns a {
+      padding: 1.1rem 2.3rem;
+      font-size: 1.05rem;
+      min-width: 160px;
+    }
+  }
+
+  /* Landscape mode için özel düzenleme */
+  @media (max-height: 600px) and (orientation: landscape) {
+    .home-box {
+      padding: 2rem 2.5rem;
+      margin: 1rem auto;
+    }
+
+    .home-box h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .home-box p {
+      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .home-btns {
+      flex-direction: row;
+      gap: 0.8rem;
+    }
+
+    .home-btns a {
+      padding: 0.7rem 1.5rem;
+      font-size: 0.9rem;
+    }
   }
 </style>
 
 <div class="home-box">
-  <h1>🎓 UniEduNote’a Hoşgeldin</h1>
+  <h1>🎓 UniEduNote'a Hoşgeldin</h1>
   <p>Ders notlarını paylaş, arkadaşlarınınkini indir, katkı sağla ve ödüller kazan!</p>
   <div class="home-btns">
     <a href="/upload/">Not Yükle</a>

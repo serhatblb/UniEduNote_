@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render, redirect
-
+from notes import views as note_views
 from notes.views import upload_note, note_list, note_detail, download_note, edit_note, delete_note
 
 
@@ -66,12 +66,16 @@ urlpatterns = [
     path('api/auth/', include('users.urls')),
     path("api/notes/", include("notes.urls")),
 
-# Şifre sıfırlama sayfaları
-path("password-reset/", password_reset_page, name="password_reset"),
-path("password-reset/done/", password_reset_done_page, name="password_reset_done"),
-path("password-reset/confirm/", password_reset_confirm_page, name="password_reset_confirm"),
-path("password-reset/complete/", password_reset_complete_page, name="password_reset_complete"),
+    # Şifre sıfırlama sayfaları
+    path("password-reset/", password_reset_page, name="password_reset"),
+    path("password-reset/done/", password_reset_done_page, name="password_reset_done"),
+    path("password-reset/confirm/", password_reset_confirm_page, name="password_reset_confirm"),
+    path("password-reset/complete/", password_reset_complete_page, name="password_reset_complete"),
 
+# AJAX URL'leri (Dropdownları doldurmak için)
+    path('ajax/load-faculties/', note_views.load_faculties, name='ajax_load_faculties'),
+    path('ajax/load-departments/', note_views.load_departments, name='ajax_load_departments'),
+    path('ajax/load-courses/', note_views.load_courses, name='ajax_load_courses'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

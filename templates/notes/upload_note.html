@@ -284,12 +284,68 @@
     <button type="submit" form="id_upload_form">Yükle</button>
   </div>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   // Form submit için düzenleme
   document.querySelector('.button-wrapper button').addEventListener('click', function(e) {
     e.preventDefault();
     document.querySelector('form').submit();
   });
+    $(document).ready(function () {
+    // 1. Üniversite değişince -> Fakülteleri Getir
+    $("#id_university").change(function () {
+      var url = "{% url 'ajax_load_faculties' %}";
+      var universityId = $(this).val();
+
+      $.ajax({
+        url: url,
+        data: { 'university': universityId },
+        success: function (data) {
+          $("#id_faculty").html('<option value="">---------</option>');
+          $("#id_department").html('<option value="">---------</option>'); // Bölümü de sıfırla
+          $("#id_course").html('<option value="">---------</option>');     // Dersi de sıfırla
+          $.each(data, function (key, value) {
+            $("#id_faculty").append('<option value="' + value.id + '">' + value.name + '</option>');
+          });
+        }
+      });
+    });
+
+    // 2. Fakülte değişince -> Bölümleri Getir
+    $("#id_faculty").change(function () {
+      var url = "{% url 'ajax_load_departments' %}";
+      var facultyId = $(this).val();
+
+      $.ajax({
+        url: url,
+        data: { 'faculty': facultyId },
+        success: function (data) {
+          $("#id_department").html('<option value="">---------</option>');
+          $("#id_course").html('<option value="">---------</option>'); // Dersi de sıfırla
+          $.each(data, function (key, value) {
+            $("#id_department").append('<option value="' + value.id + '">' + value.name + '</option>');
+          });
+        }
+      });
+    });
+
+    // 3. Bölüm değişince -> Dersleri Getir
+    $("#id_department").change(function () {
+      var url = "{% url 'ajax_load_courses' %}";
+      var departmentId = $(this).val();
+
+      $.ajax({
+        url: url,
+        data: { 'department': departmentId },
+        success: function (data) {
+          $("#id_course").html('<option value="">---------</option>');
+          $.each(data, function (key, value) {
+            $("#id_course").append('<option value="' + value.id + '">' + value.name + '</option>');
+          });
+        }
+      });
+    });
+  });
+
 </script>
 {% endblock %}

@@ -8,6 +8,7 @@ from .forms import NoteForm
 from categories.models import University, Department, Course
 from django.views.decorators.http import require_POST
 from django.shortcuts import redirect
+from django.http import JsonResponse
 
 # 📤 Not yükleme
 @login_required
@@ -60,6 +61,8 @@ def note_detail(request, pk):
 
 
 # 📥 Not indirme
+# notes/views.py
+
 @login_required
 def download_note(request, pk):
     note = get_object_or_404(Note, pk=pk)
@@ -68,20 +71,18 @@ def download_note(request, pk):
     note.download_count += 1
     note.save()
 
-    # ESKİ KODUN (Bunu sil):
-    # try:
-    #     file_path = note.file.path
-    #     return FileResponse(open(file_path, 'rb')...)
-    # except...
-
-    # YENİ KOD (Bunu yapıştır):
     if note.file:
-        # Dosya Cloudinary'de olduğu için direkt URL'sine yönlendiriyoruz
-        return redirect(note.file.url)
-    else:
-        # Dosya yoksa hata ver
-        raise Http404("Dosya bulunamadı.")
+        url = note.file.url
 
+        # SİHİRLİ DOKUNUŞ BURADA:
+        # Cloudinary linkinin içine "fl_attachment" ekliyoruz.
+        # Bu, Cloudinary'ye "Bunu gösterme, direkt indir" emri verir.
+        if "upload/" in url and "cloudinary" in url:
+            url = url.replace("upload/", "upload/fl_attachment/")
+
+        return redirect(url)
+    else:
+        raise Http404("Dosya bulunamadı.")
 
 # 🏠 Dashboard
 @login_required(login_url='/login/')
@@ -112,3 +113,18 @@ def delete_note(request, pk):
     messages.success(request, "Not silindi.")
     redirect_url = request.session.get('last_notes_list_url', '/notes/')
     return redirect(redirect_url)
+
+def load_faculties(request):
+    university_id = request.GET.get('university')
+    faculties = Faculty.objects.filter(university_id=university_id).order_by('name')
+    return JsonResponse(list(faculties.values('id', 'name')), safe=False)
+
+def load_departments(request):
+    faculty_id = request.GET.get('faculty')
+    departments = Department.objects.filter(faculty_id=faculty_id).order_by('name')
+    return JsonResponse(list(departments.values('id', 'name')), safe=False)
+
+def load_courses(request):
+    department_id = request.GET.get('department')
+    courses = Course.objects.filter(department_id=department_id).order_by('name')
+    return JsonResponse(list(courses.values('id', 'name')), safe=False)

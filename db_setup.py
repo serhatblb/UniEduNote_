@@ -5,20 +5,20 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'uniedunote.settings')
 django.setup()
 
-# Modellerini çağırıyoruz (senin app ismine göre categories veya academic)
+# Senin YENİ ve SADE modellerini çağırıyoruz
 from categories.models import University, Faculty, Department, Course
 
 
 def run():
-    print("🚀 Stratejik Veri Tabanı Doldurma Başladı (Hedef Kitle Odaklı)...")
+    print("🚀 Stratejik Veri Tabanı Doldurma Başladı (Yeni Modellerle)...")
 
     # --- 1. HEDEF KİTLE: EN KALABALIK ÜNİVERSİTELER ---
     target_unis = [
         "Anadolu Üniversitesi (Eskişehir)",  # Açıköğretim Kralı
-        "Atatürk Üniversitesi (Erzurum)",  # ATA-AÖF çok popüler
-        "İstanbul Üniversitesi",  # AUZEF + Kalabalık kampüs
-        "Marmara Üniversitesi",  # Çok öğrencisi var
-        "Sakarya Üniversitesi",  # Öğrenci şehri resmen
+        "Atatürk Üniversitesi (Erzurum)",  # ATA-AÖF
+        "İstanbul Üniversitesi",  # AUZEF
+        "Marmara Üniversitesi",
+        "Sakarya Üniversitesi",
         "Bursa Uludağ Üniversitesi",
         "Selçuk Üniversitesi (Konya)",
         "Kocaeli Üniversitesi",
@@ -26,74 +26,62 @@ def run():
         "Akdeniz Üniversitesi (Antalya)"
     ]
 
-    # --- 2. BÖLÜM STRATEJİSİ ---
-    # Not arama ihtimali en yüksek bölümler (Sözel ağırlıklı, ezber gerektiren)
-
-    # A) Açıköğretim ve Önlisans Favorileri (Anadolu, Atatürk, İstanbul için)
-    acikogretim_bolumleri = [
-        "Çocuk Gelişimi",
-        "Adalet",
-        "Sosyal Hizmetler",
-        "Tıbbi Dokümantasyon ve Sekreterlik",
-        "İlahiyat (Önlisans)",
-        "Halkla İlişkiler ve Tanıtım",
-        "İşletme Yönetimi"
-    ]
-
-    # B) Kampüs Bölümleri (Vize/Finalde not arayanlar)
-    kampus_fakulteleri = {
+    # --- 2. BÖLÜM STRATEJİSİ (FAKÜLTE -> BÖLÜMLER) ---
+    fakulte_bolum_yapisi = {
+        "Açık ve Uzaktan Öğretim Fakültesi": [
+            "Çocuk Gelişimi", "Adalet", "Sosyal Hizmetler",
+            "Tıbbi Dokümantasyon", "İlahiyat (Önlisans)",
+            "Halkla İlişkiler", "İşletme Yönetimi"
+        ],
         "Hukuk Fakültesi": ["Hukuk"],
-        "İktisadi ve İdari Bilimler": ["İşletme", "İktisat", "Siyaset Bilimi ve Kamu Yönetimi", "Maliye"],
-        "Eğitim Fakültesi": ["Sınıf Öğretmenliği", "Okul Öncesi Öğretmenliği", "Özel Eğitim Öğretmenliği"],
-        "İlahiyat Fakültesi": ["İlahiyat"],
+        "İktisadi ve İdari Bilimler": ["İşletme", "İktisat", "Siyaset Bilimi", "Maliye"],
+        "Eğitim Fakültesi": ["Sınıf Öğretmenliği", "Okul Öncesi Öğretmenliği", "Özel Eğitim"],
         "Fen-Edebiyat Fakültesi": ["Tarih", "Türk Dili ve Edebiyatı", "Psikoloji"],
         "Sağlık Bilimleri": ["Hemşirelik", "Ebelik"]
     }
 
-    # --- 3. DERS ÖRNEKLERİ (GENEL) ---
+    # --- 3. DERS ÖRNEKLERİ ---
+    # ARTIK SADECE İSİM VAR (Code, Year vs. yok)
     courses_sample = [
-        {"name": "Atatürk İlkeleri ve İnkılap Tarihi", "code": "TAR101", "year": 1, "term": "Guz"},
-        {"name": "Türk Dili I", "code": "TUR101", "year": 1, "term": "Guz"},
-        {"name": "Yabancı Dil I (İngilizce)", "code": "ING101", "year": 1, "term": "Guz"},
-        {"name": "Temel Hukuk Bilgisi", "code": "HUK101", "year": 1, "term": "Bahar"},
-        {"name": "Genel Muhasebe", "code": "ISL201", "year": 2, "term": "Guz"},
-        {"name": "İletişim Becerileri", "code": "ILT105", "year": 1, "term": "Bahar"},
+        "Atatürk İlkeleri ve İnkılap Tarihi",
+        "Türk Dili I",
+        "Yabancı Dil I (İngilizce)",
+        "Temel Hukuk Bilgisi",
+        "Genel Muhasebe",
+        "İletişim Becerileri",
+        "Giriş ve Algoritma",
+        "İktisada Giriş",
+        "Anayasa Hukuku"
     ]
 
     for uni_name in target_unis:
+        # Üniversite oluştur
         uni, created = University.objects.get_or_create(name=uni_name)
         if created:
             print(f"✅ Üniversite: {uni_name}")
 
-        # Eğer Açıköğretim devi ise, o fakülteyi özel ekle
-        if "Anadolu" in uni_name or "Atatürk" in uni_name or "İstanbul" in uni_name:
-            aof_fakulte, _ = Faculty.objects.get_or_create(university=uni, name="Açık ve Uzaktan Öğretim Fakültesi")
-            for bolum in acikogretim_bolumleri:
-                dept, _ = Department.objects.get_or_create(faculty=aof_fakulte, name=bolum)
-                # Örnek dersleri bas
-                for course in courses_sample:
-                    Course.objects.get_or_create(
-                        department=dept,
-                        name=course['name'],
-                        code=course['code'],
-                        defaults={'class_year': course['year'], 'term_season': course['term']}
-                    )
+        # Fakülteleri ve Bölümleri dönüyoruz
+        for fakulte_adi, bolumler in fakulte_bolum_yapisi.items():
 
-        # Diğer standart fakülteleri herkese ekle
-        for fakulte_adi, bolumler in kampus_fakulteleri.items():
+            # Eğer üniversite adında "Teknik" geçiyorsa ve fakülte "Hukuk" ise ekleme (saçma olmasın)
+            # Ama senin liste genel olduğu için hepsini ekleyebiliriz, sorun yok.
+
+            # Fakülte oluştur
             fac, _ = Faculty.objects.get_or_create(university=uni, name=fakulte_adi)
+
             for bolum_adi in bolumler:
+                # Bölüm oluştur
                 dept, _ = Department.objects.get_or_create(faculty=fac, name=bolum_adi)
-                # Dersleri ekle
-                for course in courses_sample:
+
+                # Dersleri ekle (Sadece isim olarak)
+                for course_name in courses_sample:
                     Course.objects.get_or_create(
                         department=dept,
-                        name=course['name'],
-                        code=course['code'],
-                        defaults={'class_year': course['year'], 'term_season': course['term']}
+                        name=course_name
+                        # DİKKAT: code, class_year, term_season ARTIK YOK. Sildik.
                     )
 
-    print("🎉 MİSYON TAMAMLANDI! En çok not aranan bölümler yüklendi.")
+    print("🎉 MİSYON TAMAMLANDI! Stratejik veriler hatasız yüklendi.")
 
 
 if __name__ == '__main__':
