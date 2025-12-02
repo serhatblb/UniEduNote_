@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     "chat",
 
     "django.contrib.sites",
+    'cloudinary_storage',  # YENİ (Staticfiles'dan önce olsun)
+    'cloudinary',
 ]
 
 SITE_ID = 1
@@ -180,3 +182,13 @@ SIMPLE_JWT = {
 # Aktivasyon linkleri için temel backend URL
 # ------------------------------------------------------------------
 BACKEND_BASE_URL = os.environ.get("BACKEND_BASE_URL", "http://127.0.0.1:8000")
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+# Medya dosyalarını (Notları) artık Cloudinary tutacak
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+MEDIA_URL = '/media/'  # Bu standart kalabilir

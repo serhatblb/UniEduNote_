@@ -7,7 +7,7 @@ from .models import Note
 from .forms import NoteForm
 from categories.models import University, Department, Course
 from django.views.decorators.http import require_POST
-
+from django.shortcuts import redirect
 
 # 📤 Not yükleme
 @login_required
@@ -63,15 +63,24 @@ def note_detail(request, pk):
 @login_required
 def download_note(request, pk):
     note = get_object_or_404(Note, pk=pk)
+
+    # İndirme sayısını artır
     note.download_count += 1
     note.save()
 
-    try:
-        file_path = note.file.path
-        file_name = os.path.basename(file_path)
-        return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=file_name)
-    except FileNotFoundError:
-        raise Http404("Dosya sunucuda bulunamadı.")
+    # ESKİ KODUN (Bunu sil):
+    # try:
+    #     file_path = note.file.path
+    #     return FileResponse(open(file_path, 'rb')...)
+    # except...
+
+    # YENİ KOD (Bunu yapıştır):
+    if note.file:
+        # Dosya Cloudinary'de olduğu için direkt URL'sine yönlendiriyoruz
+        return redirect(note.file.url)
+    else:
+        # Dosya yoksa hata ver
+        raise Http404("Dosya bulunamadı.")
 
 
 # 🏠 Dashboard
