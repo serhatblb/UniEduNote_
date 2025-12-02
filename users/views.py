@@ -11,6 +11,7 @@ from .forms import RegisterForm
 from .tokens import account_activation_token
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from .email_utils import send_activation_email
 
 User = get_user_model()
 
@@ -27,24 +28,18 @@ def register_view(request):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = account_activation_token.make_token(user)
 
-            # /activate/<uid>/<token>/ path'ini al
-            activation_path = reverse("activate", kwargs={"uidb64": uid, "token": token})
+            # Aktivasyon linkini backend base URL ile kur
+            activation_link = f"{settings.BACKEND_BASE_URL}/activate/{uid}/{token}/"
 
-            # Tam link: BACKEND_BASE_URL + path
-            activation_link = f"{settings.BACKEND_BASE_URL}{activation_path}"
-
-            subject = "UniEduNote Hesap Aktivasyonu"
-            message = render_to_string("users/activation_email.html", {
-                "user": user,
-                "activation_link": activation_link,
-            })
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+            # SendGrid üzerinden aktivasyon maili gönder
+            send_activation_email(user, activation_link)
 
             messages.success(request, "Kayıt başarılı! Aktivasyon e-postanı kontrol et.")
             return redirect("login")
     else:
         form = RegisterForm()
     return render(request, "users/register.html", {"form": form})
+
 
 
 def activate_account(request, uidb64, token):

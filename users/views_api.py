@@ -1,22 +1,23 @@
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.http import JsonResponse
-from django.urls import reverse
-from django.conf import settings
-
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+from uniedunote import settings
 from .tokens import account_activation_token
 from .serializers import UserSerializer
 from django.views.decorators.csrf import csrf_exempt
+from .email_utils import send_activation_email
 import json
 
 User = get_user_model()
@@ -29,24 +30,22 @@ class RegisterAPIView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
+            # Kullanıcıyı pasif olarak oluştur
             user = serializer.save(is_active=False)
 
-            # UID + token
+            # UID + token üret
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = account_activation_token.make_token(user)
 
-            # /activate/<uid>/<token>/ path'i (web view)
-            activation_path = reverse("activate", kwargs={"uidb64": uid, "token": token})
-            activation_link = f"{settings.BACKEND_BASE_URL}{activation_path}"
+            # Aktivasyon linkini backend base URL ile kur
+            activation_link = f"{settings.BACKEND_BASE_URL}/activate/{uid}/{token}/"
 
-            subject = "UniEduNote Hesap Aktivasyonu"
-            message = render_to_string("users/activation_email.html", {
-                "user": user,
-                "activation_link": activation_link,
-            })
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+            # SendGrid üzerinden aktivasyon maili gönder
+            send_activation_email(user, activation_link)
+
             return Response({"message": "Kayıt başarılı! Aktivasyon e-postası gönderildi."}, status=201)
         return Response(serializer.errors, status=400)
+
 
 
 # ✅ Hesap Aktivasyonu (API) – Şimdilik mail linki web view'e gidiyor,

@@ -184,4 +184,6 @@ SIMPLE_JWT = {
 # Aktivasyon linkleri için temel backend URL
 # Localde 127.0.0.1:8000, Render'da env ile değişecek
 # ------------------------------------------------------------------
+SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")
+
 BACKEND_BASE_URL = os.environ.get("BACKEND_BASE_URL", "http://127.0.0.1:8000")
