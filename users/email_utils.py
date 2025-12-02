@@ -7,9 +7,6 @@ from sendgrid.helpers.mail import Mail
 def send_email_via_sendgrid(subject: str, to_email: str, template_name: str, context: dict) -> None:
     """
     Genel amaçlı SendGrid mail gönderme fonksiyonu.
-
-    - template_name: Django template yolu (örn: 'users/activation_email.html')
-    - context: template için context dict
     """
     html_content = render_to_string(template_name, context)
 
@@ -17,7 +14,7 @@ def send_email_via_sendgrid(subject: str, to_email: str, template_name: str, con
     from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None) or "no-reply@example.com"
 
     if not api_key:
-        # PROD'da mutlaka ayarlı olmalı
+        # PROD ortamında mutlaka ayarlı olmalı
         raise RuntimeError("SENDGRID_API_KEY ayarlı değil. Render ortamında env'e eklemelisin.")
 
     message = Mail(
@@ -31,7 +28,6 @@ def send_email_via_sendgrid(subject: str, to_email: str, template_name: str, con
         sg = SendGridAPIClient(api_key)
         sg.send(message)
     except Exception as exc:
-        # Şimdilik basit log; istersen logging'e çeviririz
         print(f"SendGrid hata: {exc}")
         raise
 
