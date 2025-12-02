@@ -1,6 +1,5 @@
-from django.contrib.auth import get_user_model, authenticate, login
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes, force_str
+import json
+
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_str
@@ -8,17 +7,18 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.http import JsonResponse
+from django.conf import settings
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
-from uniedunote import settings
+
 from .tokens import account_activation_token
 from .serializers import UserSerializer
 from django.views.decorators.csrf import csrf_exempt
 from .email_utils import send_activation_email
-import json
 
 User = get_user_model()
 
@@ -30,26 +30,20 @@ class RegisterAPIView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            # Kullanıcıyı pasif olarak oluştur
             user = serializer.save(is_active=False)
 
-            # UID + token üret
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = account_activation_token.make_token(user)
 
-            # Aktivasyon linkini backend base URL ile kur
             activation_link = f"{settings.BACKEND_BASE_URL}/activate/{uid}/{token}/"
 
-            # SendGrid üzerinden aktivasyon maili gönder
             send_activation_email(user, activation_link)
 
             return Response({"message": "Kayıt başarılı! Aktivasyon e-postası gönderildi."}, status=201)
         return Response(serializer.errors, status=400)
 
 
-
-# ✅ Hesap Aktivasyonu (API) – Şimdilik mail linki web view'e gidiyor,
-# istersen bunu ileride frontend odaklı bir flow'a uyarlayabiliriz.
+# ✅ Hesap Aktivasyonu (API üzerinden kontrol)
 class ActivateAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -96,7 +90,7 @@ class PasswordResetRequestAPIView(APIView):
         return Response({"message": "Şifre sıfırlama e-postası gönderildi."})
 
 
-# ✅ Şifre sıfırlama (doğrulama)
+# ✅ Şifre sıfırlama (onay)
 class PasswordResetConfirmAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -132,13 +126,13 @@ class UserProfileAPIView(APIView):
         return Response(data)
 
 
-# ✅ JWT + Session entegrasyonu
+# ✅ Session login (opsiyonel)
 @csrf_exempt
 def session_login(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-        except:
+        except Exception:
             return JsonResponse({"error": "JSON bekleniyor"}, status=400)
 
         username = data.get("username")
@@ -170,24 +164,19 @@ class UserProfileUpdateAPIView(APIView):
         university = data.get("university", "").strip()
         password = data.get("password", "").strip()
 
-        # E-posta veya kullanıcı adı boş olamaz
         if not username or not email:
             return Response({"error": "Kullanıcı adı ve e-posta zorunludur."}, status=400)
 
-        # Mevcut şifreyle aynı olmasın (şimdilik basit kontrol)
         if password and user.check_password(password):
             return Response({"error": "Yeni şifre eskiyle aynı olamaz."}, status=400)
 
         user.username = username
         user.email = email
-        if email != user.email:
-            return Response({"error": "E-posta değişikliği e-posta doğrulaması gerektirir."}, status=400)
 
-        # Üniversite alanı backend modelinde varsa kaydet
+        # Üniversite alanı modelde varsa
         if hasattr(user, "university") and university:
             user.university = university
 
-        # Şifre değişikliği istenmişse uygula
         if password:
             user.set_password(password)
 

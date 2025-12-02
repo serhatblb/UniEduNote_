@@ -1,16 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.utils.encoding import force_str, force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.urls import reverse
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+
 from .forms import RegisterForm
 from .tokens import account_activation_token
-from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
 from .email_utils import send_activation_email
 
 User = get_user_model()
@@ -24,14 +21,11 @@ def register_view(request):
             user.is_active = False
             user.save()
 
-            # UID + token üret
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = account_activation_token.make_token(user)
 
-            # Aktivasyon linkini backend base URL ile kur
             activation_link = f"{settings.BACKEND_BASE_URL}/activate/{uid}/{token}/"
 
-            # SendGrid üzerinden aktivasyon maili gönder
             send_activation_email(user, activation_link)
 
             messages.success(request, "Kayıt başarılı! Aktivasyon e-postanı kontrol et.")
@@ -39,7 +33,6 @@ def register_view(request):
     else:
         form = RegisterForm()
     return render(request, "users/register.html", {"form": form})
-
 
 
 def activate_account(request, uidb64, token):
@@ -78,32 +71,37 @@ def logout_view(request):
     return redirect("home")
 
 
-# 🔐 Şifre sıfırlama sayfaları
+# Şifre sıfırlama sayfaları (şimdilik sadece template render)
 def password_reset_page(request):
     return render(request, "users/password_reset.html")
+
 
 def password_reset_done_page(request):
     return render(request, "users/password_reset_done.html")
 
+
 def password_reset_confirm_page(request):
     return render(request, "users/password_reset_confirm.html")
+
 
 def password_reset_complete_page(request):
     return render(request, "users/password_reset_complete.html")
 
 
-# 🔒 Giriş gerektiren sayfalar
 @login_required(login_url="/login/")
 def dashboard(request):
     return render(request, "dashboard.html")
+
 
 @login_required(login_url="/login/")
 def profile(request):
     return render(request, "profile.html")
 
+
 @login_required(login_url="/login/")
 def upload_note(request):
     return render(request, "upload_note.html")
+
 
 @login_required(login_url="/login/")
 def note_list(request):
