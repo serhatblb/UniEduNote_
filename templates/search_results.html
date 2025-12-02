@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h3 class="mb-4">🔍 Arama Sonuçları: "{{ query }}"</h3>
+
+        {% if results %}
+            <div class="list-group">
+                {% for course in results %}
+                <a href="{% url 'course_detail' course.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3">
+                    <div>
+                        <h5 class="mb-1 fw-bold text-primary">{{ course.code }} - {{ course.name }}</h5>
+                        <small class="text-muted">
+                            {{ course.department.faculty.university.name }} > {{ course.department.name }}
+                        </small>
+                    </div>
+                    <span class="badge bg-secondary">{{ course.get_term_season_display }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-warning text-center p-5">
+                <h4>😔 Sonuç Bulunamadı</h4>
+                <p>Aradığınız kriterlere uygun ders bulunamadı. Ders kodunu veya adını kontrol edin.</p>
+                <a href="{% url 'home' %}" class="btn btn-primary mt-2">Anasayfaya Dön</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<div class="text-center py-5 mb-5">
+    <h1 class="display-3 fw-bold mb-4" style="letter-spacing: -2px;">
+        Ders Notlarına Ulaşmak <br>
+        <span class="text-primary">Hiç Bu Kadar Kolay Olmamıştı.</span>
+    </h1>
+    <p class="lead text-muted mb-5 mx-auto" style="max-width: 600px;">
+        Binlerce öğrenci notlarını burada paylaşıyor. İster not yükle puan kazan, ister ihtiyacın olan nota anında ulaş.
+    </p>
+
+    <div class="row justify-content-center g-4">
+        <!-- Not Ara Card -->
+        <div class="col-md-5 col-lg-4">
+            <div class="card h-100 p-4 border-0 shadow-lg hover-scale text-start position-relative overflow-hidden">
+                <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                    <i class="fa-solid fa-magnifying-glass fa-6x text-primary"></i>
+                </div>
+                <div class="position-relative z-1">
+                    <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle p-3 d-inline-block mb-3">
+                        <i class="fa-solid fa-search fa-2x"></i>
+                    </div>
+                    <h3 class="fw-bold">Not Ara</h3>
+                    <p class="text-muted mb-4">Ders kodu veya adıyla arama yap, binlerce nota anında eriş.</p>
+
+                    <form action="{% url 'search' %}" method="GET">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control bg-light border-0"
+                                placeholder="Örn: MAT101">
+                            <button class="btn btn-primary" type="submit"><i
+                                    class="fa-solid fa-arrow-right"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Not Yükle Card -->
+        <div class="col-md-5 col-lg-4">
+            <div
+                class="card h-100 p-4 border-0 shadow-lg hover-scale text-start position-relative overflow-hidden bg-dark text-white">
+                <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                    <i class="fa-solid fa-cloud-arrow-up fa-6x text-white"></i>
+                </div>
+                <div class="position-relative z-1">
+                    <div class="icon-box bg-white bg-opacity-20 text-white rounded-circle p-3 d-inline-block mb-3">
+                        <i class="fa-solid fa-upload fa-2x"></i>
+                    </div>
+                    <h3 class="fw-bold">Not Yükle</h3>
+                    <p class="text-white-50 mb-4">Kendi notlarını paylaş, puan kazan ve topluluğa katkıda bulun.</p>
+
+                    {% if user.is_authenticated %}
+                    <!-- Kullanıcı giriş yaptıysa doğrudan yükleme sayfasına gitmeli ama ders seçimi lazım. 
+                             Şimdilik profil sayfasına yönlendiriyoruz veya bir modal açılabilir. 
+                             Basitlik için 'Profilim'e gitsin, oradan yüklesin. -->
+                    <a href="{% url 'profile' %}" class="btn btn-light w-100 fw-bold text-dark">Hemen Yükle <i
+                            class="fa-solid fa-arrow-right ms-2"></i></a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-light w-100 fw-bold text-dark">Giriş Yap ve Yükle <i
+                            class="fa-solid fa-arrow-right ms-2"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- STATS SECTION -->
+<div class="row g-4 mb-5 text-center">
+    <div class="col-md-4">
+        <div class="p-4 rounded-4 bg-white shadow-sm">
+            <h2 class="fw-bold text-primary mb-0">{{ total_notes }}+</h2>
+            <p class="text-muted mb-0">Paylaşılan Not</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="p-4 rounded-4 bg-white shadow-sm">
+            <h2 class="fw-bold text-secondary mb-0">{{ total_users }}+</h2>
+            <p class="text-muted mb-0">Öğrenci</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="p-4 rounded-4 bg-white shadow-sm">
+            <h2 class="fw-bold text-success mb-0">100%</h2>
+            <p class="text-muted mb-0">Ücretsiz Erişim</p>
+        </div>
+    </div>
+</div>
+
+<!-- UNIVERSITIES SECTION -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold m-0">🏛 Üniversiteler</h4>
+    <a href="#" class="text-decoration-none fw-bold small">Tümünü Gör <i class="fa-solid fa-chevron-right"></i></a>
+</div>
+
+<div class="row g-4">
+    {% for uni in universities %}
+    <div class="col-md-3 col-sm-6">
+        <div class="card h-100 hover-shadow text-center p-4">
+            {% if uni.logo %}
+            <img src="{{ uni.logo.url }}" class="mx-auto mb-3" style="height: 60px; object-fit: contain;">
+            {% else %}
+            <div class="mx-auto rounded-circle bg-light d-flex align-items-center justify-content-center mb-3"
+                style="width:60px; height:60px;">
+                <i class="fa-solid fa-building-columns text-secondary fs-4"></i>
+            </div>
+            {% endif %}
+            <h6 class="fw-bold text-dark mb-0">{{ uni.name }}</h6>
+            <small class="text-muted">{{ uni.faculties.count }} Fakülte</small>
+            <a href="#" class="stretched-link"></a> <!-- Detay sayfası olmadığı için # -->
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-light text-center">Henüz üniversite eklenmemiş.</div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .hover-scale {
+        transition: transform 0.3s;
+    }
+
+    .hover-scale:hover {
+        transform: translateY(-5px);
+    }
+
+    .hover-shadow:hover {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}

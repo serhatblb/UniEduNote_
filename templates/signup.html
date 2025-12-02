@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fa-solid fa-user-plus"></i> Kayıt Ol</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="alert alert-info">
+                        <i class="fa-solid fa-info-circle"></i> Kayıt olduktan sonra e-posta adresinize gelen aktivasyon
+                        linkine tıklamanız gerekmektedir.
+                    </div>
+
+                    {{ form|crispy }}
+
+                    <button type="submit" class="btn btn-success w-100 mt-3">Kaydı Tamamla</button>
+                </form>
+                <hr>
+                <p class="text-center">Zaten üye misin? <a href="{% url 'login' %}">Giriş Yap</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

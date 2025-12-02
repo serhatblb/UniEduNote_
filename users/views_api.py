@@ -5,12 +5,15 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.http import JsonResponse
+from django.urls import reverse
+from django.conf import settings
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
-from uniedunote import settings
+
 from .tokens import account_activation_token
 from .serializers import UserSerializer
 from django.views.decorators.csrf import csrf_exempt
@@ -19,7 +22,7 @@ import json
 User = get_user_model()
 
 
-# ✅ Kullanıcı Kaydı
+# ✅ Kullanıcı Kaydı (API)
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -27,20 +30,27 @@ class RegisterAPIView(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save(is_active=False)
-            current_site = get_current_site(request)
+
+            # UID + token
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = account_activation_token.make_token(user)
+
+            # /activate/<uid>/<token>/ path'i (web view)
+            activation_path = reverse("activate", kwargs={"uidb64": uid, "token": token})
+            activation_link = f"{settings.BACKEND_BASE_URL}{activation_path}"
+
             subject = "UniEduNote Hesap Aktivasyonu"
             message = render_to_string("users/activation_email.html", {
                 "user": user,
-                "domain": current_site.domain,
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                "token": account_activation_token.make_token(user),
+                "activation_link": activation_link,
             })
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
             return Response({"message": "Kayıt başarılı! Aktivasyon e-postası gönderildi."}, status=201)
         return Response(serializer.errors, status=400)
 
 
-# ✅ Hesap Aktivasyonu
+# ✅ Hesap Aktivasyonu (API) – Şimdilik mail linki web view'e gidiyor,
+# istersen bunu ileride frontend odaklı bir flow'a uyarlayabiliriz.
 class ActivateAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -146,6 +156,7 @@ def session_login(request):
             return JsonResponse({"error": "Geçersiz kullanıcı adı veya şifre"}, status=401)
 
     return JsonResponse({"error": "Yalnızca POST isteği destekleniyor"}, status=405)
+
 
 # ✅ Profil Güncelleme (JWT zorunlu)
 class UserProfileUpdateAPIView(APIView):

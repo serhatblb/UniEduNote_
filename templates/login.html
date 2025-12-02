@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fa-solid fa-right-to-bracket"></i> Giriş Yap</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Basit Bootstrap Formu -->
+                    <div class="mb-3">
+                        <label>Kullanıcı Adı</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Şifre</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
+                </form>
+                <hr>
+                <p class="text-center">Hesabın yok mu? <a href="{% url 'signup' %}">Hemen Kayıt Ol</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

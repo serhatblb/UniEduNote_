@@ -3,10 +3,10 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.utils.encoding import force_str, force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from uniedunote import settings
+from django.urls import reverse
+from django.conf import settings
 from .forms import RegisterForm
 from .tokens import account_activation_token
 from django.contrib.auth import get_user_model
@@ -23,13 +23,20 @@ def register_view(request):
             user.is_active = False
             user.save()
 
-            current_site = get_current_site(request)
+            # UID + token üret
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = account_activation_token.make_token(user)
+
+            # /activate/<uid>/<token>/ path'ini al
+            activation_path = reverse("activate", kwargs={"uidb64": uid, "token": token})
+
+            # Tam link: BACKEND_BASE_URL + path
+            activation_link = f"{settings.BACKEND_BASE_URL}{activation_path}"
+
             subject = "UniEduNote Hesap Aktivasyonu"
             message = render_to_string("users/activation_email.html", {
                 "user": user,
-                "domain": current_site.domain,
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                "token": account_activation_token.make_token(user),
+                "activation_link": activation_link,
             })
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 
