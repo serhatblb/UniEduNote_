@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------------------------------------------
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-gizli-anahtar-yoksa-bunu-kullan")
 
-# Canlıda DEBUG False olmalı, render environment'tan çekiyoruz
+# Canlıda DEBUG False olmalı, Render environment'tan çekiyoruz
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
@@ -35,23 +35,20 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
 
-    # Cloudinary Storage (Staticfiles'dan ÖNCE olmalı)
-    'cloudinary_storage',
+    # 3. Parti Kütüphaneler (Sıralama Önemli)
+    'cloudinary_storage',  # staticfiles'dan ÖNCE olmalı
     "django.contrib.staticfiles",
     'cloudinary',
-
-    # REST API
     "rest_framework",
     "rest_framework_simplejwt",
+    "django.contrib.sites",
 
-    # Proje Uygulamaları
+    # Senin Uygulamaların
     "users",
     "categories",
     "notes",
     "rewards",
     "chat",
-
-    "django.contrib.sites",
 ]
 
 SITE_ID = 1
@@ -61,7 +58,7 @@ SITE_ID = 1
 # ------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise burada olmalı
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # <-- WhiteNoise burada olmalı
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -113,16 +110,6 @@ USE_I18N = True
 USE_TZ = True
 
 # ------------------------------------------------------------------
-# STATİK VE MEDYA DOSYALARI (URL & PATH)
-# ------------------------------------------------------------------
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# ------------------------------------------------------------------
 # CLOUDINARY AYARLARI
 # ------------------------------------------------------------------
 CLOUDINARY_STORAGE = {
@@ -132,18 +119,32 @@ CLOUDINARY_STORAGE = {
 }
 
 # ------------------------------------------------------------------
-# STORAGE AYARLARI (DJANGO 5 UYUMLU - KESİN ÇÖZÜM)
+# STORAGE AYARLARI (HEM YENİ HEM ESKİ SİSTEM - ÇAKIŞMA OLMASIN DİYE)
 # ------------------------------------------------------------------
+
+# 1. Yeni Nesil Django 5 Ayarı (Django bunu kullanır)
 STORAGES = {
-    # Medya Dosyaları -> Cloudinary
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # Statik Dosyalar (CSS/JS) -> WhiteNoise
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+# 2. Eski Nesil Ayarlar (Kütüphaneler hata vermesin diye bunları da ekliyoruz)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
+# ------------------------------------------------------------------
+# URL VE PATH AYARLARI
+# ------------------------------------------------------------------
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # ------------------------------------------------------------------
 # LOGIN / LOGOUT YÖNLENDİRMELERİ
