@@ -11,12 +11,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------------------------------------------
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-gizli-anahtar-yoksa-bunu-kullan")
 
-# Canlıda DEBUG False olmalı, Render environment'tan çekiyoruz
+# Canlıda DEBUG False olmalı
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
-# Render'ın verdiği domaini otomatik ekle
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
@@ -26,7 +25,7 @@ if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
 # ------------------------------------------------------------------
-# UYGULAMALAR (APPS)
+# UYGULAMALAR
 # ------------------------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -35,15 +34,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
 
-    # 3. Parti Kütüphaneler (Sıralama Önemli)
-    'cloudinary_storage',  # staticfiles'dan ÖNCE olmalı
+    # 3. Parti
+    'cloudinary_storage',
     "django.contrib.staticfiles",
     'cloudinary',
     "rest_framework",
     "rest_framework_simplejwt",
     "django.contrib.sites",
 
-    # Senin Uygulamaların
+    # Senin Uygulamalar
     "users",
     "categories",
     "notes",
@@ -58,7 +57,7 @@ SITE_ID = 1
 # ------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # <-- WhiteNoise burada olmalı
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise devrede
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -94,7 +93,6 @@ WSGI_APPLICATION = "uniedunote.wsgi.application"
 # ------------------------------------------------------------------
 DATABASES = {
     'default': dj_database_url.config(
-        # Render'da DATABASE_URL varsa Postgres kullanır, yoksa SQLite
         default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
         conn_max_age=600
     )
@@ -119,42 +117,48 @@ CLOUDINARY_STORAGE = {
 }
 
 # ------------------------------------------------------------------
-# STORAGE AYARLARI (HEM YENİ HEM ESKİ SİSTEM - ÇAKIŞMA OLMASIN DİYE)
+# STORAGE VE STATİK DOSYA AYARLARI (HATA GEÇİRMEZ MOD)
 # ------------------------------------------------------------------
 
-# 1. Yeni Nesil Django 5 Ayarı (Django bunu kullanır)
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    },
-}
-
-# 2. Eski Nesil Ayarlar (Kütüphaneler hata vermesin diye bunları da ekliyoruz)
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-
-# ------------------------------------------------------------------
-# URL VE PATH AYARLARI
-# ------------------------------------------------------------------
+# URL Ayarları
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# Eğer 'static' klasörü yoksa hata vermesin diye boş liste yapıyoruz
+if os.path.exists(BASE_DIR / "static"):
+    STATICFILES_DIRS = [BASE_DIR / "static"]
+else:
+    STATICFILES_DIRS = []
+
+# --- KRİTİK DEĞİŞİKLİK BURADA ---
+# "Compressed" özelliklerini kaldırdık. Sadece düz WhiteNoiseStorage kullanıyoruz.
+# Bu sayede "Dosya bulunamadı, sıkıştıramadım" hatası vermez.
+
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.WhiteNoiseStorage",
+    },
+}
+
+# Eski ayarlar için de aynısı
+STATICFILES_STORAGE = "whitenoise.storage.WhiteNoiseStorage"
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # ------------------------------------------------------------------
-# LOGIN / LOGOUT YÖNLENDİRMELERİ
+# LOGIN / LOGOUT
 # ------------------------------------------------------------------
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
 LOGOUT_REDIRECT_URL = "/"
 
 # ------------------------------------------------------------------
-# GENEL VE E-POSTA AYARLARI
+# DİĞER AYARLAR
 # ------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -167,9 +171,6 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "").strip()
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "UniEduNote <ai.serhat78@gmail.com>")
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")
 
-# ------------------------------------------------------------------
-# DRF & JWT
-# ------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
