@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------------------------------------------
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-gizli-anahtar-yoksa-bunu-kullan")
 
-# Canlıda DEBUG False olmalı, ama ortam değişkeni yoksa True varsayar
+# Canlıda DEBUG False olmalı, render environment'tan çekiyoruz
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
 
-    # Senin Uygulamaların
+    # Proje Uygulamaları
     "users",
     "categories",
     "notes",
@@ -57,11 +57,11 @@ INSTALLED_APPS = [
 SITE_ID = 1
 
 # ------------------------------------------------------------------
-# MIDDLEWARE (Sıralama Önemlidir!)
+# MIDDLEWARE
 # ------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # <-- WhiteNoise burada olmalı
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise burada olmalı
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -93,42 +93,37 @@ TEMPLATES = [
 WSGI_APPLICATION = "uniedunote.wsgi.application"
 
 # ------------------------------------------------------------------
-# VERİTABANI (Kritik Nokta)
+# VERİTABANI
 # ------------------------------------------------------------------
 DATABASES = {
     'default': dj_database_url.config(
-        # Render'da DATABASE_URL varsa onu kullanır (Postgres).
-        # Yoksa (lokalde) db.sqlite3 kullanır.
+        # Render'da DATABASE_URL varsa Postgres kullanır, yoksa SQLite
         default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
         conn_max_age=600
     )
 }
 
 # ------------------------------------------------------------------
-# KULLANICI MODELİ
+# KULLANICI MODELİ VE DİL
 # ------------------------------------------------------------------
 AUTH_USER_MODEL = "users.User"
-
-# ------------------------------------------------------------------
-# DİL ve ZAMAN
-# ------------------------------------------------------------------
 LANGUAGE_CODE = "tr"
 TIME_ZONE = "Europe/Istanbul"
 USE_I18N = True
 USE_TZ = True
 
 # ------------------------------------------------------------------
-# STATİK DOSYALAR (CSS, JS, Görseller) - WhiteNoise Ayarları
+# STATİK VE MEDYA DOSYALARI (URL & PATH)
 # ------------------------------------------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# WhiteNoise ile sıkıştırma ve sunma
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # ------------------------------------------------------------------
-# MEDYA DOSYALARI (Kullanıcı Notları) - Cloudinary Ayarları
+# CLOUDINARY AYARLARI
 # ------------------------------------------------------------------
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
@@ -136,11 +131,19 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# Dosyaları sunucuda değil Cloudinary'de tut:
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# ------------------------------------------------------------------
+# STORAGE AYARLARI (DJANGO 5 UYUMLU - KESİN ÇÖZÜM)
+# ------------------------------------------------------------------
+STORAGES = {
+    # Medya Dosyaları -> Cloudinary
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    # Statik Dosyalar (CSS/JS) -> WhiteNoise
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # ------------------------------------------------------------------
 # LOGIN / LOGOUT YÖNLENDİRMELERİ
@@ -150,13 +153,10 @@ LOGIN_REDIRECT_URL = "/dashboard/"
 LOGOUT_REDIRECT_URL = "/"
 
 # ------------------------------------------------------------------
-# GENEL AYARLAR
+# GENEL VE E-POSTA AYARLARI
 # ------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ------------------------------------------------------------------
-# E-POSTA AYARLARI
-# ------------------------------------------------------------------
 EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
@@ -167,7 +167,7 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "UniEduNote <ai.serhat
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")
 
 # ------------------------------------------------------------------
-# DRF & JWT (API Ayarları)
+# DRF & JWT
 # ------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
