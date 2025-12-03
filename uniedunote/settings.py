@@ -99,7 +99,7 @@ DATABASES = {
 }
 
 # ------------------------------------------------------------------
-# KULLANICI MODELİ VE DİL
+# KULLANICI VE DİL
 # ------------------------------------------------------------------
 AUTH_USER_MODEL = "users.User"
 LANGUAGE_CODE = "tr"
@@ -108,7 +108,7 @@ USE_I18N = True
 USE_TZ = True
 
 # ------------------------------------------------------------------
-# CLOUDINARY AYARLARI
+# CLOUDINARY
 # ------------------------------------------------------------------
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
@@ -117,49 +117,36 @@ CLOUDINARY_STORAGE = {
 }
 
 # ------------------------------------------------------------------
-# STORAGE VE STATİK DOSYA AYARLARI (HATA GEÇİRMEZ MOD)
+# STATİK VE MEDYA (HATA DÜZELTİCİ MOD)
 # ------------------------------------------------------------------
-
-# URL Ayarları
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# Eğer 'static' klasörü yoksa hata vermesin diye boş liste yapıyoruz
-if os.path.exists(BASE_DIR / "static"):
-    STATICFILES_DIRS = [BASE_DIR / "static"]
-else:
-    STATICFILES_DIRS = []
+# İşte grid.png hatasını çözen o sihirli satır:
+WHITENOISE_MANIFEST_STRICT = False
 
-# --- KRİTİK DEĞİŞİKLİK BURADA ---
-# "Compressed" özelliklerini kaldırdık. Sadece düz WhiteNoiseStorage kullanıyoruz.
-# Bu sayede "Dosya bulunamadı, sıkıştıramadım" hatası vermez.
-
+# Hem Django 5 hem kütüphaneler için doğru sınıf isimleri:
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.WhiteNoiseStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
-# Eski ayarlar için de aynısı
-STATICFILES_STORAGE = "whitenoise.storage.WhiteNoiseStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-
-# ------------------------------------------------------------------
-# LOGIN / LOGOUT
-# ------------------------------------------------------------------
-LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/dashboard/"
-LOGOUT_REDIRECT_URL = "/"
 
 # ------------------------------------------------------------------
 # DİĞER AYARLAR
 # ------------------------------------------------------------------
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/dashboard/"
+LOGOUT_REDIRECT_URL = "/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
