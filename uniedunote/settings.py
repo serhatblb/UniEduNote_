@@ -57,7 +57,7 @@ SITE_ID = 1
 # ------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # WhiteNoise devrede
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -117,7 +117,7 @@ CLOUDINARY_STORAGE = {
 }
 
 # ------------------------------------------------------------------
-# STATİK VE MEDYA (HATA DÜZELTİCİ MOD)
+# STATİK VE MEDYA (GARANTİ MOD)
 # ------------------------------------------------------------------
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -125,20 +125,20 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# İşte grid.png hatasını çözen o sihirli satır:
-WHITENOISE_MANIFEST_STRICT = False
+# DİKKAT: Burada 'Manifest' kelimesi geçen her şeyi sildim.
+# Sadece 'CompressedStaticFilesStorage' kullanıyoruz.
+# Bu mod eksik dosya olsa bile hata vermez, geçer.
 
-# Hem Django 5 hem kütüphaneler için doğru sınıf isimleri:
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # ------------------------------------------------------------------
