@@ -3,19 +3,15 @@ from pathlib import Path
 from datetime import timedelta
 import dj_database_url
 
-# Proje ana dizini
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ------------------------------------------------------------------
-# GÜVENLİK VE ORTAM AYARLARI
+# GÜVENLİK
 # ------------------------------------------------------------------
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-gizli-anahtar-yoksa-bunu-kullan")
-
-# Canlıda DEBUG False olmalı
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-gizli-anahtar")
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
@@ -34,15 +30,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
 
-    # 3. Parti
     'cloudinary_storage',
-    "django.contrib.staticfiles",
+    "django.contrib.staticfiles",  # Bu önemli
     'cloudinary',
     "rest_framework",
     "rest_framework_simplejwt",
     "django.contrib.sites",
 
-    # Senin Uygulamalar
     "users",
     "categories",
     "notes",
@@ -98,9 +92,6 @@ DATABASES = {
     )
 }
 
-# ------------------------------------------------------------------
-# KULLANICI VE DİL
-# ------------------------------------------------------------------
 AUTH_USER_MODEL = "users.User"
 LANGUAGE_CODE = "tr"
 TIME_ZONE = "Europe/Istanbul"
@@ -117,17 +108,17 @@ CLOUDINARY_STORAGE = {
 }
 
 # ------------------------------------------------------------------
-# STATİK VE MEDYA (GARANTİ MOD)
+# STATİK VE MEDYA (HATA VERMEZ MODU)
 # ------------------------------------------------------------------
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# DİKKAT: Burada 'Manifest' kelimesi geçen her şeyi sildim.
-# Sadece 'CompressedStaticFilesStorage' kullanıyoruz.
-# Bu mod eksik dosya olsa bile hata vermez, geçer.
+# DİKKAT: Hem 'STORAGES' hem 'STATICFILES_STORAGE' aynı dili konuşuyor.
+# WhiteNoise'un sıkıştırmasını devre dışı bıraktık. Sadece kopyalama yapacak.
 
 STORAGES = {
     "default": {
@@ -138,11 +129,12 @@ STORAGES = {
     },
 }
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+# Eski ayarlar için de aynısı (Uyumsuzluk olmasın)
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # ------------------------------------------------------------------
-# DİĞER AYARLAR
+# DİĞERLERİ
 # ------------------------------------------------------------------
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"

@@ -62,7 +62,6 @@ def note_detail(request, pk):
 
 # 📥 Not indirme
 # notes/views.py
-
 @login_required
 def download_note(request, pk):
     note = get_object_or_404(Note, pk=pk)
@@ -72,15 +71,9 @@ def download_note(request, pk):
     note.save()
 
     if note.file:
-        url = note.file.url
-
-        # SİHİRLİ DOKUNUŞ BURADA:
-        # Cloudinary linkinin içine "fl_attachment" ekliyoruz.
-        # Bu, Cloudinary'ye "Bunu gösterme, direkt indir" emri verir.
-        if "upload/" in url and "cloudinary" in url:
-            url = url.replace("upload/", "upload/fl_attachment/")
-
-        return redirect(url)
+        # HİÇBİR OYNAMA YAPMADAN ORİJİNAL LİNKİ VERİYORUZ
+        # Cloudinary zaten imzalı ve güvenli link veriyor
+        return redirect(note.file.url)
     else:
         raise Http404("Dosya bulunamadı.")
 
