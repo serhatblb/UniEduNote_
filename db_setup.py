@@ -1,22 +1,21 @@
 import os
 import django
+from django.db import transaction
 
 # 1. Django ortamını kuruyoruz
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'uniedunote.settings')
 django.setup()
 
-# Senin YENİ ve SADE modellerini çağırıyoruz
 from categories.models import University, Faculty, Department, Course
 
 
 def run():
-    print("🚀 Stratejik Veri Tabanı Doldurma Başladı (Yeni Modellerle)...")
+    print("🚀 Veri yükleme başladı (Hafıza Dostu Mod)...")
 
-    # --- 1. HEDEF KİTLE: EN KALABALIK ÜNİVERSİTELER ---
     target_unis = [
-        "Anadolu Üniversitesi (Eskişehir)",  # Açıköğretim Kralı
-        "Atatürk Üniversitesi (Erzurum)",  # ATA-AÖF
-        "İstanbul Üniversitesi",  # AUZEF
+        "Anadolu Üniversitesi (Eskişehir)",
+        "Atatürk Üniversitesi (Erzurum)",
+        "İstanbul Üniversitesi",
         "Marmara Üniversitesi",
         "Sakarya Üniversitesi",
         "Bursa Uludağ Üniversitesi",
@@ -26,7 +25,6 @@ def run():
         "Akdeniz Üniversitesi (Antalya)"
     ]
 
-    # --- 2. BÖLÜM STRATEJİSİ (FAKÜLTE -> BÖLÜMLER) ---
     fakulte_bolum_yapisi = {
         "Açık ve Uzaktan Öğretim Fakültesi": [
             "Çocuk Gelişimi", "Adalet", "Sosyal Hizmetler",
@@ -40,8 +38,6 @@ def run():
         "Sağlık Bilimleri": ["Hemşirelik", "Ebelik"]
     }
 
-    # --- 3. DERS ÖRNEKLERİ ---
-    # ARTIK SADECE İSİM VAR (Code, Year vs. yok)
     courses_sample = [
         "Atatürk İlkeleri ve İnkılap Tarihi",
         "Türk Dili I",
@@ -50,38 +46,39 @@ def run():
         "Genel Muhasebe",
         "İletişim Becerileri",
         "Giriş ve Algoritma",
-        "İktisada Giriş",
-        "Anayasa Hukuku"
+        "İktisada Giriş"
     ]
 
+    # Her üniversiteyi ayrı ayrı işleyip hafızayı rahatlatacağız
     for uni_name in target_unis:
-        # Üniversite oluştur
-        uni, created = University.objects.get_or_create(name=uni_name)
-        if created:
-            print(f"✅ Üniversite: {uni_name}")
+        try:
+            # transaction.atomic: İşlemleri paketleyip toplu yapar, RAM'i korur
+            with transaction.atomic():
+                uni, _ = University.objects.get_or_create(name=uni_name)
 
-        # Fakülteleri ve Bölümleri dönüyoruz
-        for fakulte_adi, bolumler in fakulte_bolum_yapisi.items():
+                for fakulte_adi, bolumler in fakulte_bolum_yapisi.items():
+                    fac, _ = Faculty.objects.get_or_create(university=uni, name=fakulte_adi)
 
-            # Eğer üniversite adında "Teknik" geçiyorsa ve fakülte "Hukuk" ise ekleme (saçma olmasın)
-            # Ama senin liste genel olduğu için hepsini ekleyebiliriz, sorun yok.
+                    for bolum_adi in bolumler:
+                        dept, _ = Department.objects.get_or_create(faculty=fac, name=bolum_adi)
 
-            # Fakülte oluştur
-            fac, _ = Faculty.objects.get_or_create(university=uni, name=fakulte_adi)
+                        # Dersleri toplu oluşturma listesi (Bulk Create Hazırlığı)
+                        ders_listesi = []
+                        for course_name in courses_sample:
+                            # Önce var mı diye kontrol etmemiz lazım, yoksa bulk_create patlar
+                            if not Course.objects.filter(department=dept, name=course_name).exists():
+                                ders_listesi.append(Course(department=dept, name=course_name))
 
-            for bolum_adi in bolumler:
-                # Bölüm oluştur
-                dept, _ = Department.objects.get_or_create(faculty=fac, name=bolum_adi)
+                        # Hepsini tek seferde veritabanına göm
+                        if ders_listesi:
+                            Course.objects.bulk_create(ders_listesi)
 
-                # Dersleri ekle (Sadece isim olarak)
-                for course_name in courses_sample:
-                    Course.objects.get_or_create(
-                        department=dept,
-                        name=course_name
-                        # DİKKAT: code, class_year, term_season ARTIK YOK. Sildik.
-                    )
+            print(f"✅ {uni_name} tamamlandı.")  # Sadece üniversite bitince yaz
 
-    print("🎉 MİSYON TAMAMLANDI! Stratejik veriler hatasız yüklendi.")
+        except Exception as e:
+            print(f"❌ {uni_name} eklenirken hata: {str(e)}")
+
+    print("🎉 MİSYON TAMAMLANDI! (RAM patlamadan hallettik)")
 
 
 if __name__ == '__main__':
