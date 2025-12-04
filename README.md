@@ -1,120 +1,106 @@
 # 🎓 UniEduNote — Akademik Not Paylaşım Platformu
 
 ## 📘 Proje Özeti
-**UniEduNote**, öğrencilerin ders notlarını paylaşabildiği, yorum yapıp beğenerek etkileşime girdiği, katkı sağladıkça puan ve ödül kazandığı bir akademik topluluk platformudur.
+**UniEduNote**, öğrencilerin ders notlarını güvenli bir bulut altyapısında paylaşabildiği, yorum ve beğenilerle etkileşime girdiği, dinamik ve modern bir akademik topluluk platformudur. Proje, yerel geliştirme ortamından çıkarılarak **modern Cloud Native mimari** ile canlıya alınmıştır.
 
 ---
 
-## 🧱 Teknoloji Yığını
-| Katman | Teknoloji |
-|:--|:--|
-| **Backend** | Django 5.2 + Django ORM |
-| **Frontend** | HTML5, CSS3 (modern sade tasarım) |
-| **Veritabanı** | SQLite (dev) → PostgreSQL (prod) |
-| **API** | Django REST Framework + JWT (SimpleJWT) |
-| **Auth** | Django Auth + JWT + E-posta aktivasyonu |
-| **Depolama** | FileField (PDF, Word, Image) |
-| **Mail** | Gmail SMTP (şimdilik console backend) |
+## 🧱 Teknoloji Yığını & Altyapı
+Modern ve ölçeklenebilir teknolojiler kullanılarak geliştirilmiştir.
+
+| Katman | Teknoloji / Servis | Açıklama |
+|:--|:--|:--|
+| **Backend** | Django 5.x + Python | Ana uygulama çatısı |
+| **Veritabanı** | **PostgreSQL (Neon.tech)** | Kalıcı veri saklama (Production) |
+| **Dosya Depolama** | **Cloudinary** | Medya dosyaları (PDF, Resim) için bulut depolama |
+| **Statik Dosyalar** | **WhiteNoise** | CSS/JS dosyalarının optimize sunumu |
+| **Sunucu (Deploy)** | **Render** | PaaS (Platform as a Service) barındırma |
+| **API** | DRF + SimpleJWT | RESTful API ve Token tabanlı güvenlik |
+| **Frontend** | HTML5, CSS3, jQuery (AJAX) | Dinamik form yönetimi ve modern tasarım |
+| **Mail Servisi** | SendGrid / SMTP | Aktivasyon ve bildirim mailleri |
 
 ---
 
 ## ✨ Tamamlanan Özellikler
 
-### 🧍 Kullanıcı Sistemi
-- JWT + Session tabanlı kimlik doğrulama  
-- E-posta aktivasyon sistemi  
-- Modern kayıt / giriş ekranları  
-- Logout ve dashboard yönlendirmeleri  
-- Şifre sıfırlama (e-posta bağlantısı ile)  
-- Profil görüntüleme ve düzenleme ekranı  
-  - Şifre değişimi destekleniyor  
-  - E-posta değişimi geçici olarak kısıtlandı (ileride doğrulama eklenecek)  
+### 🚀 Canlı Sistem & Altyapı (YENİ)
+- **Render Deploy:** Proje canlı sunucuya taşındı (`gunicorn` ile).
+- **Kalıcı Veritabanı:** Sunucu yeniden başlasa bile verilerin silinmemesi için PostgreSQL entegrasyonu yapıldı.
+- **Bulut Depolama:** Yüklenen notların kaybolmaması için Cloudinary entegre edildi.
+- **Veri Doldurma Botu:** `db_setup.py` scripti ile stratejik üniversite, fakülte ve bölümlerin tek komutla veritabanına yüklenmesi sağlandı.
+
+### 🏫 Akıllı Kategori Yönetimi (YENİ)
+- **AJAX Zincirleme Dropdown:** Not yüklerken Üniversite seçilince Fakültelerin, Fakülte seçilince Bölümlerin otomatik gelmesi sağlandı.
+- **Stratejik Veri Yapısı:** AÖF ve en çok tercih edilen üniversiteler öncelikli olarak sisteme eklendi.
 
 ### 📄 Not Yönetimi
-- Not yükleme (dosya + açıklama)  
-- Not listeleme (üniversite, bölüm, ders bazlı filtreleme)  
-- Not detay ekranı (indir, yorum, beğeni, istatistik)  
-- Not düzenleme ve silme (sadece not sahibi erişebilir)  
-- Filtreli geri dön butonu (liste sayfasına filtreler korunarak dönüş)  
+- **Bulut Tabanlı Yükleme:** PDF ve görseller direkt Cloudinary CDN üzerine yüklenir.
+- **Güvenli İndirme:** Dosyalar yetkisiz erişime karşı korunur, indirme sayıları takip edilir.
+- **Filtreleme:** Üniversite > Bölüm > Ders bazlı detaylı not arama.
 
-### 💬 Yorum & Beğeni Sistemi
-- Her not için yorum ekleme, düzenleme, silme  
-- Her not için beğeni (toggle + GET durumu)  
-- Kullanıcı sadece kendi yorumlarını düzenleyip silebilir  
-- Beğeni durumu giriş/çıkış sonrası da korunur (liste ve detay ekranlarında senkron)  
-- Anlık yorum yenileme (sayfa yenilemeden liste güncellenir)  
+### 🧍 Kullanıcı Sistemi
+- JWT + Session tabanlı hibrit kimlik doğrulama.
+- E-posta aktivasyon sistemi (SendGrid entegreli).
+- Modern Dashboard ve Profil yönetimi.
+- Kullanıcıya özel yüklenen notlar listesi.
 
-### 🔒 Güvenlik & Erişim
-- Giriş yapmadan `/dashboard/`, `/upload/`, `/notes/`, `/profile/` erişimi engellendi  
-- JWT zorunluluğu (API’lerde `IsAuthenticated`)  
-- `@login_required` ile tüm web view’lar koruma altında  
-- Sadece içerik sahibi düzenleme ve silme işlemi yapabilir  
-
-### 🎨 Görsel & UI
-- Buton ve linklerde alt çizgi kaldırıldı  
-- Modern mavi-beyaz tema  
-- Responsive grid tabanlı kart yapısı  
-- Hover efektleri ve sade animasyonlar  
+### 💬 Etkileşim
+- Yorum yapma ve silme (Anlık güncellenen arayüz).
+- Beğeni sistemi (Like/Unlike).
+- Sadece içerik sahibi tarafından düzenleme/silme yetkisi.
 
 ---
 
-## 🔧 Geliştirme Aşamasında
-| Özellik | Durum |
-|:--|:--|
-| Şifre sıfırlama | ✅ |
-| Profil düzenleme | ✅ |
-| E-posta değişiklik doğrulama | 🔜 |
-| Şifre geçmişi / tekrar kullanımı engelleme | 🔜 |
-| Erişim kontrolü ve JWT entegrasyonu | ✅ |
-| Not yükleme / düzenleme / silme | ✅ |
-| Yorum & beğeni sistemi | ✅ |
+## 🔧 Kurulum & Geliştirme (Lokalde Çalıştırma)
 
----
+Projeyi kendi bilgisayarınızda çalıştırmak için:
 
-## 🏅 Planlanan Özellikler
+1.  **Depoyu klonlayın:**
+    ```bash
+    git clone https://github.com/serhatblb/UniEduNote.git
+    cd UniEduNote
+    ```
 
-### 🌟 Puan & Ödül Sistemi
-- Not yükleme, indirme, beğeni, yorum ile puan kazanma  
-- Puan bazlı seviye sistemi (⭐ → ⭐⭐⭐⭐)  
-- İlerleme çubuğu ve seviye ikonları  
-- `signals.py` üzerinden otomatik puan hesaplama  
+2.  **Sanal ortamı kurun ve paketleri yükleyin:**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # Windows: venv\Scripts\activate
+    pip install -r requirements.txt
+    ```
 
-### 🏫 Kategori & Üniversite Yönetimi
-- Üniversite, fakülte, bölüm ve ders listelerinin JSON / SQL kaynaktan yüklenmesi  
-- Dinamik zincirleme dropdown (üniversite → fakülte → bölüm → ders)  
-- Admin panelinden kategori ekleme / güncelleme  
+3.  **Çevre Değişkenlerini (.env) Ayarlayın:**
+    *   `SECRET_KEY`, `DEBUG`, `DATABASE_URL` (Opsiyonel), `CLOUDINARY_` anahtarlarını ekleyin.
 
-### 🖥️ Dashboard Geliştirmeleri
-- En çok indirilen notlar  
-- Yeni üyeler listesi  
-- İstatistik grafikleri ve XP barı  
+4.  **Veritabanını Hazırlayın:**
+    ```bash
+    python manage.py migrate
+    python db_setup.py  # Üniversite verilerini otomatik yükler
+    ```
 
-### 🤖 Gelecek Faz
-- AI destekli not özetleme  
-- PDF OCR ve içerik arama  
-- Mobil uygulama (Flutter)  
-- Akademisyen rozet sistemi  
+5.  **Sunucuyu Başlatın:**
+    ```bash
+    python manage.py runserver
+    ```
 
 ---
 
 ## 📅 Geliştirme Yol Haritası
 | Sıra | Modül | Durum |
 |------|--------|--------|
-| 1️⃣ | JWT + E-posta aktivasyon | ✅ |
-| 2️⃣ | Şifre sıfırlama / Profil düzenleme | ✅ |
-| 3️⃣ | Erişim ve güvenlik (JWT validation) | ✅ |
-| 4️⃣ | Not Yönetimi + Yorum & Beğeni | ✅ |
-| 5️⃣ | Puan / ödül sistemi | 🔜 |
-| 6️⃣ | Dashboard istatistikleri | 🔜 |
-| 7️⃣ | Üniversite – fakülte – bölüm zinciri | 🔜 |
-| 8️⃣ | Mobil + AI entegrasyonu | 🚧 |
+| 1️⃣ | JWT + E-posta aktivasyon | ✅ Tamamlandı |
+| 2️⃣ | Cloudinary & PostgreSQL Geçişi | ✅ Tamamlandı |
+| 3️⃣ | AJAX ile Dinamik Formlar | ✅ Tamamlandı |
+| 4️⃣ | Render Deploy (Canlı Yayın) | ✅ Tamamlandı |
+| 5️⃣ | Puan & Ödül Sistemi | 🔜 Sırada |
+| 6️⃣ | Dashboard İstatistik Grafikleri | 🔜 Planlanıyor |
+| 7️⃣ | Mobil Uygulama (Flutter) | 🚧 Ar-Ge Aşamasında |
 
 ---
 
 ## 🧩 Geliştirici Notları
-- E-posta değişiklik doğrulaması **ilerleyen aşamada eklenecek.**  
-- Şifre tekrar kullanımı ve geçmiş kontrolü **veritabanı fazında uygulanacak.**  
-- Üniversite–fakülte–bölüm verileri büyük olduğu için **SQL tabanlı import planlanıyor.**
+- Proje **Django 5** standartlarına uygun `STORAGES` yapısına geçirilmiştir.
+- Statik dosyalar için **WhiteNoise**, Medya dosyaları için **Cloudinary** hibrit yapısı kurulmuştur.
+- Veritabanı bağlantısı `dj_database_url` ile ortam değişkenine göre (Localde SQLite, Canlıda Postgres) otomatik değişir.
 
 ---
 
@@ -126,4 +112,4 @@
 ---
 
 > “Bilgi paylaştıkça çoğalır.”  
-> — UniEduNote Ekibi  
+> — UniEduNote Ekibi
