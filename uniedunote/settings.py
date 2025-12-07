@@ -105,13 +105,13 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    'RESOURCE_TYPE': 'auto',  # <--- BU SATIRI MUTLAKA EKLE
+    'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
 }
 
 # ------------------------------------------------------------------
 # STATİK VE MEDYA (HATA VERMEZ MODU)
 # ------------------------------------------------------------------
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -119,13 +119,17 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # DİKKAT: Hem 'STORAGES' hem 'STATICFILES_STORAGE' aynı dili konuşuyor.
 # WhiteNoise'un sıkıştırmasını devre dışı bıraktık. Sadece kopyalama yapacak.
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {
+    # Medya dosyaları için Cloudinary (Resim ve Dosyalar)
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
+    # Statik dosyalar için WhiteNoise (CSS/JS Render'da çalışması için)
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 

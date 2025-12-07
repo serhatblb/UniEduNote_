@@ -66,16 +66,20 @@ def note_detail(request, pk):
 def download_note(request, pk):
     note = get_object_or_404(Note, pk=pk)
 
-    # İndirme sayısını artır
-    note.download_count += 1
-    note.save()
+    try:
+        if note.file:
+            # İndirme sayısını artır
+            note.download_count += 1
+            note.save()
 
-    if note.file:
-        # HİÇBİR OYNAMA YAPMADAN ORİJİNAL LİNKİ VERİYORUZ
-        # Cloudinary zaten imzalı ve güvenli link veriyor
-        return redirect(note.file.url)
-    else:
-        raise Http404("Dosya bulunamadı.")
+            # Eğer dosya varsa Cloudinary URL'sine yönlendir
+            return redirect(note.file.url)
+    except Exception as e:
+        print(f"Dosya hatası: {e}")
+        messages.error(request, "Dosya sunucuda bulunamadı (Silinmiş olabilir).")
+
+    # Hata varsa detay sayfasına geri dön
+    return redirect('note_detail', pk=pk)
 
 # 🏠 Dashboard
 @login_required(login_url='/login/')

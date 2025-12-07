@@ -242,7 +242,8 @@
 <div class="upload-card">
   <h2>📄 Yeni Not Yükle</h2>
   <div class="form-wrapper">
-    <form method="POST" enctype="multipart/form-data">
+    <!-- DÜZELTME: id="id_upload_form" eklendi -->
+    <form method="POST" enctype="multipart/form-data" id="id_upload_form">
       {% csrf_token %}
       <div class="form-grid-content">
         <div class="form-field">
@@ -281,17 +282,26 @@
     </form>
   </div>
   <div class="button-wrapper">
+    <!-- Button zaten form attribute'u ile yukarıdaki ID'yi hedefliyor -->
     <button type="submit" form="id_upload_form">Yükle</button>
   </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  // Form submit için düzenleme
+  // Form submit için düzenleme (ID GARANTİSİ)
   document.querySelector('.button-wrapper button').addEventListener('click', function(e) {
     e.preventDefault();
-    document.querySelector('form').submit();
+    // Doğrudan ID ile formu bulup gönderiyoruz
+    var form = document.getElementById('id_upload_form');
+    if (form) {
+        form.submit();
+    } else {
+        console.error("Form bulunamadı!");
+    }
   });
-    $(document).ready(function () {
+
+  $(document).ready(function () {
     // 1. Üniversite değişince -> Fakülteleri Getir
     $("#id_university").change(function () {
       var url = "{% url 'ajax_load_faculties' %}";
@@ -302,8 +312,8 @@
         data: { 'university': universityId },
         success: function (data) {
           $("#id_faculty").html('<option value="">---------</option>');
-          $("#id_department").html('<option value="">---------</option>'); // Bölümü de sıfırla
-          $("#id_course").html('<option value="">---------</option>');     // Dersi de sıfırla
+          $("#id_department").html('<option value="">---------</option>');
+          $("#id_course").html('<option value="">---------</option>');
           $.each(data, function (key, value) {
             $("#id_faculty").append('<option value="' + value.id + '">' + value.name + '</option>');
           });
@@ -321,7 +331,7 @@
         data: { 'faculty': facultyId },
         success: function (data) {
           $("#id_department").html('<option value="">---------</option>');
-          $("#id_course").html('<option value="">---------</option>'); // Dersi de sıfırla
+          $("#id_course").html('<option value="">---------</option>');
           $.each(data, function (key, value) {
             $("#id_department").append('<option value="' + value.id + '">' + value.name + '</option>');
           });
@@ -346,6 +356,5 @@
       });
     });
   });
-
 </script>
 {% endblock %}
