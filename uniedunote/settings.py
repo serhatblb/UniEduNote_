@@ -123,18 +123,23 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {
-    # Medya dosyaları için Cloudinary (Resim ve Dosyalar)
+    # Medya dosyaları (Cloudinary) - BURASI AYNI KALSIN
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # Statik dosyalar için WhiteNoise (CSS/JS Render'da çalışması için)
+    # Statik dosyalar (WhiteNoise) - BURAYI DEĞİŞTİRİYORUZ
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        # ESKİSİ (Hata veren buydu):
+        # "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+
+        # YENİSİ (Hata vermeyen, daha esnek mod):
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
 # Eski ayarlar için de aynısı (Uyumsuzluk olmasın)
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # ------------------------------------------------------------------
