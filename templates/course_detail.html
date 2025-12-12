@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Anasayfa</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'department_detail' course.department.id %}">{{
+                course.department.name }}</a></li>
+        <li class="breadcrumb-item active">{{ course.name }}</li>
+    </ol>
+</nav>
+
+<div class="card bg-dark text-white p-5 mb-5 position-relative overflow-hidden border-0">
+    <div class="position-absolute top-0 end-0 p-3 opacity-10">
+        <i class="fa-solid fa-book-open fa-8x text-white"></i>
+    </div>
+    <div class="position-relative z-1">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <span class="badge bg-primary fs-6">{{ course.code }}</span>
+            <span class="badge bg-secondary bg-opacity-25 border border-secondary">{{ course.get_class_year_display
+                }}</span>
+            <span class="badge bg-secondary bg-opacity-25 border border-secondary">{{ course.get_term_season_display
+                }}</span>
+        </div>
+        <h1 class="display-5 fw-bold">{{ course.name }}</h1>
+        <p class="lead opacity-75 mb-4">Bu derse ait notları aşağıda bulabilirsin. Sen de not yükleyerek katkıda bulun!
+        </p>
+
+        <a href="{% url 'upload_note' course.id %}" class="btn btn-success btn-lg fw-bold shadow-lg">
+            <i class="fa-solid fa-cloud-arrow-up me-2"></i> Not Yükle (+5 Puan)
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for note in notes %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 hover-shadow border-0 shadow-sm">
+            <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="icon-box bg-danger bg-opacity-10 text-danger rounded-circle p-3">
+                        <i class="fa-solid fa-file-pdf fa-2x"></i>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                            <li><a class="dropdown-item" href="#"><i class="fa-regular fa-flag me-2"></i> Bildir</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h5 class="card-title fw-bold mb-2">{{ note.title }}</h5>
+                <p class="card-text text-muted small flex-grow-1">{{ note.description|truncatechars:80 }}</p>
+
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    {% if note.uploader.profile.avatar %}
+                    <img src="{{ note.uploader.profile.avatar.url }}" class="rounded-circle"
+                        style="width: 24px; height: 24px;">
+                    {% else %}
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
+                        style="width: 24px; height: 24px; font-size: 10px;">
+                        {{ note.uploader.username|make_list|first|upper }}
+                    </div>
+                    {% endif %}
+                    <small class="text-muted">{{ note.uploader.username }}</small>
+                    <span class="text-muted mx-1">•</span>
+                    <small class="text-muted">{{ note.created_at|timesince }} önce</small>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <div class="d-flex gap-3 text-muted small">
+                        <span title="İndirme"><i class="fa-solid fa-download me-1"></i> {{ note.downloads }}</span>
+                        <span title="Beğeni"><i class="fa-solid fa-heart me-1"></i> {{ note.likes }}</span>
+                    </div>
+                    <a href="{{ note.pdf_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary fw-bold">
+                        İncele <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <div class="bg-white rounded-4 p-5 shadow-sm d-inline-block">
+            <i class="fa-regular fa-folder-open fa-4x text-muted mb-3 opacity-50"></i>
+            <h4>Henüz Not Yok</h4>
+            <p class="text-muted">Bu ders için ilk notu sen yükle!</p>
+            <a href="{% url 'upload_note' course.id %}" class="btn btn-primary mt-2">Not Yükle</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .hover-shadow {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+    }
+</style>
+{% endblock %}

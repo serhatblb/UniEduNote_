@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Anasayfa</a></li>
+    <li class="breadcrumb-item active">{{ department.name }}</li>
+  </ol>
+</nav>
+
+<h2 class="mb-4">{{ department.name }} Müfredatı</h2>
+
+<!-- DERSLERİ ÖNCE SINIF SEVİYESİNE GÖRE GRUPLUYORUZ -->
+{% regroup courses by get_class_year_display as class_list %}
+
+<div class="accordion" id="accordionCurriculum">
+    {% for class_group in class_list %}
+    <div class="accordion-item mb-3 border">
+        <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}">
+                <strong>📂 {{ class_group.grouper }} Dersleri</strong>
+            </button>
+        </h2>
+        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#accordionCurriculum">
+            <div class="accordion-body bg-light">
+
+                <!-- ŞİMDİ DE O SINIFIN İÇİNDEKİ DÖNEMLERE (GÜZ/BAHAR) GÖRE AYIRIYORUZ -->
+                {% regroup class_group.list by get_term_season_display as term_list %}
+
+                {% for term_group in term_list %}
+                    <h5 class="text-primary mt-3 border-bottom pb-2">{{ term_group.grouper }}</h5>
+                    <div class="row">
+                        {% for course in term_group.list %}
+                        <div class="col-md-4 mb-2">
+                            <a href="{% url 'course_detail' course.id %}" class="text-decoration-none">
+                                <div class="card p-2 h-100 shadow-sm" style="transition:0.2s;">
+                                    <div class="card-body p-2">
+                                        <h6 class="card-title text-dark mb-0">{{ course.name }}</h6>
+                                        <small class="text-muted">{{ course.code }}</small>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+    {% empty %}
+        <div class="alert alert-warning">Bu bölüme henüz ders eklenmemiş. Admin panelinden ekleyin.</div>
+    {% endfor %}
+</div>
+{% endblock %}

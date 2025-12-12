@@ -1,0 +1,594 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  /* === GENEL CONTAINER === */
+  .content-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  /* === HERO SECTION === */
+  .hero-section {
+    text-align: center;
+    padding: 3rem 1rem;
+    margin-bottom: 3rem;
+  }
+
+  .hero-section h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    letter-spacing: -2px;
+    line-height: 1.2;
+  }
+
+  .hero-section .text-primary {
+    color: #3b82f6 !important;
+  }
+
+  .hero-section .lead {
+    font-size: 1.25rem;
+    color: #6b7280;
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  /* === CARD STYLES === */
+  .card {
+    border: none;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .hover-scale {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hover-scale:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .hover-shadow {
+    transition: box-shadow 0.3s ease;
+  }
+
+  .hover-shadow:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  /* === ICON BOX === */
+  .icon-box {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* === STATS SECTION === */
+  .stats-section {
+    margin-bottom: 3rem;
+  }
+
+  .stats-section .card {
+    padding: 2rem;
+    border-radius: 1.5rem;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  }
+
+  .stats-section h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  /* === UNIVERSITIES SECTION === */
+  .universities-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .universities-header h4 {
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .university-card {
+    height: 100%;
+    padding: 2rem;
+    text-align: center;
+    border-radius: 1rem;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+  }
+
+  .university-card img,
+  .university-card .logo-placeholder {
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+  }
+
+  .logo-placeholder {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+  }
+
+  .university-card h6 {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.3rem;
+  }
+
+  .university-card small {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  /* === FORM STYLES === */
+  .input-group .form-control {
+    background: #f3f4f6;
+    border: none;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+
+  .input-group .btn {
+    padding: 0.75rem 1.5rem;
+  }
+
+  /* === BUTTONS === */
+  .btn {
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  /* === RESPONSIVE DESIGN === */
+
+  /* Desktop büyük (1400px ve üstü) */
+  @media (min-width: 1400px) {
+    .hero-section h1 {
+      font-size: 4rem;
+    }
+  }
+
+  /* Tablet ve orta ekranlar (992px ve altı) */
+  @media (max-width: 992px) {
+    .hero-section {
+      padding: 2.5rem 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-section h1 {
+      font-size: 2.8rem;
+    }
+
+    .hero-section .lead {
+      font-size: 1.1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stats-section .card {
+      padding: 1.5rem;
+    }
+
+    .stats-section h2 {
+      font-size: 2rem;
+    }
+
+    .icon-box {
+      width: 60px;
+      height: 60px;
+    }
+
+    .university-card {
+      padding: 1.5rem;
+    }
+  }
+
+  /* Mobil cihazlar (768px ve altı) */
+  @media (max-width: 768px) {
+    .content-wrapper {
+      padding: 0 0.75rem;
+    }
+
+    .hero-section {
+      padding: 2rem 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero-section h1 {
+      font-size: 2.2rem;
+      letter-spacing: -1px;
+      margin-bottom: 1rem;
+    }
+
+    .hero-section .lead {
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      padding: 0 0.5rem;
+    }
+
+    /* Cards yan yana kalmasın, tek sütun */
+    .hero-section .row .col-md-5 {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .card.h-100 {
+      padding: 1.5rem !important;
+    }
+
+    .icon-box {
+      width: 50px;
+      height: 50px;
+      padding: 0.5rem !important;
+    }
+
+    .icon-box i {
+      font-size: 1.5rem !important;
+    }
+
+    .card h3 {
+      font-size: 1.3rem;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+    }
+
+    /* Stats kartları */
+    .stats-section {
+      margin-bottom: 2rem;
+    }
+
+    .stats-section .card {
+      padding: 1.25rem;
+    }
+
+    .stats-section h2 {
+      font-size: 1.8rem;
+    }
+
+    .stats-section p {
+      font-size: 0.9rem;
+    }
+
+    /* Universities header */
+    .universities-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .universities-header h4 {
+      font-size: 1.25rem;
+    }
+
+    .universities-header a {
+      font-size: 0.875rem;
+    }
+
+    /* University cards */
+    .university-card {
+      padding: 1.25rem;
+    }
+
+    .university-card img,
+    .logo-placeholder {
+      height: 50px;
+      width: 50px;
+    }
+
+    .university-card h6 {
+      font-size: 0.95rem;
+    }
+
+    /* Form input */
+    .input-group .form-control {
+      font-size: 0.9rem;
+      padding: 0.65rem 0.9rem;
+    }
+
+    .input-group .btn {
+      padding: 0.65rem 1.2rem;
+    }
+
+    /* Button tam genişlik */
+    .btn.w-100 {
+      font-size: 0.95rem;
+    }
+  }
+
+  /* Küçük mobil cihazlar (480px ve altı) */
+  @media (max-width: 480px) {
+    .hero-section {
+      padding: 1.5rem 0.5rem;
+    }
+
+    .hero-section h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .hero-section h1 br {
+      display: none; /* Başlık tek satırda */
+    }
+
+    .hero-section .lead {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .card.h-100 {
+      padding: 1.2rem !important;
+    }
+
+    .card h3 {
+      font-size: 1.15rem;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+      margin-bottom: 1rem !important;
+    }
+
+    .icon-box {
+      width: 45px;
+      height: 45px;
+    }
+
+    .icon-box i {
+      font-size: 1.25rem !important;
+    }
+
+    /* Stats */
+    .stats-section .card {
+      padding: 1rem;
+    }
+
+    .stats-section h2 {
+      font-size: 1.5rem;
+    }
+
+    .stats-section p {
+      font-size: 0.85rem;
+    }
+
+    /* Universities */
+    .universities-header h4 {
+      font-size: 1.1rem;
+    }
+
+    .university-card {
+      padding: 1rem;
+    }
+
+    .university-card h6 {
+      font-size: 0.9rem;
+    }
+
+    .university-card small {
+      font-size: 0.8rem;
+    }
+
+    /* Form */
+    .input-group .form-control {
+      font-size: 0.85rem;
+      padding: 0.6rem 0.8rem;
+    }
+
+    .input-group .btn {
+      padding: 0.6rem 1rem;
+    }
+
+    /* Arka plan ikonları küçült */
+    .position-absolute.top-0.end-0 i {
+      font-size: 4rem !important;
+    }
+  }
+
+  /* Çok küçük mobil cihazlar (360px ve altı) */
+  @media (max-width: 360px) {
+    .hero-section h1 {
+      font-size: 1.5rem;
+    }
+
+    .hero-section .lead {
+      font-size: 0.85rem;
+    }
+
+    .card.h-100 {
+      padding: 1rem !important;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+    }
+
+    .stats-section h2 {
+      font-size: 1.3rem;
+    }
+
+    .university-card {
+      padding: 0.8rem;
+    }
+
+    .logo-placeholder,
+    .university-card img {
+      height: 40px;
+      width: 40px;
+    }
+  }
+
+  /* Landscape mode optimizasyonu */
+  @media (max-height: 600px) and (orientation: landscape) {
+    .hero-section {
+      padding: 1.5rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-section h1 {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-section .lead {
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card.h-100 {
+      padding: 1.2rem !important;
+    }
+
+    .stats-section {
+      margin-bottom: 1.5rem;
+    }
+  }
+</style>
+
+<div class="content-wrapper">
+  <!-- HERO SECTION -->
+  <div class="hero-section">
+    <h1 class="fw-bold mb-4">
+      Ders Notlarına Ulaşmak <br>
+      <span class="text-primary">Hiç Bu Kadar Kolay Olmamıştı.</span>
+    </h1>
+    <p class="lead">
+      Binlerce öğrenci notlarını burada paylaşıyor. İster not yükle puan kazan, ister ihtiyacın olan nota anında ulaş.
+    </p>
+
+    <div class="row justify-content-center g-4">
+      <!-- Not Ara Card -->
+      <div class="col-md-5 col-lg-4">
+        <div class="card h-100 p-4 shadow-lg hover-scale text-start position-relative overflow-hidden">
+          <div class="position-absolute top-0 end-0 p-3 opacity-10">
+            <i class="fa-solid fa-magnifying-glass fa-6x text-primary"></i>
+          </div>
+          <div class="position-relative z-1">
+            <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle p-3 d-inline-block mb-3">
+              <i class="fa-solid fa-search fa-2x"></i>
+            </div>
+            <h3 class="fw-bold">Not Ara</h3>
+            <p class="text-muted mb-4">Ders kodu veya adıyla arama yap, binlerce nota anında eriş.</p>
+
+            <form action="{% url 'search' %}" method="GET">
+              <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Örn: MAT101">
+                <button class="btn btn-primary" type="submit">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Not Yükle Card -->
+      <div class="col-md-5 col-lg-4">
+        <div class="card h-100 p-4 shadow-lg hover-scale text-start position-relative overflow-hidden bg-dark text-white">
+          <div class="position-absolute top-0 end-0 p-3 opacity-10">
+            <i class="fa-solid fa-cloud-arrow-up fa-6x text-white"></i>
+          </div>
+          <div class="position-relative z-1">
+            <div class="icon-box bg-white bg-opacity-20 text-white rounded-circle p-3 d-inline-block mb-3">
+              <i class="fa-solid fa-upload fa-2x"></i>
+            </div>
+            <h3 class="fw-bold">Not Yükle</h3>
+            <p class="text-white-50 mb-4">Kendi notlarını paylaş, puan kazan ve topluluğa katkıda bulun.</p>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}" class="btn btn-light w-100 fw-bold text-dark">
+              Hemen Yükle <i class="fa-solid fa-arrow-right ms-2"></i>
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-light w-100 fw-bold text-dark">
+              Giriş Yap ve Yükle <i class="fa-solid fa-arrow-right ms-2"></i>
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS SECTION -->
+  <div class="row g-4 stats-section text-center">
+    <div class="col-md-4">
+      <div class="card">
+        <h2 class="text-primary mb-0">{{ total_notes }}+</h2>
+        <p class="text-muted mb-0">Paylaşılan Not</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <h2 class="text-secondary mb-0">{{ total_users }}+</h2>
+        <p class="text-muted mb-0">Öğrenci</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <h2 class="text-success mb-0">100%</h2>
+        <p class="text-muted mb-0">Ücretsiz Erişim</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNIVERSITIES SECTION -->
+  <div class="universities-header">
+    <h4 class="fw-bold m-0">🏛 Üniversiteler</h4>
+    <a href="#" class="text-decoration-none fw-bold small">
+      Tümünü Gör <i class="fa-solid fa-chevron-right"></i>
+    </a>
+  </div>
+
+  <div class="row g-4">
+    {% for uni in universities %}
+    <div class="col-md-3 col-sm-6">
+      <div class="university-card hover-shadow">
+        {% if uni.logo %}
+        <img src="{{ uni.logo.url }}" class="mx-auto" alt="{{ uni.name }}">
+        {% else %}
+        <div class="logo-placeholder">
+          <i class="fa-solid fa-building-columns text-secondary fs-4"></i>
+        </div>
+        {% endif %}
+        <h6>{{ uni.name }}</h6>
+        <small>{{ uni.faculties.count }} Fakülte</small>
+        <a href="#" class="stretched-link"></a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="alert alert-light text-center">Henüz üniversite eklenmemiş.</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

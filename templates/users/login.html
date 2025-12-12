@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Giriş Yap{% endblock %}
+{% block content %}
+<style>
+  .auth-container {
+    max-width: 400px;
+    margin: 80px auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    animation: fadeIn 0.8s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+  h2 { color:#00205B; font-weight:700; margin-bottom:1.5rem; }
+  .form-group { text-align:left; margin-bottom:1rem; }
+  label { font-weight:600; display:block; margin-bottom:4px; color:#001540; }
+  input {
+    width:100%; padding:10px 12px; border:1px solid #ccc;
+    border-radius:8px; font-size:15px;
+  }
+  input:focus {
+    border-color:#00205B; outline:none;
+    box-shadow:0 0 0 2px rgba(0,32,91,0.15);
+  }
+  button {
+    width:100%; background:linear-gradient(135deg,#00205B,#001540);
+    color:#fff; border:none; border-radius:8px;
+    padding:10px; font-weight:600; cursor:pointer; transition:.3s;
+  }
+  button:hover { opacity:.9; }
+  .bottom-text { margin-top:1rem; font-size:14px; }
+  .bottom-text a { color:#00205B; font-weight:600; text-decoration:none; }
+  .msg { margin-top:1rem; font-size:15px; }
+</style>
+
+<div class="auth-container">
+  <h2>🔑 Giriş Yap</h2>
+  <form id="loginForm">
+    <div class="form-group">
+      <label for="username">Kullanıcı Adı</label>
+      <input type="text" id="username" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Şifre</label>
+      <input type="password" id="password" required>
+    </div>
+    <button type="submit">Giriş Yap</button>
+  </form>
+  <p class="bottom-text">
+    Hesabın yok mu? <a href="{% url 'register' %}">Kayıt Ol</a> <br>
+    <a href="{% url 'password_reset' %}">Şifremi Unuttum</a>
+
+  </p>
+  <p id="msg" class="msg"></p>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const msg = document.getElementById('msg');
+  msg.style.color = '#555';
+  msg.innerText = '⏳ Giriş yapılıyor...';
+
+  try {
+    const res = await fetch('/api/auth/token/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      // Token’ları kaydet
+      localStorage.setItem('access', data.access);
+      localStorage.setItem('refresh', data.refresh);
+
+      // Session başlatmak için backend’e sinyal gönder
+      await fetch('/api/auth/session-login/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ username, password })
+});
+
+
+
+      msg.style.color = 'green';
+      msg.innerText = '✅ Giriş başarılı! Yönlendiriliyorsunuz...';
+      setTimeout(()=>window.location.href='/dashboard/',1500);
+    } else {
+      msg.style.color = 'red';
+      msg.innerText = '⚠️ ' + (data.detail || 'Bilgiler hatalı veya hesap aktif değil.');
+    }
+  } catch (err) {
+    msg.style.color = 'red';
+    msg.innerText = '⚠️ Sunucu hatası, tekrar deneyin.';
+  }
+});
+</script>
+
+{% endblock %}

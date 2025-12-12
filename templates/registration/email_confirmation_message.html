@@ -1,0 +1,9 @@
+{% autoescape off %}
+Merhaba {{ user.username }},
+
+UniEduNote'a hoş geldin! Hesabını aktifleştirmek için lütfen aşağıdaki linke tıkla:
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+Eğer bu isteği sen yapmadıysan, bu maili görmezden gelebilirsin.
+{% endautoescape %}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Hesabını Aktifleştir</title>
+</head>
+<body style="font-family:Arial,sans-serif;background:#f6f9fc;padding:40px;">
+  <div style="max-width:600px;margin:auto;background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1)">
+    <h2 style="color:#1a2b6b;">Merhaba {{ user.username }} 👋</h2>
+    <p>UniEduNote’a kayıt olduğun için teşekkürler!</p>
+    <p>Hesabını aktifleştirmek için aşağıdaki butona tıklayabilirsin 👇</p>
+    <p style="text-align:center;margin:30px 0;">
+      <a href="http://{{ domain }}/activate/{{ uid }}/{{ token }}/"
+         style="background:#1a2b6b;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;">
+        Hesabımı Aktifleştir
+      </a>
+    </p>
+    <p style="color:#555;">Eğer bu işlemi sen başlatmadıysan, bu e-postayı görmezden gelebilirsin.</p>
+  </div>
+</body>
+</html>

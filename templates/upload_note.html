@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">📤 Not Yükle: {{ course.name }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Not Başlığı</label>
+                        {{ form.title }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Açıklama</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">PDF Dosyası</label>
+                        {{ form.pdf_file }}
+                        <div class="form-text">Lütfen sadece PDF formatında dosya yükleyiniz.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 py-2">✅ Notu Paylaş</button>
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'course_detail' course.id %}" class="text-secondary">İptal Et ve Geri Dön</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
