@@ -4,28 +4,23 @@ from datetime import timedelta
 import dj_database_url
 from dotenv import load_dotenv
 
-# .env dosyasını yükle (Lokalde ve Sunucuda environment değişkenlerini okumak için)
+# .env dosyasını yükle
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-
 # ------------------------------------------------------------------
 # GÜVENLİK
 # ------------------------------------------------------------------
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-default-key")
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-varsayilan-anahtar")
 
-# Canlıda (Sunucuda) DEBUG False olmalı, lokalde True olabilir
+# Canlıda False, Lokalde True
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-# .env dosyasındaki ALLOWED_HOSTS'u virgülle ayırıp listeye çevirir
-# Örn: "127.0.0.1,165.22.xx.xx,siteadi.com" -> ['127.0.0.1', '165.22.xx.xx', 'siteadi.com']
+# Allowed Hosts
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
 
 CSRF_TRUSTED_ORIGINS = []
-if os.environ.get("RENDER_EXTERNAL_HOSTNAME"):  # Render kalıntısı ama zararı yok
-    CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME')}")
 # Alan adın varsa HTTPS için buraya eklenmeli
 if "dersnotlarım.com.tr" in str(ALLOWED_HOSTS):
     CSRF_TRUSTED_ORIGINS.append("https://dersnotlarım.com.tr")
@@ -41,13 +36,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    # Cloudinary SİLİNDİ (Artık sunucu diskini kullanacağız)
-
+    # Cloudinary YOK
     "rest_framework",
     "rest_framework_simplejwt",
     "django.contrib.sites",
-
     # Kendi uygulamaların
     "users",
     "categories",
@@ -63,7 +55,7 @@ SITE_ID = 1
 # ------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # Statik dosyalar için performans sağlar
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -95,9 +87,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "uniedunote.wsgi.application"
 
 # ------------------------------------------------------------------
-# VERİTABANI (PostgreSQL Hazır)
+# VERİTABANI
 # ------------------------------------------------------------------
-# .env dosyasındaki DATABASE_URL'i okur. Yoksa sqlite kullanır.
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
@@ -112,47 +103,38 @@ USE_I18N = True
 USE_TZ = True
 
 # ------------------------------------------------------------------
-# STATİK VE MEDYA (YEREL DİSK AYARLARI)
+# STATİK VE MEDYA
 # ------------------------------------------------------------------
-
-# Statik Dosyalar (CSS, JS, İkonlar)
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# Medya Dosyaları (Kullanıcıların yüklediği Notlar/Resimler)
-# Cloudinary yerine artık sunucunun kendi klasörüne kaydedilecek.
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {
-    # Varsayılan: Yerel Disk (Media dosyaları için)
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
-    # Statik dosyalar: WhiteNoise (Sıkıştırma yapar, hızlıdır)
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
 # ------------------------------------------------------------------
-# MAIL AYARLARI (SMTP)
+# MAIL AYARLARI
 # ------------------------------------------------------------------
-# .env dosyasından okur, yoksa varsayılanları kullanır
 EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "").strip()
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "UniEduNote <noreply@dersnotlarim.com.tr>")
-
-# SendGrid API Key (Opsiyonel, SMTP kullanıyorsan gerek yok ama kalsın)
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "UniEduNote <ai.serhat78@gmail.com>")
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")
 
 # ------------------------------------------------------------------
-# REST FRAMEWORK & JWT
+# JWT
 # ------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -168,3 +150,4 @@ SIMPLE_JWT = {
 }
 
 BACKEND_BASE_URL = os.environ.get("BACKEND_BASE_URL", "http://127.0.0.1:8000")
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
