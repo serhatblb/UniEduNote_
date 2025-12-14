@@ -107,6 +107,36 @@
       transition: margin-left 0.3s ease;
     }
 
+    /* === LANDING PAGE STİLLERİ (Ana Sayfa İçin) === */
+    .landing {
+      background: linear-gradient(145deg, #1e3a8a, #3b82f6, #7dd3fc);
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: #fff;
+      text-align: center;
+      padding: 2rem;
+      border-radius: 20px;
+    }
+
+    .landing h1 { font-size: 3rem; margin-bottom: 1rem; }
+    .landing p { font-size: 1.2rem; max-width: 700px; margin-bottom: 2rem; }
+    .icon-row { font-size: 2.5rem; margin-bottom: 1.5rem; }
+
+    .landing-buttons { display: flex; gap: 1rem; }
+    .landing-buttons a {
+      padding: 1rem 2rem; border-radius: 50px; text-decoration: none; font-weight: bold;
+      background: white; color: #1e3a8a; transition: 0.3s;
+    }
+    .landing-buttons a:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+    .stats-container { display: flex; gap: 2rem; margin-top: 3rem; flex-wrap: wrap; justify-content: center; }
+    .stat-box { background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 15px; min-width: 150px; }
+    .stat-box h2 { margin: 0; font-size: 2rem; }
+
     /* === OVERLAY (Mobilde menü açılınca arkası kararır) === */
     .overlay {
       display: none;
@@ -136,11 +166,13 @@
       /* Mobil Header Görünür */
       .mobile-header { display: flex; }
 
-      /* Ana içerik genişler ve yukarıdan boşluk bırakır */
+      /* Ana içerik padding ayarı */
       .main {
         margin-left: 0;
-        padding: 1.5rem;
-        padding-top: 80px; /* Header için boşluk */
+        padding: 0;
+        padding-top: 60px; /* Header yüksekliği kadar boşluk */
+        width: 100%;
+        overflow-x: hidden;
       }
 
       /* Overlay görünürlük ayarı */
@@ -148,6 +180,18 @@
         display: block;
         opacity: 1;
       }
+
+      /* Landing (Karşılama) sayfası düzeltmeleri */
+      .landing {
+        min-height: calc(100vh - 60px); /* Ekran boyu - header */
+        border-radius: 0;
+        padding: 2rem 1rem;
+      }
+
+      .landing h1 { font-size: 2rem; }
+      .icon-row { font-size: 1.8rem; flex-wrap: wrap; justify-content: center; }
+      .landing-buttons { flex-direction: column; width: 100%; }
+      .landing-buttons a { width: 100%; text-align: center; }
     }
   </style>
 </head>
