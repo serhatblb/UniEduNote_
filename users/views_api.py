@@ -76,19 +76,25 @@ class PasswordResetRequestAPIView(APIView):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
+            # Güvenlik için kullanıcı yoksa bile "Gönderildi" diyelim (User Enumeration engellemek için)
+            # Ama test aşamasında hata dönebiliriz. Şimdilik hata dönelim:
             return Response({"error": "Bu e-posta adresi kayıtlı değil."}, status=400)
 
-        current_site = get_current_site(request)
-        subject = "UniEduNote Şifre Sıfırlama"
-        message = render_to_string("users/password_reset_email.html", {
-            "user": user,
-            "domain": current_site.domain,
-            "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-            "token": account_activation_token.make_token(user),
-        })
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
-        return Response({"message": "Şifre sıfırlama e-postası gönderildi."})
+        # Token ve UID oluştur
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = account_activation_token.make_token(user)
 
+        # Linki settings'den alalım (Daha güvenli)
+        reset_link = f"{settings.BACKEND_BASE_URL}/password-reset-confirm/{uid}/{token}/"
+
+        subject = "UniEduNote Şifre Sıfırlama"
+        message = f"Merhaba {user.username},\n\nŞifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:\n\n{reset_link}\n\nEğer bu isteği siz yapmadıysanız dikkate almayın."
+
+        try:
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email], fail_silently=False)
+            return Response({"message": "Şifre sıfırlama e-postası gönderildi."})
+        except Exception as e:
+            return Response({"error": f"Mail gönderilemedi: {str(e)}"}, status=500)
 
 # ✅ Şifre sıfırlama (onay)
 class PasswordResetConfirmAPIView(APIView):
