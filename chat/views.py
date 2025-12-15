@@ -5,10 +5,10 @@ from .models import ChatMessage
 import json
 import re
 
-# ==========================
-# CHAT VIEWS
-# ==========================
 
+# ==========================
+# CHAT SAYFASI
+# ==========================
 @login_required(login_url='/login/')
 def chat_room(request):
     return render(request, 'chat/room.html')
@@ -29,7 +29,6 @@ def get_messages(request):
 # ==========================
 # KÜFÜR FİLTRESİ
 # ==========================
-
 BAD_WORDS = [
     "aptal", "salak", "gerizekalı", "geri zekalı", "embesil", "ahmak",
     "beyinsiz", "mal", "dangoz", "öküz", "eşek", "hayvan",
@@ -58,47 +57,19 @@ BAD_WORDS = [
 
 
 def normalize_text(text):
-    replacements = {
-        "ı": "i", "İ": "i",
-        "ş": "s", "Ş": "s",
-        "ğ": "g", "Ğ": "g",
-        "ç": "c", "Ç": "c",
-        "ö": "o", "Ö": "o",
-        "ü": "u", "Ü": "u"
-    }
+    replacements = {"ı": "i", "İ": "i", "ş": "s", "Ş": "s", "ğ": "g", "Ğ": "g", "ç": "c", "Ç": "c", "ö": "o", "Ö": "o",
+                    "ü": "u", "Ü": "u"}
     text = text.lower()
     for k, v in replacements.items():
         text = text.replace(k, v)
     return text
 
 
-def word_to_regex(word):
-    word = normalize_text(word)
-    pattern = ""
-    for char in word:
-        pattern += char + r"[\W_]*"
-    return pattern
-
-
-def filter_profanity(text):
-    normalized = normalize_text(text)
-
-    for bad_word in BAD_WORDS:
-        pattern = word_to_regex(bad_word)
-        regex = re.compile(pattern, re.IGNORECASE)
-
-        if regex.search(normalized):
-            text = regex.sub("*" * len(bad_word), text)
-
-    return text
-
-
 def contains_profanity(text):
     normalized = normalize_text(text)
-
     for bad_word in BAD_WORDS:
-        pattern = word_to_regex(bad_word)
-        if re.search(pattern, normalized, re.IGNORECASE):
+        # Kelime içinde geçiyor mu? (Basit kontrol)
+        if bad_word in normalized:
             return True
     return False
 
@@ -106,29 +77,28 @@ def contains_profanity(text):
 # ==========================
 # MESAJ GÖNDERME
 # ==========================
-
 @login_required
 def send_message(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        msg = data.get('message', '').strip()
+        try:
+            data = json.loads(request.body)
+            msg = data.get('message', '').strip()
 
-        if not msg:
-            return JsonResponse({'status': 'empty'})
+            if not msg:
+                return JsonResponse({'status': 'empty'})
 
-        # 🚫 Küfür varsa engelle
-        if contains_profanity(msg):
-            return JsonResponse({
-                'status': 'blocked',
-                'error': 'Mesajınız uygunsuz kelimeler içeriyor.'
-            })
+            # 🚫 Küfür varsa engelle
+            if contains_profanity(msg):
+                return JsonResponse({
+                    'status': 'blocked',
+                    'error': 'Mesajınız uygunsuz kelimeler içeriyor. Lütfen düzeltin.'
+                })
 
-        # ✅ Temiz mesajı kaydet
-        ChatMessage.objects.create(
-            user=request.user,
-            message=msg
-        )
+            # ✅ Temiz mesajı kaydet
+            ChatMessage.objects.create(user=request.user, message=msg)
+            return JsonResponse({'status': 'ok'})
 
-        return JsonResponse({'status': 'ok'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'error': str(e)})
 
     return JsonResponse({'status': 'error'})
