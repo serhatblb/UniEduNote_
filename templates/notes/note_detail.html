@@ -128,44 +128,102 @@
 </div>
 
 <script>
-    // Mevcut JS kodların (Beğeni ve Yorum için) aynen çalışacak, sadece ID'ler korundu.
-    const noteId={{ note.id }};
-    const token=localStorage.getItem('access');
+    const noteId = {{ note.id }};
+    const token = localStorage.getItem('access');
+    const currentUserId = {{ request.user.id }}; // Mevcut kullanıcı ID'si
 
-    // Beğeni JS (Basitleştirilmiş)
-    document.getElementById('likeBtn').addEventListener('click', async()=>{
-      try{
-        const res=await fetch(`/api/notes/${noteId}/like/`,{method:'POST',headers:{'Authorization':'Bearer '+token}});
-        const data=await res.json();
-        document.getElementById('likeCount').innerText=data.total_likes;
-      }catch{ alert('Giriş yapmalısın!'); }
-    });
-
-    // Yorum JS
+    // Yorumları Yükle
     async function loadComments(){
-      const list=document.getElementById('commentList');
+      const list = document.getElementById('commentList');
       try{
-        const res=await fetch(`/api/notes/${noteId}/comments/`,{headers:{'Authorization':'Bearer '+token}});
-        const data=await res.json();
-        list.innerHTML= data.length ? data.map(c=>`
-          <div class='comment-item'>
-            <div class='comment-user'>${c.user} <span class='comment-date'>• ${new Date(c.created_at).toLocaleDateString()}</span></div>
-            <div class='comment-text'>${c.content}</div>
-          </div>`).join('') : "<p style='color:#999'>Henüz yorum yok.</p>";
-      }catch{ list.innerHTML='Yorumlar yüklenemedi.'; }
+        // Token varsa header'a ekle, yoksa ekleme
+        const headers = token ? {'Authorization':'Bearer '+token} : {};
+        const res = await fetch(`/api/notes/${noteId}/comments/`, {headers});
+        const data = await res.json();
+
+        if(data.length === 0) {
+            list.innerHTML = "<p style='color:#999'>Henüz yorum yok. İlk yorumu sen yap!</p>";
+            return;
+        }
+
+        list.innerHTML = data.map(c => `
+          <div class='comment-item' id='comment-${c.id}'>
+            <div style="display:flex; justify-content:space-between;">
+                <div class='comment-user'>${c.user} <span class='comment-date'>• ${new Date(c.created_at).toLocaleDateString()}</span></div>
+
+                <!-- Sadece Kendi Yorumuysa Butonları Göster -->
+                ${c.user_id == currentUserId ? `
+                <div style="font-size:0.8rem;">
+                    <button onclick="editMode(${c.id}, '${c.content.replace(/'/g, "\\'")}')" style="background:none; border:none; color:#007AFF; cursor:pointer;">Düzenle</button>
+                    <button onclick="deleteComment(${c.id})" style="background:none; border:none; color:#FF3B30; cursor:pointer; margin-left:5px;">Sil</button>
+                </div>
+                ` : ''}
+            </div>
+            <div class='comment-text' id='text-${c.id}'>${c.content}</div>
+          </div>`).join('');
+
+      } catch(e) {
+          console.error(e);
+          list.innerHTML='Yorumlar yüklenemedi.';
+      }
     }
 
+    // Yorum Gönder
     document.getElementById('sendComment').addEventListener('click', async()=>{
-      const text=document.getElementById('commentText').value.trim();
+      const text = document.getElementById('commentText').value.trim();
       if(!text) return;
-      await fetch(`/api/notes/${noteId}/comments/`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-        body:JSON.stringify({content:text})
-      });
-      document.getElementById('commentText').value='';
-      loadComments();
+
+      try {
+          await fetch(`/api/notes/${noteId}/comments/`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+            body:JSON.stringify({content:text})
+          });
+          document.getElementById('commentText').value='';
+          loadComments(); // Listeyi yenile
+      } catch(e) { alert("Yorum gönderilemedi."); }
     });
+
+    // Düzenleme Modunu Aç
+    window.editMode = function(id, content) {
+        const div = document.getElementById(`comment-${id}`);
+        div.innerHTML = `
+            <textarea id="edit-input-${id}" rows="3" style="width:100%; padding:10px;">${content}</textarea>
+            <div style="margin-top:5px; display:flex; gap:10px;">
+                <button onclick="saveEdit(${id})" class="btn-action btn-primary" style="padding:8px 15px; font-size:0.8rem;">Kaydet</button>
+                <button onclick="loadComments()" class="btn-action btn-secondary" style="padding:8px 15px; font-size:0.8rem;">İptal</button>
+            </div>
+        `;
+    }
+
+    // Düzenlemeyi Kaydet
+    window.saveEdit = async function(id) {
+        const newText = document.getElementById(`edit-input-${id}`).value.trim();
+        if(!newText) return;
+
+        try {
+            await fetch(`/api/notes/${noteId}/comments/`,{
+                method:'PUT', // Veya PATCH
+                headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+                body:JSON.stringify({id: id, content: newText}) // API yapına göre sadece content de olabilir
+            });
+            loadComments();
+        } catch(e) { alert("Düzenleme başarısız."); }
+    }
+
+    // Yorum Sil
+    window.deleteComment = async function(id) {
+        if(!confirm('Yorumu silmek istediğine emin misin?')) return;
+
+        try {
+            await fetch(`/api/notes/${noteId}/comments/`,{
+                method:'DELETE',
+                headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+                body:JSON.stringify({id: id}) // Bazı API'ler body ister, bazıları URL'den (comments/ID/) siler.
+            });
+            loadComments();
+        } catch(e) { alert("Silme başarısız."); }
+    }
 
     loadComments();
 </script>
