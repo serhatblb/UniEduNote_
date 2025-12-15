@@ -278,37 +278,27 @@
 
     {% else %}
     <!-- === GİRİŞ YAPMAMIŞ (MİSAFİR) ARAYÜZÜ === -->
-    <div class="landing-page">
-        <div class="landing-hero glass" style="padding: 40px; max-width: 800px;">
-            <div style="font-size: 3rem; margin-bottom: 20px;">🎓 🚀 📚</div>
-            <h1>Üniversite Notları Artık Cebinde!</h1>
-            <p>
-                Ders notlarını paylaş, arkadaşlarının notlarını indir ve akademik topluluğun bir parçası ol.
-                Binlerce öğrenci arasına katılmak için hemen başla.
-            </p>
-            <div style="margin-top: 30px;">
-                <a href="{% url 'register' %}" class="landing-btn btn-primary">Hemen Kayıt Ol</a>
-                <a href="{% url 'login' %}" class="landing-btn btn-outline">Giriş Yap</a>
-            </div>
-        </div>
 
-        <!-- İstatistikler -->
-        <div style="display: flex; gap: 20px; margin-top: 50px; flex-wrap: wrap; justify-content: center;">
-            <div class="glass" style="padding: 20px 40px; min-width: 150px;">
-                <h2 style="margin: 0; color: var(--primary);">10+</h2>
-                <p style="margin: 0; color: var(--text-gray);">Üniversite</p>
-            </div>
-            <div class="glass" style="padding: 20px 40px; min-width: 150px;">
-                <h2 style="margin: 0; color: var(--primary);">500+</h2>
-                <p style="margin: 0; color: var(--text-gray);">Ders Notu</p>
+    <!-- Eğer Login veya Register sayfasındaysak Landing'i gösterme, sadece formu göster -->
+    {% if request.resolver_match.url_name == 'login' or request.resolver_match.url_name == 'register' or request.resolver_match.url_name == 'password_reset' %}
+        <div style="padding: 20px;">
+            {% block content %}{% endblock %}
+        </div>
+    {% else %}
+        <!-- Landing Page (Sadece Ana Sayfada Görünsün) -->
+        <div class="landing-page">
+            <div class="landing-hero glass" style="padding: 40px; max-width: 800px;">
+                <div style="font-size: 3rem; margin-bottom: 20px;">🎓 🚀 📚</div>
+                <h1>Üniversite Notları Artık Cebinde!</h1>
+                <p>Binlerce öğrenci arasına katılmak için hemen başla.</p>
+                <div style="margin-top: 30px;">
+                    <a href="{% url 'register' %}" class="landing-btn btn-primary">Hemen Kayıt Ol</a>
+                    <a href="{% url 'login' %}" class="landing-btn btn-outline">Giriş Yap</a>
+                </div>
             </div>
         </div>
+    {% endif %}
 
-        <!-- Eğer misafir sayfalar (Login/Register) render ediliyorsa block content burada çalışsın -->
-        <div style="margin-top: 40px; width: 100%; max-width: 500px;">
-            {% block guest_content %}{% endblock %}
-        </div>
-    </div>
     {% endif %}
 
 </body>
