@@ -12,6 +12,11 @@ from .email_utils import send_activation_email
 
 User = get_user_model()
 
+# --- EKSİK OLAN HOME FONKSİYONU ---
+def home(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    return render(request, 'base.html')
 
 def register_view(request):
     if request.method == "POST":
@@ -71,18 +76,19 @@ def logout_view(request):
     return redirect("home")
 
 
-# Şifre sıfırlama sayfaları (şimdilik sadece template render)
+# --- Şifre sıfırlama sayfaları ---
 def password_reset_page(request):
     return render(request, "users/password_reset.html")
-
 
 def password_reset_done_page(request):
     return render(request, "users/password_reset_done.html")
 
-
-def password_reset_confirm_page(request):
-    return render(request, "users/password_reset_confirm.html")
-
+# BURASI GÜNCELLENDİ (Parametreleri alacak şekilde)
+def password_reset_confirm_page(request, uidb64, token):
+    return render(request, "users/password_reset_confirm.html", {
+        'uid': uidb64,
+        'token': token
+    })
 
 def password_reset_complete_page(request):
     return render(request, "users/password_reset_complete.html")
@@ -96,13 +102,3 @@ def dashboard(request):
 @login_required(login_url="/login/")
 def profile(request):
     return render(request, "profile.html")
-
-
-@login_required(login_url="/login/")
-def upload_note(request):
-    return render(request, "upload_note.html")
-
-
-@login_required(login_url="/login/")
-def note_list(request):
-    return render(request, "note_list.html")
