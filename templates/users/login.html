@@ -1,60 +1,110 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Giriş Yap{% endblock %}
+
 {% block content %}
 <style>
-  .auth-container {
-    max-width: 400px;
-    margin: 80px auto;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    padding: 2.5rem 2rem;
+  .auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 150px);
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
     text-align: center;
-    animation: fadeIn 0.8s ease;
   }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
-  h2 { color:#00205B; font-weight:700; margin-bottom:1.5rem; }
-  .form-group { text-align:left; margin-bottom:1rem; }
-  label { font-weight:600; display:block; margin-bottom:4px; color:#001540; }
+
+  .form-group {
+    text-align: left;
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+    color: var(--text-dark);
+  }
+
   input {
-    width:100%; padding:10px 12px; border:1px solid #ccc;
-    border-radius:8px; font-size:15px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.6);
+    font-size: 1rem;
+    transition: 0.3s;
+    box-sizing: border-box;
   }
+
   input:focus {
-    border-color:#00205B; outline:none;
-    box-shadow:0 0 0 2px rgba(0,32,91,0.15);
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
   }
+
   button {
-    width:100%; background:linear-gradient(135deg,#00205B,#001540);
-    color:#fff; border:none; border-radius:8px;
-    padding:10px; font-weight:600; cursor:pointer; transition:.3s;
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
   }
-  button:hover { opacity:.9; }
-  .bottom-text { margin-top:1rem; font-size:14px; }
-  .bottom-text a { color:#00205B; font-weight:600; text-decoration:none; }
-  .msg { margin-top:1rem; font-size:15px; }
+
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+  }
+
+  .bottom-text {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+  }
+
+  .bottom-text a {
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .msg { margin-top: 15px; font-weight: 600; font-size: 0.95rem; }
 </style>
 
-<div class="auth-container">
-  <h2>🔑 Giriş Yap</h2>
-  <form id="loginForm">
-    <div class="form-group">
-      <label for="username">Kullanıcı Adı</label>
-      <input type="text" id="username" required>
-    </div>
-    <div class="form-group">
-      <label for="password">Şifre</label>
-      <input type="password" id="password" required>
-    </div>
-    <button type="submit">Giriş Yap</button>
-  </form>
-  <p class="bottom-text">
-    Hesabın yok mu? <a href="{% url 'register' %}">Kayıt Ol</a> <br>
-    <a href="{% url 'password_reset' %}">Şifremi Unuttum</a>
+<div class="auth-wrapper">
+  <div class="glass auth-card">
+    <div style="font-size: 3rem; margin-bottom: 10px;">👋</div>
+    <h2 style="margin-bottom: 30px; color: var(--text-dark);">Tekrar Hoşgeldin!</h2>
 
-  </p>
-  <p id="msg" class="msg"></p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Kullanıcı Adı</label>
+        <input type="text" id="username" placeholder="Kullanıcı adın" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Şifre</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit">Giriş Yap</button>
+    </form>
+
+    <p id="msg" class="msg"></p>
+
+    <div class="bottom-text">
+      Hesabın yok mu? <a href="{% url 'register' %}">Kayıt Ol</a> <br><br>
+      <a href="{% url 'password_reset' %}" style="color: var(--text-gray); font-size: 0.85rem;">Şifremi Unuttum</a>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -63,10 +113,11 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
   const msg = document.getElementById('msg');
-  msg.style.color = '#555';
+  msg.style.color = '#666';
   msg.innerText = '⏳ Giriş yapılıyor...';
 
   try {
+    // 1. Token Al
     const res = await fetch('/api/auth/token/', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -75,31 +126,27 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const data = await res.json();
 
     if (res.ok) {
-      // Token’ları kaydet
       localStorage.setItem('access', data.access);
       localStorage.setItem('refresh', data.refresh);
 
-      // Session başlatmak için backend’e sinyal gönder
+      // 2. Session Başlat (Django girişi)
       await fetch('/api/auth/session-login/', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ username, password })
-});
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
 
-
-
-      msg.style.color = 'green';
+      msg.style.color = '#34C759';
       msg.innerText = '✅ Giriş başarılı! Yönlendiriliyorsunuz...';
-      setTimeout(()=>window.location.href='/dashboard/',1500);
+      setTimeout(() => window.location.href='/dashboard/', 1000);
     } else {
-      msg.style.color = 'red';
-      msg.innerText = '⚠️ ' + (data.detail || 'Bilgiler hatalı veya hesap aktif değil.');
+      msg.style.color = '#FF3B30';
+      msg.innerText = '⚠️ ' + (data.detail || 'Kullanıcı adı veya şifre hatalı.');
     }
   } catch (err) {
-    msg.style.color = 'red';
-    msg.innerText = '⚠️ Sunucu hatası, tekrar deneyin.';
+    msg.style.color = '#FF3B30';
+    msg.innerText = '⚠️ Sunucu hatası, lütfen tekrar deneyin.';
   }
 });
 </script>
-
 {% endblock %}
