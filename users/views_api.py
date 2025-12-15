@@ -8,7 +8,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.conf import settings
-
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -160,31 +160,41 @@ def session_login(request):
 # ✅ Profil Güncelleme (JWT zorunlu)
 class UserProfileUpdateAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  # Dosya yükleme yeteneği
 
     def post(self, request):
         user = request.user
         data = request.data
 
-        username = data.get("username", "").strip()
-        email = data.get("email", "").strip()
-        university = data.get("university", "").strip()
-        password = data.get("password", "").strip()
+        # Kullanıcı adı ve e-posta
+        username = data.get("username")
+        email = data.get("email")
 
-        if not username or not email:
-            return Response({"error": "Kullanıcı adı ve e-posta zorunludur."}, status=400)
+        if username: user.username = username
+        if email: user.email = email
 
-        if password and user.check_password(password):
-            return Response({"error": "Yeni şifre eskiyle aynı olamaz."}, status=400)
-
-        user.username = username
-        user.email = email
-
-        # Üniversite alanı modelde varsa
-        if hasattr(user, "university") and university:
-            user.university = university
-
-        if password:
+        # Şifre değiştirme
+        password = data.get("password")
+        if password and len(password) >= 8:
             user.set_password(password)
 
-        user.save()
-        return Response({"message": "Profil başarıyla güncellendi."})
+        # Üniversite Güncelleme (ID gelir)
+        uni_id = data.get("university")
+        if uni_id:
+            try:
+                # Veritabanından ID ile bulup atıyoruz
+                from categories.models import University
+                user.university = University.objects.get(id=uni_id)
+            except:
+                pass  # Hatalı ID gelirse yoksay
+
+        # Avatar Güncelleme (Dosya)
+        avatar = request.FILES.get('avatar')
+        if avatar:
+            user.avatar = avatar
+
+        try:
+            user.save()
+            return Response({"message": "Profil başarıyla güncellendi."})
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)

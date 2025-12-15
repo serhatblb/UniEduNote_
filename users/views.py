@@ -7,6 +7,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
+
 from .forms import RegisterForm
 from .tokens import account_activation_token
 from .email_utils import send_activation_email
@@ -19,7 +20,13 @@ def home(request):
         return redirect('dashboard')
     return render(request, 'base.html')
 
+
+# users/views.py
+
 def register_view(request):
+    # 1. Üniversite listesini çekiyoruz (Dropdown için şart)
+    universities = University.objects.all().order_by('name')
+
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
@@ -38,8 +45,13 @@ def register_view(request):
             return redirect("login")
     else:
         form = RegisterForm()
-    return render(request, "users/register.html", {"form": form})
 
+    # 2. Hem formu hem de üniversite listesini şablona gönderiyoruz
+    context = {
+        'form': form,
+        'universities': universities
+    }
+    return render(request, "users/register.html", context)
 
 def activate_account(request, uidb64, token):
     try:

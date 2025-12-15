@@ -89,6 +89,9 @@
                 <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-grid-2"></i> Paneli</a>
                 <a href="{% url 'note_list' %}" class="menu-item {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-compass"></i> Keşfet</a>
                 <a href="{% url 'upload_note' %}" class="menu-item {% if 'upload' in request.path %}active{% endif %}"><i class="fa-solid fa-cloud-arrow-up"></i> Not Yükle</a>
+                <a href="{% url 'chat_room' %}" class="menu-item {% if 'chat' in request.path %}active{% endif %}">
+    <i class="fa-regular fa-comments"></i> Sohbet
+</a>
                 <a href="{% url 'profile' %}" class="menu-item {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i> Profil</a>
             </nav>
             <div style="margin-top: auto;">
@@ -161,6 +164,9 @@
         <a href="{% url 'dashboard' %}" class="nav-icon {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-house"></i></a>
         <a href="{% url 'note_list' %}" class="nav-icon {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-magnifying-glass"></i></a>
         <a href="{% url 'upload_note' %}" class="add-btn-mobile"><i class="fa-solid fa-plus"></i></a>
+    <a href="{% url 'chat_room' %}" class="nav-icon {% if 'chat' in request.path %}active{% endif %}">
+    <i class="fa-regular fa-comments"></i>
+</a>
         <a href="{% url 'profile' %}" class="nav-icon {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i></a>
         <a href="{% url 'logout' %}" class="nav-icon" style="color: #FF3B30;"><i class="fa-solid fa-power-off"></i></a>
     </div>
