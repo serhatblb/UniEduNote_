@@ -51,67 +51,75 @@
   <div class="glass auth-card">
     <div style="font-size: 3rem; margin-bottom: 10px;">🚀</div>
     <h2 style="margin-bottom: 10px; color: var(--text-dark);">Aramıza Katıl!</h2>
-    <p style="color: var(--text-gray); margin-bottom: 30px;">Hemen hesap oluştur, notlarını paylaş.</p>
 
     <form id="registerForm">
       <div class="form-group">
-        <label for="username">Kullanıcı Adı</label>
+        <label>Kullanıcı Adı (Sadece harf ve rakam)</label>
         <input type="text" id="username" placeholder="Örn: ogrenci123" required>
       </div>
       <div class="form-group">
-        <label for="email">E-posta</label>
+        <label>E-posta</label>
         <input type="email" id="email" placeholder="ornek@email.com" required>
       </div>
+      <!-- Yeni: Üniversite Seçimi -->
       <div class="form-group">
-        <label for="password">Şifre</label>
-        <input type="password" id="password" placeholder="En az 6 karakter" required>
+        <label>Üniversite (İsteğe Bağlı)</label>
+        <select id="university" style="width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.6);">
+            <option value="">Seçiniz...</option>
+            <!-- JS ile dolacak -->
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Şifre (En az 8 karakter)</label>
+        <input type="password" id="password" placeholder="Güçlü bir şifre" required>
       </div>
       <button type="submit">Kayıt Ol</button>
     </form>
-
     <p id="msg" class="msg"></p>
-
     <p class="bottom-text">Zaten hesabın var mı? <a href="{% url 'login' %}">Giriş Yap</a></p>
   </div>
 </div>
 
 <script>
+// Üniversiteleri Yükle
+fetch('/ajax/load-faculties/?university=all') // Bu endpoint yoksa manuel liste koyabilirsin veya mevcut ajax yapını kullan
+    .catch(() => console.log("Üniversite listesi yüklenemedi (API yoksa normal)"));
+
+// Kayıt İşlemi
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const username = document.getElementById('username').value.trim();
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
+  const university = document.getElementById('university').value;
   const msg = document.getElementById('msg');
 
-  msg.style.color = '#666';
-  msg.innerText = '⏳ Kayıt yapılıyor...';
+  msg.style.color = '#666'; msg.innerText = '⏳ Kayıt yapılıyor...';
 
   try {
     const res = await fetch('/api/auth/register/', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ username, email, password })
+      body: JSON.stringify({ username, email, password, university })
     });
     const data = await res.json();
+
     if (res.ok) {
       msg.style.color = '#34C759';
-      msg.innerText = '✅ Kayıt başarılı! Aktivasyon maili gönderildi. Lütfen mail kutunu kontrol et.';
+      msg.innerText = '✅ Kayıt başarılı! Aktivasyon mailini kontrol et.';
       e.target.reset();
     } else {
       msg.style.color = '#FF3B30';
-      // Hata mesajını düzgün göster
-      let errorText = "Bir hata oluştu.";
-      if (data.detail) errorText = data.detail;
-      else if (data.username) errorText = "Bu kullanıcı adı zaten alınmış.";
-      else if (data.email) errorText = "Bu e-posta adresi zaten kullanımda.";
-      else if (data.password) errorText = "Şifre çok kısa veya basit.";
+      // Detaylı Hata Gösterimi
+      let errorMsg = "Hata oluştu.";
+      if(data.username) errorMsg = data.username[0];
+      else if(data.email) errorMsg = data.email[0];
+      else if(data.password) errorMsg = data.password[0];
+      else if(data.detail) errorMsg = data.detail;
 
-      msg.innerText = '⚠️ ' + errorText;
+      msg.innerText = '⚠️ ' + errorMsg;
     }
-  } catch (err) {
-    msg.style.color = '#FF3B30';
-    msg.innerText = '⚠️ Sunucu hatası, lütfen tekrar deneyin.';
-  }
+  } catch { msg.innerText = '⚠️ Sunucu hatası.'; }
 });
 </script>
 {% endblock %}

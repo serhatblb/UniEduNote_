@@ -1,43 +1,71 @@
 {% extends "base.html" %}
-{% block title %}Profil Bilgileri{% endblock %}
+{% block title %}Profilim{% endblock %}
 
 {% block content %}
 <style>
-    .profile-container { max-width: 800px; margin: 0 auto; }
+    .profile-container { max-width: 850px; margin: 0 auto; }
 
     .profile-header {
         display: flex;
         align-items: center;
-        gap: 20px;
-        margin-bottom: 30px;
+        gap: 25px;
+        margin-bottom: 35px;
+        position: relative;
     }
 
-    .profile-avatar {
-        width: 80px; height: 80px;
+    .profile-avatar-large {
+        width: 100px; height: 100px;
         background: var(--primary);
         color: white;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: 800;
-        box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 122, 255, 0.4);
+        border: 4px solid white;
+        overflow: hidden;
+    }
+
+    .profile-avatar-large img {
+        width: 100%; height: 100%; object-fit: cover;
+    }
+
+    .rank-badge {
+        background: #FFD60A;
+        color: #1D1D1F;
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+        border-radius: 8px;
+        display: inline-block;
+        margin-top: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     .info-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
         margin-bottom: 30px;
     }
 
-    .info-item label {
+    .info-card {
+        background: rgba(255,255,255,0.5);
+        padding: 15px 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .info-label {
         display: block;
         font-size: 0.85rem;
         color: var(--text-gray);
         margin-bottom: 5px;
         font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .info-value {
@@ -46,94 +74,124 @@
         color: var(--text-dark);
     }
 
-    /* Form Stilleri */
+    /* Form Elemanları */
     input, select {
-        width: 100%; padding: 12px; border-radius: 12px;
-        border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.6);
+        width: 100%; padding: 14px; border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.1); background: white;
         font-size: 1rem; transition: 0.3s; box-sizing: border-box;
+        color: var(--text-dark);
     }
     input:focus, select:focus {
-        border-color: var(--primary); background: white; outline: none;
+        border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,122,255,0.1);
     }
 
     .btn-action {
-        padding: 12px 24px; border-radius: 12px; font-weight: 600;
-        border: none; cursor: pointer; transition: 0.3s;
+        padding: 14px 28px; border-radius: 14px; font-weight: 600;
+        border: none; cursor: pointer; transition: 0.3s; font-size: 1rem;
+        display: inline-flex; align-items: center; gap: 8px;
     }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-secondary { background: rgba(0,0,0,0.05); color: var(--text-dark); }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3); }
+    .btn-primary:hover { transform: translateY(-2px); }
+
+    .btn-secondary { background: #E5E5EA; color: var(--text-dark); }
+    .btn-secondary:hover { background: #D1D1D6; }
+
+    /* Dosya Yükleme */
+    .file-input-wrapper {
+        position: relative;
+        margin-top: 10px;
+    }
+    input[type="file"] {
+        padding: 10px; border: 1px dashed var(--primary); background: rgba(0,122,255,0.05);
+    }
 </style>
 
 <div class="profile-container">
     <div class="glass" style="padding: 40px;">
 
+        <!-- Üst Başlık -->
         <div class="profile-header">
-            <div class="profile-avatar">{{ user.username|make_list|first|upper }}</div>
+            <div class="profile-avatar-large">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="Avatar">
+                {% else %}
+                    {{ user.username|make_list|first|upper }}
+                {% endif %}
+            </div>
             <div>
-                <h2 style="margin: 0; color: var(--text-dark);">{{ user.username }}</h2>
-                <p style="margin: 5px 0 0; color: var(--text-gray);">{{ user.email }}</p>
+                <h1 style="margin: 0; font-size: 2rem; color: var(--text-dark);">{{ user.username }}</h1>
+                <div class="rank-badge">
+                    {% if total_downloads > 100 %} 🧠 Profesör
+                    {% elif total_downloads > 50 %} 🎓 Mezun
+                    {% elif total_downloads > 10 %} ✏️ Öğrenci
+                    {% else %} 🌱 Çaylak {% endif %}
+                </div>
             </div>
         </div>
 
         <!-- Görüntüleme Modu -->
         <div id="view-mode">
             <div class="info-grid">
-                <div class="info-item">
-                    <label>Kullanıcı Adı</label>
-                    <div class="info-value">{{ user.username }}</div>
-                </div>
-                <div class="info-item">
-                    <label>E-posta</label>
+                <div class="info-card">
+                    <span class="info-label">E-posta Adresi</span>
                     <div class="info-value">{{ user.email }}</div>
                 </div>
-                <div class="info-item">
-                    <label>Üniversite</label>
-                    <div class="info-value">{{ user.university.name|default:"-" }}</div>
+                <div class="info-card">
+                    <span class="info-label">Üniversite</span>
+                    <div class="info-value">{{ user.university.name|default:"Henüz seçilmedi" }}</div>
                 </div>
-                <div class="info-item">
-                    <label>Katkı Puanı</label>
-                    <div class="info-value" style="color: #34C759;">{{ uploaded_notes.count|add:total_downloads }} XP</div>
+                <div class="info-card">
+                    <span class="info-label">Yüklenen Notlar</span>
+                    <div class="info-value">{{ uploaded_notes.count }} Adet</div>
+                </div>
+                <div class="info-card">
+                    <span class="info-label">Toplam İndirilme (XP)</span>
+                    <div class="info-value" style="color: #34C759;">{{ total_downloads|default:"0" }} XP</div>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 10px;">
-                <button type="button" id="editBtn" class="btn-action btn-primary">
-                    <i class="fa-solid fa-pen"></i> Bilgileri Düzenle
-                </button>
-            </div>
+            <button type="button" id="editBtn" class="btn-action btn-primary">
+                <i class="fa-solid fa-pen-to-square"></i> Profili Düzenle
+            </button>
         </div>
 
         <!-- Düzenleme Modu -->
         <div id="edit-mode" style="display:none;">
-            <form id="profileForm">
+            <form id="profileForm" enctype="multipart/form-data">
                 <div class="info-grid">
                     <div>
-                        <label>Kullanıcı Adı</label>
+                        <label class="info-label">Kullanıcı Adı</label>
                         <input type="text" id="username" value="{{ user.username }}" required>
                     </div>
                     <div>
-                        <label>E-posta</label>
+                        <label class="info-label">E-posta</label>
                         <input type="email" id="email" value="{{ user.email }}" required>
                     </div>
                     <div>
-                        <label>Üniversite</label>
+                        <label class="info-label">Üniversite</label>
                         <select id="university">
                             <option value="">Seçiniz...</option>
-                            <!-- AJAX ile dolacak -->
+                            {% for uni in universities %}
+                                <option value="{{ uni.id }}" {% if user.university.id == uni.id %}selected{% endif %}>{{ uni.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div>
-                        <label>Yeni Şifre (İsteğe Bağlı)</label>
-                        <input type="password" id="password" placeholder="Değiştirmek istersen yaz">
+                        <label class="info-label">Profil Resmi (İsteğe Bağlı)</label>
+                        <input type="file" id="avatarInput" accept="image/*">
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <label class="info-label">Yeni Şifre (Değiştirmek istemiyorsan boş bırak)</label>
+                        <input type="password" id="password" placeholder="En az 8 karakter">
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px;">
-                    <button type="submit" class="btn-action btn-primary">Kaydet</button>
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button type="submit" class="btn-action btn-primary" id="saveBtn">Kaydet</button>
                     <button type="button" id="cancelBtn" class="btn-action btn-secondary">İptal</button>
                 </div>
             </form>
-            <p id="msg" style="margin-top: 15px; font-weight: bold;"></p>
+            <p id="msg" style="margin-top: 20px; font-weight: bold; text-align: center;"></p>
         </div>
 
     </div>
@@ -144,67 +202,51 @@
     const editMode = document.getElementById('edit-mode');
     const editBtn = document.getElementById('editBtn');
     const cancelBtn = document.getElementById('cancelBtn');
-    const uniSelect = document.getElementById('university');
 
-    // Düzenleme moduna geç
+    // Mod Değiştirme
     editBtn.addEventListener('click', () => {
         viewMode.style.display = 'none';
         editMode.style.display = 'block';
-        if(uniSelect.children.length <= 1) loadUniversities(); // Sadece ilk sefer yükle
     });
 
-    // İptal et
     cancelBtn.addEventListener('click', () => {
         editMode.style.display = 'none';
         viewMode.style.display = 'block';
     });
 
-    // Üniversiteleri Yükle (AJAX)
-    async function loadUniversities() {
-        uniSelect.innerHTML = '<option>Yükleniyor...</option>';
-        try {
-            // Not: API endpoint'inin doğru olduğundan emin ol (categories app)
-            // Eğer API yoksa JSONResponse döndüren bir view kullanabiliriz
-            // Şimdilik varsayılan AJAX view'ini kullanalım
-            const res = await fetch('/ajax/load-universities/'); // Veya API endpointin
-            // Eğer endpoint yoksa manuel ekleyelim (Geçici)
-            /*
-               Kanka burası önemli: Eğer 'University' listesini veren bir API endpoint'in yoksa
-               bunu yapamayız. Eğer yoksa söyle, view yazalım.
-               Şimdilik boş bırakıyorum hata vermesin.
-            */
-            uniSelect.innerHTML = '<option value="">Üniversite Seçilemedi (API Eksik)</option>';
-        } catch {
-            uniSelect.innerHTML = '<option>Hata oluştu</option>';
-        }
-    }
-
-    // Formu Gönder
+    // Form Gönderimi (AJAX)
     document.getElementById('profileForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const msg = document.getElementById('msg');
+        const saveBtn = document.getElementById('saveBtn');
+
         msg.style.color = "#666";
         msg.innerText = "⏳ Güncelleniyor...";
+        saveBtn.disabled = true;
 
-        const data = {
-            username: document.getElementById('username').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            password: document.getElementById('password').value
-        };
+        // FormData kullanarak Dosya + Metin gönderiyoruz
+        const formData = new FormData();
+        formData.append('username', document.getElementById('username').value.trim());
+        formData.append('email', document.getElementById('email').value.trim());
 
-        // Üniversite seçildiyse ekle
-        if(uniSelect.value) data.university = uniSelect.value;
+        const uniId = document.getElementById('university').value;
+        if (uniId) formData.append('university', uniId);
+
+        const pass = document.getElementById('password').value;
+        if (pass) formData.append('password', pass);
+
+        const avatarFile = document.getElementById('avatarInput').files[0];
+        if (avatarFile) formData.append('avatar', avatarFile);
 
         try {
             const token = localStorage.getItem('access');
-            const res = await fetch('/api/auth/profile/update/', { // Endpoint doğru mu kontrol et
+            const res = await fetch('/api/auth/profile/update/', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + token,
-                    'X-CSRFToken': '{{ csrf_token }}' // Django için
+                    'X-CSRFToken': '{{ csrf_token }}'
                 },
-                body: JSON.stringify(data)
+                body: formData // JSON değil, FormData gönderiyoruz
             });
 
             const result = await res.json();
@@ -216,11 +258,12 @@
             } else {
                 msg.style.color = "#FF3B30";
                 msg.innerText = "⚠️ " + (result.error || 'Bir hata oluştu.');
+                saveBtn.disabled = false;
             }
         } catch (err) {
             msg.style.color = "#FF3B30";
             msg.innerText = "⚠️ Sunucu hatası.";
-            console.error(err);
+            saveBtn.disabled = false;
         }
     });
 </script>

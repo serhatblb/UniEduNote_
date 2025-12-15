@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from users import views as user_views
 from notes import views as note_views
+from chat import views as chat_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -41,6 +42,10 @@ urlpatterns = [
     # --- API ---
     path('api/auth/', include('users.urls')),
     path("api/notes/", include("notes.urls")),
+
+path('chat/', chat_views.chat_room, name='chat_room'),
+    path('chat/get/', chat_views.get_messages, name='get_messages'),
+    path('chat/send/', chat_views.send_message, name='send_message'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

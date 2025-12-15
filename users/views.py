@@ -1,3 +1,4 @@
+from categories.models import University
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
@@ -103,15 +104,19 @@ def dashboard(request):
 
 @login_required(login_url="/login/")
 def profile(request):
-    # Kullanıcının yüklediği notları çek
+    # Kullanıcının yüklediği notlar
     uploaded_notes = request.user.note_set.all()
 
-    # Toplam indirme sayısını hesapla
+    # Toplam indirme sayısı
     total_downloads = sum(note.download_count for note in uploaded_notes)
+
+    # Tüm üniversiteleri çek (Dropdown için)
+    universities = University.objects.all().order_by('name')
 
     context = {
         'user': request.user,
         'uploaded_notes': uploaded_notes,
-        'total_downloads': total_downloads  # İşte bu eksikti!
+        'total_downloads': total_downloads,
+        'universities': universities,  # Bunu ekledik ki listede çıksın
     }
-    return render(request, "profile.html", context)
+    return render(request, "users/profile.html", context)
