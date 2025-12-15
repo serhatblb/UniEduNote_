@@ -104,19 +104,17 @@ def dashboard(request):
 
 @login_required(login_url="/login/")
 def profile(request):
-    # Kullanıcının yüklediği notlar
     uploaded_notes = request.user.note_set.all()
-
-    # Toplam indirme sayısı
     total_downloads = sum(note.download_count for note in uploaded_notes)
-
-    # Tüm üniversiteleri çek (Dropdown için)
     universities = University.objects.all().order_by('name')
 
     context = {
         'user': request.user,
         'uploaded_notes': uploaded_notes,
         'total_downloads': total_downloads,
-        'universities': universities,  # Bunu ekledik ki listede çıksın
+        'universities': universities,
     }
-    return render(request, "users/profile.html", context)
+
+    # ESKİSİ: return render(request, "users/profile.html", context)
+    # YENİSİ (Eğer dosya ana dizindeyse):
+    return render(request, "profile.html", context)
