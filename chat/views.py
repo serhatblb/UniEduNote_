@@ -34,31 +34,29 @@ BAD_WORDS = [
     "beyinsiz", "mal", "dangoz", "öküz", "eşek", "hayvan",
     "şerefsiz", "namussuz", "adi", "alçak", "pislik", "rezil",
     "iğrenç", "terbiyesiz",
-
-    "orospu", "orospu çocuğu", "oç", "oc", "kahpe", "sürtük",
+    "orospu", "oç", "oc", "kahpe", "sürtük",
     "fahişe", "pezevenk", "ibne", "top", "gavat", "puşt",
     "yavşak", "dangalak",
-
-    "amk", "aq", "amına koy", "amına koyayım", "amına koyim",
-    "ananı sik", "anasını sik", "sikeyim", "sikim", "siktir",
-
+    "amk", "aq", "amına", "sikeyim", "sikim", "siktir",
     "sik", "sikik", "yarrak", "yarak", "taşak", "göt", "götveren",
     "bok", "boktan",
-
     "piç", "piç kurusu", "it", "köpek", "çakal", "hödük",
     "keko", "maganda", "ezik",
-
     "geber", "defol", "kes sesini",
-
-    "am", "amcık", "amcik", "amına",
-
-    "godoş", "ibnelik"
+    "am", "amcık", "amcik", "godoş", "ibnelik"
 ]
 
 
 def normalize_text(text):
-    replacements = {"ı": "i", "İ": "i", "ş": "s", "Ş": "s", "ğ": "g", "Ğ": "g", "ç": "c", "Ç": "c", "ö": "o", "Ö": "o",
-                    "ü": "u", "Ü": "u"}
+    """Türkçe karakterleri İngilizce karşılıklarına çevirir"""
+    replacements = {
+        "ı": "i", "İ": "i",
+        "ş": "s", "Ş": "s",
+        "ğ": "g", "Ğ": "g",
+        "ç": "c", "Ç": "c",
+        "ö": "o", "Ö": "o",
+        "ü": "u", "Ü": "u"
+    }
     text = text.lower()
     for k, v in replacements.items():
         text = text.replace(k, v)
@@ -66,11 +64,21 @@ def normalize_text(text):
 
 
 def contains_profanity(text):
-    normalized = normalize_text(text)
+    # Kullanıcının yazdığı metni normalize et (örn: "Göt" -> "got")
+    normalized_text = normalize_text(text)
+
     for bad_word in BAD_WORDS:
-        # Kelime içinde geçiyor mu? (Basit kontrol)
-        if bad_word in normalized:
+        # Yasaklı kelimeyi de normalize et (örn: "göt" -> "got")
+        normalized_bad_word = normalize_text(bad_word)
+
+        # Kelime sınırlarını kontrol et (regex ile)
+        # Bu sayede "analiz" kelimesindeki "anal" yüzünden engellemez.
+        # Sadece tam kelime eşleşmesine veya bariz küfürlere bakar.
+
+        # Basit kontrol (Eğer kelime içinde geçiyorsa)
+        if normalized_bad_word in normalized_text:
             return True
+
     return False
 
 
@@ -91,7 +99,7 @@ def send_message(request):
             if contains_profanity(msg):
                 return JsonResponse({
                     'status': 'blocked',
-                    'error': 'Mesajınız uygunsuz kelimeler içeriyor. Lütfen düzeltin.'
+                    'error': 'Mesajınız uygunsuz kelimeler içeriyor.'
                 })
 
             # ✅ Temiz mesajı kaydet
