@@ -99,6 +99,19 @@ def dashboard(request):
     return render(request, "dashboard.html")
 
 
+# users/views.py dosyasının en altı:
+
 @login_required(login_url="/login/")
 def profile(request):
-    return render(request, "profile.html")
+    # Kullanıcının yüklediği notları çek
+    uploaded_notes = request.user.note_set.all()
+
+    # Toplam indirme sayısını hesapla
+    total_downloads = sum(note.download_count for note in uploaded_notes)
+
+    context = {
+        'user': request.user,
+        'uploaded_notes': uploaded_notes,
+        'total_downloads': total_downloads  # İşte bu eksikti!
+    }
+    return render(request, "profile.html", context)
