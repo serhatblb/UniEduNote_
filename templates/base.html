@@ -5,15 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}UniEduNote{% endblock %}</title>
-    <!-- Modern Font (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- İkonlar -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
             --primary: #007AFF;
-            --glass-bg: rgba(255, 255, 255, 0.85); /* Biraz daha opak */
+            --glass-bg: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(255, 255, 255, 0.6);
             --text-dark: #1D1D1F;
             --text-gray: #86868B;
@@ -25,10 +23,7 @@
 
         body {
             background-color: var(--bg-color);
-            background-image:
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%),
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%),
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
+            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
             background-size: cover;
             background-attachment: fixed;
             color: var(--text-dark);
@@ -36,271 +31,140 @@
         }
 
         a { text-decoration: none; color: inherit; }
+        .glass { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: var(--shadow); border-radius: 24px; }
 
-        /* === CAM EFEKTİ === */
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow);
-            border-radius: 24px;
-        }
+        /* === YAPI === */
+        .app-container { display: flex; min-height: 100vh; }
 
-        /* === GİRİŞ YAPMIŞ KULLANICI LAYOUTU === */
-        .app-layout {
-            display: flex;
-            min-height: 100vh;
-        }
+        /* Sidebar */
+        .sidebar { width: 260px; height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 24px; z-index: 1000; border-right: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.7); backdrop-filter: blur(30px); }
+        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .menu-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 8px; color: var(--text-gray); border-radius: 16px; font-weight: 600; transition: 0.2s ease; }
+        .menu-item:hover, .menu-item.active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-        /* Sidebar (Sola Sabitlenmiş) */
-        .sidebar {
-            width: 260px;
-            height: 100vh;
-            position: fixed; /* Ekrana sabitle */
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-            z-index: 1000;
-            border-right: 1px solid rgba(255,255,255,0.5);
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(30px);
-        }
+        /* İçerik Alanı */
+        .main-content { flex: 1; padding: 30px; max-width: 1400px; width: 100%; }
+        /* Giriş yapmışsa sidebar kadar boşluk bırak, yapmamışsa bırakma */
+        .main-content.authenticated { margin-left: 260px; padding-bottom: 100px; }
+        .main-content.guest { margin-left: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 16px;
-            margin-bottom: 8px;
-            color: var(--text-gray);
-            border-radius: 16px;
-            font-weight: 600;
-            transition: 0.2s ease;
-        }
-
-        .menu-item:hover, .menu-item.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        /* Ana İçerik Alanı */
-        .main-content {
-            margin-left: 260px; /* Sidebar kadar boşluk */
-            flex: 1;
-            padding: 30px;
-            max-width: 1400px; /* İçerik çok yayılmasın */
-        }
-
-        /* === KARŞILAMA EKRANI (Giriş Yapmamışlar İçin) === */
-        .landing-page {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .landing-hero h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #007AFF, #5856D6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-        }
-
-        .landing-hero p {
-            font-size: 1.2rem;
-            color: var(--text-gray);
-            max-width: 600px;
-            margin: 0 auto 40px;
-            line-height: 1.6;
-        }
-
-        .landing-btn {
-            padding: 16px 32px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            transition: 0.3s;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 10px 25px rgba(0, 122, 255, 0.3);
-        }
-
+        /* Landing Page */
+        .landing-hero h1 { font-size: 3.5rem; font-weight: 800; background: linear-gradient(135deg, #007AFF, #5856D6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+        .landing-hero p { font-size: 1.2rem; color: var(--text-gray); max-width: 600px; margin: 0 auto 40px; line-height: 1.6; }
+        .landing-btn { padding: 16px 32px; border-radius: 50px; font-weight: 700; font-size: 1.1rem; transition: 0.3s; display: inline-block; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 10px 25px rgba(0, 122, 255, 0.3); }
         .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 122, 255, 0.4); }
-
-        .btn-outline {
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            margin-left: 15px;
-        }
-
+        .btn-outline { border: 2px solid var(--primary); color: var(--primary); margin-left: 15px; }
         .btn-outline:hover { background: var(--primary); color: white; }
 
-        /* === MOBİL TASARIM (992px altı) === */
+        /* Mobil Nav */
+        .mobile-nav { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 70px; justify-content: space-around; align-items: center; z-index: 2000; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .nav-icon { color: #999; font-size: 1.4rem; padding: 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
+        .nav-icon.active { color: var(--primary); }
+        .add-btn-mobile { background: var(--primary); color: white; border-radius: 50%; width: 54px; height: 54px; display: flex; justify-content: center; align-items: center; margin-bottom: 40px; box-shadow: 0 8px 20px rgba(0,122,255,0.4); font-size: 1.5rem; }
+
+        .alert-box { padding: 15px; border-radius: 16px; margin-bottom: 20px; width: 100%; }
+        .alert-success { background: #E3F9E5; color: #1F7A38; border: 1px solid #C3E6CB; }
+        .alert-error { background: #FFEBEB; color: #C0392B; border: 1px solid #F5C6CB; }
+
         @media (max-width: 992px) {
-            .sidebar { display: none; } /* Yan menüyü gizle */
-            .main-content { margin-left: 0; padding: 20px; padding-bottom: 100px; }
+            .sidebar { display: none; }
+            .main-content.authenticated { margin-left: 0; padding: 20px; padding-bottom: 100px; }
+            .mobile-nav { display: flex; }
             .landing-hero h1 { font-size: 2.2rem; }
-
-            /* Mobil Alt Menü */
-            .mobile-nav {
-                display: flex;
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 90%;
-                max-width: 400px;
-                height: 70px;
-                justify-content: space-around;
-                align-items: center;
-                z-index: 2000;
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(20px);
-                border-radius: 24px;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            }
-
-            .nav-icon {
-                color: #999; font-size: 1.4rem; padding: 10px; border-radius: 12px;
-                display: flex; flex-direction: column; align-items: center;
-            }
-            .nav-icon.active { color: var(--primary); }
-
-            .add-btn-mobile {
-                background: var(--primary); color: white; border-radius: 50%; width: 54px; height: 54px;
-                display: flex; justify-content: center; align-items: center; margin-bottom: 40px;
-                box-shadow: 0 8px 20px rgba(0,122,255,0.4); font-size: 1.5rem;
-            }
         }
-
-        @media (min-width: 993px) {
-            .mobile-nav { display: none; } /* Masaüstünde alt menüyü gizle */
-        }
+        @media (min-width: 993px) { .mobile-nav { display: none; } }
     </style>
 </head>
 <body>
 
-    {% if user.is_authenticated %}
-    <!-- === GİRİŞ YAPMIŞ KULLANICI ARAYÜZÜ === -->
-    <div class="app-layout">
+    <!-- YAPIYI BURADA KURUYORUZ -->
+    <div class="app-container">
 
-        <!-- SIDEBAR (Masaüstü) -->
+        <!-- 1. SIDEBAR (Sadece Giriş Yapmışsa ve Masaüstündeyse) -->
+        {% if user.is_authenticated %}
         <aside class="sidebar">
-            <div class="logo">
-                <i class="fa-solid fa-graduation-cap"></i> UniEduNote
-            </div>
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i> UniEduNote</div>
             <nav>
-                <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}">
-                    <i class="fa-solid fa-grid-2"></i> Paneli
-                </a>
-                <a href="{% url 'note_list' %}" class="menu-item {% if 'notes' in request.path %}active{% endif %}">
-                    <i class="fa-solid fa-compass"></i> Keşfet
-                </a>
-                <a href="{% url 'upload_note' %}" class="menu-item {% if 'upload' in request.path %}active{% endif %}">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Not Yükle
-                </a>
-                <a href="{% url 'profile' %}" class="menu-item {% if 'profile' in request.path %}active{% endif %}">
-                    <i class="fa-solid fa-user"></i> Profil
-                </a>
+                <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-grid-2"></i> Paneli</a>
+                <a href="{% url 'note_list' %}" class="menu-item {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-compass"></i> Keşfet</a>
+                <a href="{% url 'upload_note' %}" class="menu-item {% if 'upload' in request.path %}active{% endif %}"><i class="fa-solid fa-cloud-arrow-up"></i> Not Yükle</a>
+                <a href="{% url 'profile' %}" class="menu-item {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i> Profil</a>
             </nav>
             <div style="margin-top: auto;">
-                <a href="{% url 'logout' %}" class="menu-item" style="color: #FF3B30;">
-                    <i class="fa-solid fa-right-from-bracket"></i> Çıkış
-                </a>
+                <a href="{% url 'logout' %}" class="menu-item" style="color: #FF3B30;"><i class="fa-solid fa-right-from-bracket"></i> Çıkış</a>
             </div>
         </aside>
+        {% endif %}
 
-        <!-- ANA İÇERİK -->
-        <main class="main-content">
+        <!-- 2. ANA İÇERİK ALANI (Tek Bir Yer) -->
+        <main class="main-content {% if user.is_authenticated %}authenticated{% else %}guest{% endif %}">
 
-            <!-- Üst Başlık (Mobilde ve Masaüstünde) -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <!-- HEADER (Sadece giriş yapmışsa) -->
+            {% if user.is_authenticated %}
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; width: 100%;">
                 <div>
                     <h2 style="font-weight: 800; margin: 0;">Merhaba, {{ user.username|title }} 👋</h2>
                     <p style="color: var(--text-gray); margin: 5px 0 0;">İyi çalışmalar dileriz.</p>
                 </div>
-                <!-- Masaüstü Profil İkonu -->
                 <a href="{% url 'profile' %}" style="background: white; padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow);" class="glass">
-                    <div style="width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                        {{ user.username|make_list|first|upper }}
-                    </div>
+                    <div style="width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">{{ user.username|make_list|first|upper }}</div>
                     <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark);">Hesabım</span>
                 </a>
             </div>
 
-            <!-- Django Mesajları -->
+            <!-- MESAJLAR -->
             {% if messages %}
                 {% for message in messages %}
-                    <div style="padding: 15px; margin-bottom: 20px; border-radius: 16px; background: white; border-left: 5px solid {% if message.tags == 'success' %}#34C759{% else %}#FF3B30{% endif %}; box-shadow: var(--shadow);">
-                        {{ message }}
-                    </div>
+                    <div class="alert-box alert-{{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
+            {% endif %}
 
-            <!-- Sayfa İçeriği -->
-            {% block content %}
-            {% endblock %}
+            <!-- 3. İÇERİK MANTIĞI -->
+
+            {% if not user.is_authenticated and request.resolver_match.url_name == 'home' %}
+                <!-- === LANDING PAGE (Sadece Ana Sayfadaki Misafirler İçin) === -->
+                <div class="landing-page" style="text-align: center; padding: 20px;">
+                    <div class="landing-hero glass" style="padding: 40px; max-width: 800px;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🎓 🚀 📚</div>
+                        <h1>Üniversite Notları Artık Cebinde!</h1>
+                        <p>Ders notlarını paylaş, arkadaşlarının notlarını indir ve akademik topluluğun bir parçası ol. Binlerce öğrenci arasına katılmak için hemen başla.</p>
+                        <div style="margin-top: 30px;">
+                            <a href="{% url 'register' %}" class="landing-btn btn-primary">Hemen Kayıt Ol</a>
+                            <a href="{% url 'login' %}" class="landing-btn btn-outline">Giriş Yap</a>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 20px; margin-top: 50px; flex-wrap: wrap; justify-content: center;">
+                        <div class="glass" style="padding: 20px 40px; min-width: 150px;">
+                            <h2 style="margin: 0; color: var(--primary);">10+</h2>
+                            <p style="margin: 0; color: var(--text-gray);">Üniversite</p>
+                        </div>
+                        <div class="glass" style="padding: 20px 40px; min-width: 150px;">
+                            <h2 style="margin: 0; color: var(--primary);">500+</h2>
+                            <p style="margin: 0; color: var(--text-gray);">Ders Notu</p>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <!-- === DİĞER SAYFALAR (Login, Register, Dashboard vs.) === -->
+                <!-- Burası 'block content' alanıdır ve SADECE BİR KERE YAZILMIŞTIR -->
+                {% block content %}{% endblock %}
+            {% endif %}
+
         </main>
-
-        <!-- MOBİL ALT MENÜ -->
-        <div class="mobile-nav">
-            <a href="{% url 'dashboard' %}" class="nav-icon {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-house"></i></a>
-            <a href="{% url 'note_list' %}" class="nav-icon {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-magnifying-glass"></i></a>
-            <a href="{% url 'upload_note' %}" class="add-btn-mobile"><i class="fa-solid fa-plus"></i></a>
-            <a href="{% url 'profile' %}" class="nav-icon {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i></a>
-            <a href="{% url 'logout' %}" class="nav-icon" style="color: #FF3B30;"><i class="fa-solid fa-power-off"></i></a>
-        </div>
-
     </div>
 
-    {% else %}
-    <!-- === GİRİŞ YAPMAMIŞ (MİSAFİR) ARAYÜZÜ === -->
-
-    <!-- Eğer Login veya Register sayfasındaysak Landing'i gösterme, sadece formu göster -->
-    {% if request.resolver_match.url_name == 'login' or request.resolver_match.url_name == 'register' or request.resolver_match.url_name == 'password_reset' %}
-        <div style="padding: 20px;">
-            {% block content %}{% endblock %}
-        </div>
-    {% else %}
-        <!-- Landing Page (Sadece Ana Sayfada Görünsün) -->
-        <div class="landing-page">
-            <div class="landing-hero glass" style="padding: 40px; max-width: 800px;">
-                <div style="font-size: 3rem; margin-bottom: 20px;">🎓 🚀 📚</div>
-                <h1>Üniversite Notları Artık Cebinde!</h1>
-                <p>Binlerce öğrenci arasına katılmak için hemen başla.</p>
-                <div style="margin-top: 30px;">
-                    <a href="{% url 'register' %}" class="landing-btn btn-primary">Hemen Kayıt Ol</a>
-                    <a href="{% url 'login' %}" class="landing-btn btn-outline">Giriş Yap</a>
-                </div>
-            </div>
-        </div>
+    <!-- 4. MOBİL ALT MENÜ (Sadece Giriş Yapmışsa) -->
+    {% if user.is_authenticated %}
+    <div class="mobile-nav">
+        <a href="{% url 'dashboard' %}" class="nav-icon {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-house"></i></a>
+        <a href="{% url 'note_list' %}" class="nav-icon {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="{% url 'upload_note' %}" class="add-btn-mobile"><i class="fa-solid fa-plus"></i></a>
+        <a href="{% url 'profile' %}" class="nav-icon {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i></a>
+        <a href="{% url 'logout' %}" class="nav-icon" style="color: #FF3B30;"><i class="fa-solid fa-power-off"></i></a>
+    </div>
     {% endif %}
-
-    {% endif %}
-
 
 </body>
 </html>
