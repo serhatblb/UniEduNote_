@@ -2,264 +2,317 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}UniEduNote{% endblock %}</title>
-  <!-- FontAwesome (İkonlar için) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}UniEduNote{% endblock %}</title>
+    <!-- Modern Font (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- İkonlar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <style>
-    /* === GENEL === */
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #f8fafc;
-      display: flex;
-      min-height: 100vh;
-      color: #1e2a44;
-    }
+    <style>
+        :root {
+            --primary: #007AFF; /* Apple Blue */
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-dark: #1D1D1F;
+            --text-gray: #86868B;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --bg-color: #F2F2F7;
+        }
 
-    /* === MOBİL HEADER (Sadece mobilde görünür) === */
-    .mobile-header {
-      display: none; /* Masaüstünde gizli */
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      background: #1a2b6b;
-      align-items: center;
-      padding: 0 1rem;
-      z-index: 2000;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      color: white;
-      justify-content: space-between;
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
 
-    .mobile-menu-btn {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
+            background-size: cover;
+            background-attachment: fixed;
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding-bottom: 90px; /* Mobil menü boşluğu */
+        }
 
-    .mobile-logo {
-      font-weight: 700;
-      font-size: 1.2rem;
-    }
+        a { text-decoration: none; color: inherit; }
 
-    /* === SIDEBAR (Masaüstü) === */
-    .sidebar {
-      width: 280px;
-      background: linear-gradient(180deg, #1a2b6b 0%, #0f172a 100%);
-      color: #fff;
-      padding: 2rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      z-index: 1000;
-      transition: transform 0.3s ease;
-    }
+        /* === CAM EFEKTİ === */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+            border-radius: 24px;
+        }
 
-    .sidebar h2 {
-      text-align: center;
-      font-size: 1.8rem;
-      margin-bottom: 2rem;
-      background: linear-gradient(to right, #60a5fa, #a5b4fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+        /* === LAYOUT === */
+        .app-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 24px;
+        }
 
-    .nav-links a {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #bfdbfe;
-      text-decoration: none;
-      padding: 12px 15px;
-      border-radius: 10px;
-      margin-bottom: 8px;
-      transition: 0.3s;
-      font-weight: 500;
-    }
+        /* === SIDEBAR (Masaüstü) === */
+        .sidebar {
+            width: 260px;
+            height: calc(100vh - 40px);
+            position: sticky;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            z-index: 100;
+        }
 
-    .nav-links a:hover {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-      transform: translateX(5px);
-    }
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #007AFF, #5856D6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .nav-links i { width: 20px; text-align: center; }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            color: var(--text-gray);
+            border-radius: 16px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
 
-    /* === ANA İÇERİK === */
-    .main {
-      flex: 1;
-      margin-left: 280px; /* Sidebar kadar boşluk */
-      padding: 2rem;
-      width: 100%;
-      transition: margin-left 0.3s ease;
-    }
+        .menu-item:hover, .menu-item.active {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transform: scale(1.02);
+        }
 
-    /* === LANDING PAGE STİLLERİ (Ana Sayfa İçin) === */
-    .landing {
-      background: linear-gradient(145deg, #1e3a8a, #3b82f6, #7dd3fc);
-      min-height: 100vh;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      color: #fff;
-      text-align: center;
-      padding: 2rem;
-      border-radius: 20px;
-    }
+        /* === MAIN CONTENT === */
+        .main-content {
+            flex: 1;
+            width: 100%;
+        }
 
-    .landing h1 { font-size: 3rem; margin-bottom: 1rem; }
-    .landing p { font-size: 1.2rem; max-width: 700px; margin-bottom: 2rem; }
-    .icon-row { font-size: 2.5rem; margin-bottom: 1.5rem; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
 
-    .landing-buttons { display: flex; gap: 1rem; }
-    .landing-buttons a {
-      padding: 1rem 2rem; border-radius: 50px; text-decoration: none; font-weight: bold;
-      background: white; color: #1e3a8a; transition: 0.3s;
-    }
-    .landing-buttons a:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-    .stats-container { display: flex; gap: 2rem; margin-top: 3rem; flex-wrap: wrap; justify-content: center; }
-    .stat-box { background: rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 15px; min-width: 150px; }
-    .stat-box h2 { margin: 0; font-size: 2rem; }
+        .user-profile:hover { background: #fff; }
 
-    /* === OVERLAY (Mobilde menü açılınca arkası kararır) === */
-    .overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 900;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #007AFF, #00C6FF);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
 
-    /* === RESPONSIVE (Mobil Ayarları) === */
-    @media (max-width: 992px) {
-      /* Mobilde Sidebar Gizlenir */
-      .sidebar {
-        transform: translateX(-100%); /* Sola sakla */
-        width: 260px;
-        z-index: 3000; /* En üstte olsun */
-        box-shadow: 2px 0 15px rgba(0,0,0,0.3);
-      }
+        /* === MOBİL ALT MENÜ === */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 400px;
+            height: 70px;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+        }
 
-      /* Sidebar Aktif Olunca */
-      .sidebar.active {
-        transform: translateX(0); /* Geri getir */
-      }
+        .nav-icon {
+            color: #999;
+            font-size: 1.3rem;
+            padding: 10px;
+            border-radius: 14px;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
 
-      /* Mobil Header Görünür */
-      .mobile-header { display: flex; }
+        .nav-icon.active { color: var(--primary); }
 
-      /* Ana içerik padding ayarı */
-      .main {
-        margin-left: 0;
-        padding: 0;
-        padding-top: 60px; /* Header yüksekliği kadar boşluk */
-        width: 100%;
-        overflow-x: hidden;
-      }
+        .nav-icon.active::after {
+            content: ''; position: absolute; bottom: 5px; width: 4px; height: 4px;
+            background: var(--primary); border-radius: 50%;
+        }
 
-      /* Overlay görünürlük ayarı */
-      .overlay.active {
-        display: block;
-        opacity: 1;
-      }
+        /* Ortadaki Ekle Butonu */
+        .add-btn-mobile {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(0,122,255,0.4);
+            font-size: 1.4rem;
+            transition: 0.3s;
+        }
 
-      /* Landing (Karşılama) sayfası düzeltmeleri */
-      .landing {
-        min-height: calc(100vh - 60px); /* Ekran boyu - header */
-        border-radius: 0;
-        padding: 2rem 1rem;
-      }
+        .add-btn-mobile:active { transform: scale(0.9); }
 
-      .landing h1 { font-size: 2rem; }
-      .icon-row { font-size: 1.8rem; flex-wrap: wrap; justify-content: center; }
-      .landing-buttons { flex-direction: column; width: 100%; }
-      .landing-buttons a { width: 100%; text-align: center; }
-    }
-  </style>
+        /* Mesaj Kutuları */
+        .alert-box {
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .alert-success { background: #E3F9E5; color: #1F7A38; border: 1px solid #C3E6CB; }
+        .alert-error { background: #FFEBEB; color: #C0392B; border: 1px solid #F5C6CB; }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 992px) {
+            .sidebar { display: none; }
+            .mobile-nav { display: flex; }
+            .app-container { padding: 20px 16px; display: block; }
+            .header h1 { font-size: 1.5rem; }
+            .header p { font-size: 0.9rem; }
+        }
+    </style>
 </head>
-
 <body>
 
-  <!-- Mobil Üst Menü -->
-  <div class="mobile-header">
-    <button class="mobile-menu-btn" onclick="toggleSidebar()">
-      <i class="fa-solid fa-bars"></i>
-    </button>
-    <div class="mobile-logo">UniEduNote</div>
-    <div style="width: 24px;"></div> <!-- Dengelemek için boşluk -->
-  </div>
+    <div class="app-container">
 
-  <!-- Karartma Katmanı -->
-  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+        <!-- SIDEBAR (Sadece Masaüstü) -->
+        <aside class="sidebar glass">
+            <div class="logo">
+                <i class="fa-solid fa-graduation-cap"></i> UniEduNote
+            </div>
+            <nav>
+                <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}">
+                    <i class="fa-solid fa-grid-2"></i> Paneli
+                </a>
+                <a href="{% url 'note_list' %}" class="menu-item {% if 'notes' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-compass"></i> Keşfet
+                </a>
+                <a href="{% url 'upload_note' %}" class="menu-item {% if 'upload' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Yükle
+                </a>
+                <a href="{% url 'profile' %}" class="menu-item {% if 'profile' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-user"></i> Profil
+                </a>
+            </nav>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <div>
-      <h2>UniEduNote</h2>
-      <div class="nav-links">
-        <a href="/"><i class="fa-solid fa-home"></i> Ana Sayfa</a>
+            <div style="margin-top: auto;">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="menu-item" style="color: #FF3B30;">
+                        <i class="fa-solid fa-right-from-bracket"></i> Çıkış
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="menu-item" style="color: var(--primary);">
+                        <i class="fa-solid fa-right-to-bracket"></i> Giriş
+                    </a>
+                {% endif %}
+            </div>
+        </aside>
+
+        <!-- ANA İÇERİK -->
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    {% if user.is_authenticated %}
+                        <h1 style="font-weight: 800; letter-spacing: -0.5px;">Selam, {{ user.username|title }}! 👋</h1>
+                        <p style="color: var(--text-gray);">Bugün ne öğrenmek istersin?</p>
+                    {% else %}
+                        <h1 style="font-weight: 800;">Hoşgeldin! 👋</h1>
+                        <p style="color: var(--text-gray);">Öğrenmeye başlamak için giriş yap.</p>
+                    {% endif %}
+                </div>
+
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}" class="user-profile glass">
+                    <div class="avatar">{{ user.username|make_list|first|upper }}</div>
+                    <span style="font-weight: 600; font-size: 0.9rem; margin-left: 8px;">Hesabım</span>
+                </a>
+                {% endif %}
+            </header>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert-box alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+    </div>
+
+    <!-- MOBİL ALT MENÜ (Sadece Mobilde) -->
+    <div class="mobile-nav glass">
+        <a href="{% url 'dashboard' %}" class="nav-icon {% if request.path == '/dashboard/' %}active{% endif %}">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <a href="{% url 'note_list' %}" class="nav-icon {% if 'notes' in request.path %}active{% endif %}">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </a>
+
+        <!-- Ortadaki Ekle Butonu -->
+        <a href="{% url 'upload_note' %}" class="add-btn-mobile">
+            <i class="fa-solid fa-plus"></i>
+        </a>
+
+        <a href="{% url 'profile' %}" class="nav-icon {% if 'profile' in request.path %}active{% endif %}">
+            <i class="fa-solid fa-user"></i>
+        </a>
+
         {% if user.is_authenticated %}
-          <a href="{% url 'note_list' %}"><i class="fa-solid fa-book"></i> Notlar</a>
-          <a href="{% url 'upload_note' %}"><i class="fa-solid fa-upload"></i> Not Yükle</a>
-          <a href="{% url 'profile' %}"><i class="fa-solid fa-user"></i> Profil</a>
+            <a href="{% url 'logout' %}" class="nav-icon" style="color: #FF3B30;">
+                <i class="fa-solid fa-power-off"></i>
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="nav-icon">
+                <i class="fa-solid fa-right-to-bracket"></i>
+            </a>
         {% endif %}
-      </div>
     </div>
-
-    <div class="nav-links">
-      {% if user.is_authenticated %}
-        <a href="{% url 'logout' %}"><i class="fa-solid fa-sign-out-alt"></i> Çıkış Yap</a>
-      {% else %}
-        <a href="{% url 'login' %}"><i class="fa-solid fa-key"></i> Giriş</a>
-        <a href="{% url 'register' %}"><i class="fa-solid fa-user-plus"></i> Kayıt</a>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- Ana İçerik -->
-  <div class="main">
-    {% if messages %}
-      {% for message in messages %}
-        <div style="padding: 15px; margin-bottom: 20px; border-radius: 8px;
-             background: {% if message.tags == 'success' %}#d1fae5{% else %}#fee2e2{% endif %};
-             color: {% if message.tags == 'success' %}#065f46{% else %}#991b1b{% endif %};">
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endif %}
-
-    {% block content %}
-    {% endblock %}
-  </div>
-
-  <!-- JavaScript -->
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('overlay');
-
-      sidebar.classList.toggle('active');
-      overlay.classList.toggle('active');
-    }
-  </script>
 
 </body>
 </html>

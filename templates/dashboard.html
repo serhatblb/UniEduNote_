@@ -1,269 +1,119 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
+
 {% block content %}
 <style>
-  /* === DASHBOARD CONTAINER === */
-  .dashboard-header {
-    margin-bottom: 2rem;
-  }
-
-  .dashboard-header h2 {
-    color: #001540;
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
-
-  .dashboard-header p {
-    color: #555;
-    font-size: 1.1rem;
-    line-height: 1.6;
-  }
-
-  .dashboard {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-  }
-
-  /* === CARD STYLES === */
-  .card {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-    padding: 1.8rem;
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 240px;
-  }
-
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-  }
-
-  .card h3 {
-    color: #001540;
-    font-weight: 700;
-    font-size: 1.4rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .card p {
-    color: #555;
-    font-size: 15px;
-    line-height: 1.6;
-    margin-bottom: 1.2rem;
-    flex-grow: 1;
-  }
-
-  /* === BUTTON STYLES === */
-  .btn-main {
-    display: inline-block;
-    background: linear-gradient(135deg, #00205B, #001540);
-    color: #fff;
-    padding: 12px 24px;
-    border-radius: 10px;
-    font-weight: 600;
-    text-decoration: none;
-    margin-top: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 32, 91, 0.2);
-  }
-
-  .btn-main:hover {
-    opacity: 0.9;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 32, 91, 0.3);
-  }
-
-  .btn-main:active {
-    transform: translateY(0);
-  }
-
-  /* === RESPONSIVE DESIGN === */
-
-  /* Tablet ve orta ekranlar (992px ve altı) */
-  @media (max-width: 992px) {
-    .dashboard {
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.2rem;
-    }
-
-    .dashboard-header h2 {
-      font-size: 1.8rem;
-    }
-
-    .dashboard-header p {
-      font-size: 1rem;
+    /* Dashboard Widget Stilleri */
+    .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
     }
 
     .card {
-      padding: 1.5rem;
-      min-height: 220px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s ease;
+        min-height: 200px;
+        position: relative;
     }
 
-    .card h3 {
-      font-size: 1.3rem;
+    .card:active { transform: scale(0.98); }
+
+    .card-big { grid-column: span 2; }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #86868B;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    .card p {
-      font-size: 14px;
+    .card-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #1D1D1F;
+        letter-spacing: -1px;
     }
 
-    .btn-main {
-      padding: 10px 20px;
-      font-size: 0.95rem;
-    }
-  }
-
-  /* Mobil cihazlar (768px ve altı) */
-  @media (max-width: 768px) {
-    .dashboard-header {
-      margin-bottom: 1.5rem;
-    }
-
-    .dashboard-header h2 {
-      font-size: 1.6rem;
-    }
-
-    .dashboard-header p {
-      font-size: 0.95rem;
+    .action-btn {
+        margin-top: auto;
+        background: #007AFF;
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        transition: 0.3s;
+        text-decoration: none;
     }
 
-    .dashboard {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
+    .action-btn:hover { background: #0056b3; }
 
-    .card {
-      padding: 1.4rem;
-      min-height: auto;
+    /* Mobilde büyük kartı tek sütun yap */
+    @media (max-width: 768px) {
+        .card-big { grid-column: span 1; }
+        .bento-grid { grid-template-columns: 1fr; }
     }
-
-    .card h3 {
-      font-size: 1.2rem;
-      margin-bottom: 0.6rem;
-    }
-
-    .card p {
-      font-size: 14px;
-      margin-bottom: 1rem;
-    }
-
-    .btn-main {
-      width: 100%;
-      padding: 12px 20px;
-      font-size: 0.95rem;
-      margin-top: 0.8rem;
-    }
-  }
-
-  /* Küçük mobil cihazlar (480px ve altı) */
-  @media (max-width: 480px) {
-    .dashboard-header h2 {
-      font-size: 1.4rem;
-    }
-
-    .dashboard-header p {
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    .dashboard {
-      gap: 0.8rem;
-    }
-
-    .card {
-      padding: 1.2rem;
-      border-radius: 12px;
-    }
-
-    .card h3 {
-      font-size: 1.1rem;
-    }
-
-    .card p {
-      font-size: 13px;
-    }
-
-    .btn-main {
-      padding: 10px 18px;
-      font-size: 0.9rem;
-      border-radius: 8px;
-    }
-  }
-
-  /* Çok küçük mobil cihazlar (360px ve altı) */
-  @media (max-width: 360px) {
-    .dashboard-header h2 {
-      font-size: 1.3rem;
-    }
-
-    .dashboard-header p {
-      font-size: 0.85rem;
-    }
-
-    .card {
-      padding: 1rem;
-    }
-
-    .card h3 {
-      font-size: 1rem;
-    }
-
-    .card p {
-      font-size: 12px;
-    }
-
-    .btn-main {
-      padding: 9px 16px;
-      font-size: 0.85rem;
-    }
-  }
-
-  /* Geniş ekranlar için grid optimizasyonu */
-  @media (min-width: 1400px) {
-    .dashboard {
-      grid-template-columns: repeat(3, 1fr);
-      max-width: 1200px;
-    }
-  }
 </style>
 
-<div class="dashboard-header">
-  <h2>🎓 Hoşgeldin, {{ user.username|title }}</h2>
-  <p>Buradan not yükleyebilir, notlara göz atabilir veya profil bilgilerini görüntüleyebilirsin.</p>
-</div>
+<div class="bento-grid">
 
-<div class="dashboard">
-  <div class="card">
-    <div>
-      <h3>📄 Yeni Not Yükle</h3>
-      <p>Ders notlarını PDF, Word veya görsel olarak yükle ve katkı puanı kazan.</p>
+    <!-- Büyük Aksiyon Kartı -->
+    <div class="card glass card-big">
+        <div class="card-title">
+            <span>🚀 Hızlı İşlem</span>
+            <i class="fa-solid fa-bolt" style="color: #FFD60A; font-size: 1.2rem;"></i>
+        </div>
+        <div>
+            <h3 style="margin-bottom: 8px; font-size: 1.4rem; font-weight: 700;">Bilgi Paylaştıkça Çoğalır</h3>
+            <p style="color: #86868B; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
+                Ders notlarını yükle, arkadaşlarına yardımcı ol ve toplulukta öne çık.
+            </p>
+        </div>
+        <a href="{% url 'upload_note' %}" class="action-btn">
+            <i class="fa-solid fa-plus"></i> Yeni Not Yükle
+        </a>
     </div>
-    <a href="{% url 'upload_note' %}" class="btn-main">Not Yükle</a>
-  </div>
 
-  <div class="card">
-    <div>
-      <h3>📚 Notları Keşfet</h3>
-      <p>Üniversitelere, bölümlere ve derslere göre paylaşılan notlara göz at.</p>
+    <!-- Keşfet Kartı -->
+    <div class="card glass">
+        <div class="card-title">
+            <span>📚 Kütüphane</span>
+            <i class="fa-solid fa-book-open" style="color: #30D158;"></i>
+        </div>
+        <p style="color: #86868B; font-size: 0.9rem; margin-bottom: 10px;">
+            Üniversite, fakülte ve bölümlere göre notları incele.
+        </p>
+        <a href="{% url 'note_list' %}" class="action-btn" style="background: rgba(0,0,0,0.05); color: #1D1D1F;">
+            Notları Keşfet
+        </a>
     </div>
-    <a href="{% url 'note_list' %}" class="btn-main">Notları Gör</a>
-  </div>
 
-  <div class="card">
-    <div>
-      <h3>🏆 Profil ve Puanlar</h3>
-      <p>Puan durumunu, katkı seviyeni ve yüklediğin notları buradan incele.</p>
+    <!-- Puan Kartı -->
+    <div class="card glass">
+        <div class="card-title">
+            <span>🏆 Puanım</span>
+            <i class="fa-solid fa-star" style="color: #FF9500;"></i>
+        </div>
+        <!-- Puan verisi veritabanından gelecek, şimdilik statik -->
+        <div class="card-value">0</div>
+        <div style="color: #34C759; font-size: 0.9rem; margin-top: 5px; font-weight: 600;">
+            <i class="fa-solid fa-arrow-trend-up"></i> Başlangıç Seviyesi
+        </div>
     </div>
-    <a href="{% url 'profile' %}" class="btn-main">Profili Gör</a>
-  </div>
+
 </div>
 {% endblock %}
