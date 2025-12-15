@@ -1,360 +1,192 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Yeni Not Yükle{% endblock %}
+
 {% block content %}
 <style>
-  body {
-    background: #f8fafc;
-    overflow: hidden;
-  }
-  .main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    padding: 0;
-    overflow: hidden;
-  }
-  .upload-card {
-    max-width: 900px;
-    width: 95%;
-    max-height: 95vh;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(243, 244, 246, 0.9));
-    border-radius: 20px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-    padding: 2rem 2.5rem;
-    position: relative;
-    animation: slideUp 1s ease-out;
-    backdrop-filter: blur(10px);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  .upload-card::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    left: -50px;
-    width: 150px;
-    height: 150px;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
-    filter: blur(30px);
-    animation: float 6s ease-in-out infinite alternate;
-    z-index: 0;
-  }
-  .upload-card h2 {
-    text-align: center;
-    color: #1e3a8a;
-    font-weight: 800;
-    font-size: 2rem;
-    margin-bottom: 1.2rem;
-    background: linear-gradient(to right, #1e3a8a, #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    animation: slideUp 1.2s ease-out 0.2s;
-    position: relative;
-    z-index: 1;
-    flex-shrink: 0;
-  }
-  .form-wrapper {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-right: 0.5rem;
-  }
-  .form-wrapper::-webkit-scrollbar {
-    width: 6px;
-  }
-  .form-wrapper::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .form-wrapper::-webkit-scrollbar-thumb {
-    background: #bfdbfe;
-    border-radius: 3px;
-  }
-  .form-wrapper::-webkit-scrollbar-thumb:hover {
-    background: #93c5fd;
-  }
-  .upload-card form {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    position: relative;
-    z-index: 1;
-    padding-bottom: 0.5rem;
-    padding-right: 0.3rem;
-  }
-  .form-grid-content {
-    display: contents;
-  }
-  .form-field {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    min-width: 0;
-  }
-  .upload-card label {
-    font-weight: 600;
-    color: #1e2a44;
-    margin-bottom: 6px;
-    display: block;
-    font-size: 0.95rem;
-  }
-  .upload-card input,
-  .upload-card select,
-  .upload-card textarea {
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0.65rem 0.9rem !important;
-    border: 1px solid #bfdbfe !important;
-    border-radius: 12px !important;
-    font-size: 0.92rem !important;
-    background: #fff !important;
-    color: #1e2a44 !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-    animation: slideUp 1.4s ease-out 0.4s;
-    position: relative;
-    z-index: 1;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-  }
-  .upload-card input:focus,
-  .upload-card select:focus,
-  .upload-card textarea:focus {
-    border-color: #3b82f6;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    z-index: 2;
-  }
-  .upload-card textarea {
-    min-height: 70px;
-    resize: none;
-    font-family: inherit;
-  }
-  .upload-card input[type="file"] {
-    padding: 0.65rem 0.5rem;
-    cursor: pointer;
-  }
-  .upload-card input[type="file"]::file-selector-button {
-    background: #3b82f6;
-    color: white;
-    border: none;
-    padding: 0.4rem 0.9rem;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-right: 0.8rem;
-    transition: all 0.2s ease;
-    font-size: 0.85rem;
-  }
-  .upload-card input[type="file"]::file-selector-button:hover {
-    background: #2563eb;
-  }
-  .full-width {
-    grid-column: span 2;
-  }
-  .button-wrapper {
-    flex-shrink: 0;
-    padding-top: 0.8rem;
-    position: relative;
-    z-index: 1;
-  }
-  .upload-card button[type="submit"] {
-    width: 100%;
-    padding: 0.85rem;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(90deg, #3b82f6, #60a5fa);
-    color: #fff;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    animation: slideUp 1.6s ease-out 0.6s;
-  }
-  .upload-card button[type="submit"]:hover {
-    background: linear-gradient(90deg, #2563eb, #3b82f6);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  }
-  @media (max-width: 992px) {
-    .main {
-      margin-left: 0;
+    .upload-container {
+        max-width: 800px;
+        margin: 0 auto;
     }
-    .upload-card {
-      width: 95%;
-      padding: 1.8rem 1.5rem;
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
     }
-    .upload-card h2 {
-      font-size: 1.7rem;
-      margin-bottom: 1rem;
+
+    .full-width {
+        grid-column: span 2;
     }
-    .upload-card form {
-      gap: 0.9rem;
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.95rem;
     }
-  }
-  @media (max-width: 768px) {
-    .upload-card {
-      padding: 1.5rem;
-      max-height: 96vh;
+
+    /* Input Stilleri */
+    input[type="text"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.5);
+        font-size: 1rem;
+        transition: 0.3s;
+        box-sizing: border-box;
     }
-    .upload-card h2 {
-      font-size: 1.5rem;
-      margin-bottom: 0.9rem;
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
     }
-    .upload-card form {
-      grid-template-columns: 1fr;
-      gap: 0.8rem;
+
+    /* Dosya Yükleme Alanı */
+    input[type="file"] {
+        background: white;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px dashed var(--primary);
+        width: 100%;
+        cursor: pointer;
     }
-    .full-width,
-    .form-field {
-      grid-column: span 1 !important;
+
+    /* Buton */
+    .submit-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        width: 100%;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
     }
-    .upload-card input,
-    .upload-card select,
-    .upload-card textarea {
-      padding: 0.6rem 0.8rem;
-      font-size: 0.88rem;
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
     }
-    .upload-card textarea {
-      min-height: 65px;
+
+    @media (max-width: 768px) {
+        .form-grid { grid-template-columns: 1fr; }
+        .full-width { grid-column: span 1; }
     }
-    .upload-card button[type="submit"] {
-      padding: 0.75rem;
-      font-size: 0.95rem;
-    }
-    .button-wrapper {
-      padding-top: 0.5rem;
-    }
-  }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes float {
-    from { transform: translate(0, 0); }
-    to { transform: translate(10px, 15px); }
-  }
 </style>
 
-<div class="upload-card">
-  <h2>📄 Yeni Not Yükle</h2>
-  <div class="form-wrapper">
-    <!-- DÜZELTME: id="id_upload_form" eklendi -->
-    <form method="POST" enctype="multipart/form-data" id="id_upload_form">
-      {% csrf_token %}
-      <div class="form-grid-content">
-        <div class="form-field">
-          <label for="id_university">Üniversite</label>
-          {{ form.university }}
-        </div>
-        <div class="form-field">
-          <label for="id_faculty">Fakülte</label>
-          {{ form.faculty }}
-        </div>
-        <div class="form-field">
-          <label for="id_department">Bölüm</label>
-          {{ form.department }}
-        </div>
-        <div class="form-field">
-          <label for="id_semester">Dönem</label>
-          {{ form.semester }}
-        </div>
-        <div class="form-field">
-          <label for="id_course">Ders</label>
-          {{ form.course }}
-        </div>
-        <div class="form-field full-width">
-          <label for="id_title">Not Başlığı</label>
-          {{ form.title }}
-        </div>
-        <div class="form-field full-width">
-          <label for="id_description">Açıklama</label>
-          {{ form.description }}
-        </div>
-        <div class="form-field full-width">
-          <label for="id_file">PDF / Word / Görsel Dosya</label>
-          {{ form.file }}
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="button-wrapper">
-    <!-- Button zaten form attribute'u ile yukarıdaki ID'yi hedefliyor -->
-    <button type="submit" form="id_upload_form">Yükle</button>
-  </div>
+<div class="upload-container">
+    <div class="glass" style="padding: 30px;">
+        <h2 style="margin-bottom: 25px; color: var(--primary); display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Yeni Not Yükle
+        </h2>
+
+        <form method="POST" enctype="multipart/form-data" id="id_upload_form">
+            {% csrf_token %}
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Üniversite</label>
+                    {{ form.university }}
+                </div>
+                <div class="form-group">
+                    <label>Fakülte</label>
+                    {{ form.faculty }}
+                </div>
+                <div class="form-group">
+                    <label>Bölüm</label>
+                    {{ form.department }}
+                </div>
+                <div class="form-group">
+                    <label>Dönem</label>
+                    {{ form.semester }}
+                </div>
+                <div class="form-group full-width">
+                    <label>Ders</label>
+                    {{ form.course }}
+                </div>
+                <div class="form-group full-width">
+                    <label>Not Başlığı</label>
+                    {{ form.title }}
+                </div>
+                <div class="form-group full-width">
+                    <label>Açıklama</label>
+                    {{ form.description }}
+                </div>
+                <div class="form-group full-width">
+                    <label>Dosya (PDF, Word, Görsel)</label>
+                    {{ form.file }}
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fa-solid fa-paper-plane"></i> Notu Paylaş
+            </button>
+        </form>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  // Form submit için düzenleme (ID GARANTİSİ)
-  document.querySelector('.button-wrapper button').addEventListener('click', function(e) {
-    e.preventDefault();
-    // Doğrudan ID ile formu bulup gönderiyoruz
-    var form = document.getElementById('id_upload_form');
-    if (form) {
-        form.submit();
-    } else {
-        console.error("Form bulunamadı!");
-    }
-  });
+    // Dropdown Zinciri (Senin Orijinal Kodun)
+    $(document).ready(function () {
+        $("#id_university").change(function () {
+            var url = "{% url 'ajax_load_faculties' %}";
+            var universityId = $(this).val();
+            $.ajax({
+                url: url, data: { 'university': universityId },
+                success: function (data) {
+                    $("#id_faculty").html('<option value="">---------</option>');
+                    $("#id_department").html('<option value="">---------</option>');
+                    $("#id_course").html('<option value="">---------</option>');
+                    $.each(data, function (key, value) {
+                        $("#id_faculty").append('<option value="' + value.id + '">' + value.name + '</option>');
+                    });
+                }
+            });
+        });
 
-  $(document).ready(function () {
-    // 1. Üniversite değişince -> Fakülteleri Getir
-    $("#id_university").change(function () {
-      var url = "{% url 'ajax_load_faculties' %}";
-      var universityId = $(this).val();
+        $("#id_faculty").change(function () {
+            var url = "{% url 'ajax_load_departments' %}";
+            var facultyId = $(this).val();
+            $.ajax({
+                url: url, data: { 'faculty': facultyId },
+                success: function (data) {
+                    $("#id_department").html('<option value="">---------</option>');
+                    $("#id_course").html('<option value="">---------</option>');
+                    $.each(data, function (key, value) {
+                        $("#id_department").append('<option value="' + value.id + '">' + value.name + '</option>');
+                    });
+                }
+            });
+        });
 
-      $.ajax({
-        url: url,
-        data: { 'university': universityId },
-        success: function (data) {
-          $("#id_faculty").html('<option value="">---------</option>');
-          $("#id_department").html('<option value="">---------</option>');
-          $("#id_course").html('<option value="">---------</option>');
-          $.each(data, function (key, value) {
-            $("#id_faculty").append('<option value="' + value.id + '">' + value.name + '</option>');
-          });
-        }
-      });
+        $("#id_department").change(function () {
+            var url = "{% url 'ajax_load_courses' %}";
+            var departmentId = $(this).val();
+            $.ajax({
+                url: url, data: { 'department': departmentId },
+                success: function (data) {
+                    $("#id_course").html('<option value="">---------</option>');
+                    $.each(data, function (key, value) {
+                        $("#id_course").append('<option value="' + value.id + '">' + value.name + '</option>');
+                    });
+                }
+            });
+        });
     });
-
-    // 2. Fakülte değişince -> Bölümleri Getir
-    $("#id_faculty").change(function () {
-      var url = "{% url 'ajax_load_departments' %}";
-      var facultyId = $(this).val();
-
-      $.ajax({
-        url: url,
-        data: { 'faculty': facultyId },
-        success: function (data) {
-          $("#id_department").html('<option value="">---------</option>');
-          $("#id_course").html('<option value="">---------</option>');
-          $.each(data, function (key, value) {
-            $("#id_department").append('<option value="' + value.id + '">' + value.name + '</option>');
-          });
-        }
-      });
-    });
-
-    // 3. Bölüm değişince -> Dersleri Getir
-    $("#id_department").change(function () {
-      var url = "{% url 'ajax_load_courses' %}";
-      var departmentId = $(this).val();
-
-      $.ajax({
-        url: url,
-        data: { 'department': departmentId },
-        success: function (data) {
-          $("#id_course").html('<option value="">---------</option>');
-          $.each(data, function (key, value) {
-            $("#id_course").append('<option value="' + value.id + '">' + value.name + '</option>');
-          });
-        }
-      });
-    });
-  });
 </script>
 {% endblock %}

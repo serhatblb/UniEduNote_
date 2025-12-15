@@ -1,220 +1,189 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Tüm Notlar{% endblock %}
+
 {% block content %}
 <style>
-  h2 {
-    color: #1e3a8a;
-    font-weight: 800;
-    font-size: 2rem;
-    margin-bottom: 2rem;
-    background: linear-gradient(to right, #1e3a8a, #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+    /* Filtre Alanı */
+    .filter-section {
+        margin-bottom: 30px;
+        padding: 20px;
+    }
 
-  .filter-box {
-    background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(243,244,246,0.9));
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    margin-bottom: 2.5rem;
-    backdrop-filter: blur(10px);
-  }
+    .filter-form {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
 
-  .filter-row {
-    display: flex;
-    gap: 1.2rem;
-    flex-wrap: wrap;
-  }
+    .filter-form select {
+        flex: 1;
+        min-width: 200px;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.1);
+        background: rgba(255,255,255,0.8);
+    }
 
-  select, button {
-    padding: 0.8rem 1rem;
-    border-radius: 10px;
-    font-size: 1rem;
-    border: 1px solid #bfdbfe;
-  }
+    .filter-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .filter-btn:hover { background: #0056b3; }
 
-  button {
-    background: linear-gradient(90deg,#3b82f6,#60a5fa);
-    color: #fff;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: .3s;
-  }
+    /* Not Kartları (Grid) */
+    .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
 
-  .note-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
-    gap: 1.8rem;
-  }
+    .note-card {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s;
+        position: relative;
+    }
 
-  .note-card {
-    background: linear-gradient(145deg,rgba(255,255,255,0.95),rgba(243,244,246,0.9));
-    border-radius: 16px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    padding: 1.5rem;
-    transition: all .3s ease;
-    position: relative;
-  }
+    .note-card:hover { transform: translateY(-5px); }
 
-  .note-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-  }
+    .note-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: var(--primary);
+    }
 
-  .note-card h4 {
-    color:#1e3a8a;
-    font-weight:700;
-    font-size:1.2rem;
-    margin-bottom:0.5rem;
-  }
+    .note-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: var(--text-dark);
+    }
 
-  .note-meta {
-    font-size: .9rem;
-    color:#4b5563;
-    margin: .5rem 0 1rem 0;
-  }
+    .note-info {
+        font-size: 0.85rem;
+        color: var(--text-gray);
+        margin-bottom: 15px;
+    }
 
-  .btn {
-    display:inline-block;
-    text-align:center;
-    padding: .6rem 1rem;
-    border-radius:10px;
-    font-weight:600;
-    font-size:.9rem;
-    cursor:pointer;
-    text-decoration:none;
-    transition:.3s;
-  }
+    .card-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: auto;
+    }
 
-  .btn-detail {
-    background:#f8fafc;
-    color:#1e3a8a;
-    border:1px solid #bfdbfe;
-  }
+    .btn-card {
+        flex: 1;
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: 0.2s;
+        border: none;
+        cursor: pointer;
+    }
 
-  .btn-download {
-    background:linear-gradient(90deg,#3b82f6,#60a5fa);
-    color:#fff;
-  }
+    .btn-view { background: rgba(0, 122, 255, 0.1); color: var(--primary); }
+    .btn-view:hover { background: var(--primary); color: white; }
 
-  .btn-like {
-    background:#f3f4f6;
-    color:#1e3a8a;
-    border:1px solid #d1d5db;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:5px;
-  }
+    .btn-like { background: rgba(255, 59, 48, 0.1); color: #FF3B30; display: flex; align-items: center; justify-content: center; gap: 5px;}
+    .btn-like:hover { background: #FF3B30; color: white; }
 
-  .btn-like:hover {
-    background:#e0e7ff;
-  }
-
-  .btn-detail:hover, .btn-download:hover {
-    transform: translateY(-2px);
-    box-shadow:0 6px 15px rgba(0,0,0,0.15);
-  }
-
-  .card-btns {
-    display:flex;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:.6rem;
-  }
 </style>
 
-<h2>📚 Tüm Notlar</h2>
-
-<div class="filter-box">
-  <form method="get" class="filter-row">
-    <select name="university">
-      <option value="">Üniversite</option>
-      {% for uni in universities %}
-        <option value="{{ uni.id }}" {% if request.GET.university == uni.id|stringformat:"s" %}selected{% endif %}>{{ uni.name }}</option>
-      {% endfor %}
-    </select>
-    <select name="department">
-      <option value="">Bölüm</option>
-      {% for dep in departments %}
-        <option value="{{ dep.id }}" {% if request.GET.department == dep.id|stringformat:"s" %}selected{% endif %}>{{ dep.name }}</option>
-      {% endfor %}
-    </select>
-    <select name="course">
-      <option value="">Ders</option>
-      {% for c in courses %}
-        <option value="{{ c.id }}" {% if request.GET.course == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
-      {% endfor %}
-    </select>
-    <button type="submit">Ara</button>
-  </form>
+<!-- Filtreleme Alanı -->
+<div class="glass filter-section">
+    <h3 style="margin-bottom: 15px; color: var(--text-dark);"><i class="fa-solid fa-filter"></i> Notları Filtrele</h3>
+    <form method="get" class="filter-form">
+        <select name="university">
+            <option value="">Üniversite Seç</option>
+            {% for uni in universities %}
+            <option value="{{ uni.id }}" {% if request.GET.university == uni.id|stringformat:"s" %}selected{% endif %}>{{ uni.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="department">
+            <option value="">Bölüm Seç</option>
+            {% for dep in departments %}
+            <option value="{{ dep.id }}" {% if request.GET.department == dep.id|stringformat:"s" %}selected{% endif %}>{{ dep.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="course">
+            <option value="">Ders Seç</option>
+            {% for c in courses %}
+            <option value="{{ c.id }}" {% if request.GET.course == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="filter-btn">Ara</button>
+    </form>
 </div>
 
-<div class="note-grid">
-  {% for note in notes %}
-  <div class="note-card" data-note="{{ note.id }}">
-    <h4>{{ note.title }}</h4>
-    <small>{{ note.course }} - {{ note.semester }}</small>
-    <div class="note-meta">
-      <strong>Yükleyen:</strong> {{ note.user.username }}<br>
-      📥 {{ note.download_count }} indirme
+<!-- Not Listesi -->
+<div class="notes-grid">
+    {% for note in notes %}
+    <div class="glass note-card" data-note="{{ note.id }}">
+        <div>
+            <div class="note-icon"><i class="fa-regular fa-file-lines"></i></div>
+            <div class="note-title">{{ note.title }}</div>
+            <div class="note-info">
+                <i class="fa-solid fa-graduation-cap"></i> {{ note.course.name }} <br>
+                <i class="fa-regular fa-user"></i> {{ note.user.username }} •
+                <i class="fa-solid fa-download"></i> {{ note.download_count }}
+            </div>
+        </div>
+
+        <div class="card-actions">
+            <a href="{% url 'note_detail' note.id %}" class="btn-card btn-view">İncele</a>
+            <button class="btn-card btn-like" onclick="toggleLike({{ note.id }}, this)">
+                <i class="fa-regular fa-heart"></i> <span class="like-count">{{ note.likes }}</span>
+            </button>
+        </div>
     </div>
-    <div class="card-btns">
-      <a href="{% url 'note_detail' note.id %}" class="btn btn-detail">👁 Detay</a>
-      <a href="{% url 'download_note' note.id %}" class="btn btn-download">📥 İndir</a>
-      <button class="btn btn-like" onclick="toggleLike({{ note.id }}, this)">❤️ <span class="like-count">{{ note.likes }}</span></button>
+    {% empty %}
+    <div class="glass" style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-gray);">
+        <h3>📭 Henüz not bulunamadı.</h3>
+        <p>İlk notu sen yükleyerek katkıda bulunabilirsin!</p>
     </div>
-  </div>
-  {% empty %}
-  <p style="text-align:center;color:#4b5563;">Henüz not yüklenmemiş.</p>
-  {% endfor %}
+    {% endfor %}
 </div>
 
+<!-- Beğeni Scripti -->
 <script>
 const token = localStorage.getItem('access');
 
-// 🔹 Tüm notlar yüklendiğinde kullanıcı hangi notları beğenmiş öğren
-document.addEventListener('DOMContentLoaded', async () => {
-  if(!token) return;
-  const cards = document.querySelectorAll('.note-card');
-  for (const card of cards) {
-    const id = card.dataset.note;
-    const btn = card.querySelector('.btn-like');
-    try {
-      const res = await fetch(`/api/notes/${id}/like/`, {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-      if(!res.ok) continue;
-      const data = await res.json();
-      const countEl = btn.querySelector('.like-count');
-      countEl.textContent = data.total_likes;
-      btn.innerHTML = data.liked
-        ? '💔 <span class="like-count">'+data.total_likes+'</span>'
-        : '❤️ <span class="like-count">'+data.total_likes+'</span>';
-    } catch {}
-  }
-});
-
-// 🔹 Toggle (beğen / geri al)
+// Beğeni Butonu İşlevi
 async function toggleLike(noteId, btn){
   try{
     const res = await fetch(`/api/notes/${noteId}/like/`, {
       method:'POST',
       headers:{'Authorization':'Bearer '+token}
     });
+    if(!res.ok) { alert("Lütfen giriş yapın."); return; }
+
     const data = await res.json();
     const countEl = btn.querySelector('.like-count');
+    const iconEl = btn.querySelector('i');
+
     countEl.textContent = data.total_likes;
-    btn.innerHTML = data.liked
-      ? '💔 <span class="like-count">'+data.total_likes+'</span>'
-      : '❤️ <span class="like-count">'+data.total_likes+'</span>';
-  }catch{
-    alert('Beğeni işlemi başarısız.');
+
+    if(data.liked) {
+        iconEl.classList.remove('fa-regular');
+        iconEl.classList.add('fa-solid'); // İçi dolu kalp
+    } else {
+        iconEl.classList.remove('fa-solid');
+        iconEl.classList.add('fa-regular'); // İçi boş kalp
+    }
+  } catch(e) {
+    console.error(e);
   }
 }
 </script>
-
 {% endblock %}
