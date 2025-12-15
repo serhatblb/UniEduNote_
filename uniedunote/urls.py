@@ -43,9 +43,16 @@ urlpatterns = [
     path('api/auth/', include('users.urls')),
     path("api/notes/", include("notes.urls")),
 
-path('chat/', chat_views.chat_room, name='chat_room'),
+    path('chat/', chat_views.chat_room, name='chat_room'),
     path('chat/get/', chat_views.get_messages, name='get_messages'),
     path('chat/send/', chat_views.send_message, name='send_message'),
+
+    # Premium
+    path('premium/', user_views.premium_page, name='premium'),
+
+    # Bildirimler
+    path('api/notifications/get/', user_views.get_notifications, name='get_notifications'),
+    path('api/notifications/read/', user_views.mark_notifications_read, name='mark_notifications_read'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

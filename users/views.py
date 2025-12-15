@@ -1,4 +1,3 @@
-from categories.models import University
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
@@ -6,12 +5,13 @@ from django.utils.encoding import force_str, force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-
+from django.http import JsonResponse
 
 from .forms import RegisterForm
 from .tokens import account_activation_token
 from .email_utils import send_activation_email
-
+from categories.models import University
+from .models import Notification
 User = get_user_model()
 
 # --- EKSİK OLAN HOME FONKSİYONU ---
@@ -130,3 +130,31 @@ def profile(request):
     # ESKİSİ: return render(request, "users/profile.html", context)
     # YENİSİ (Eğer dosya ana dizindeyse):
     return render(request, "profile.html", context)
+
+
+@login_required
+def premium_page(request):
+    """Para kazanma sayfası"""
+    return render(request, 'users/premium.html')
+
+
+@login_required
+def get_notifications(request):
+    """Okunmamış bildirimleri çeker (AJAX için)"""
+    notifs = Notification.objects.filter(user=request.user, is_read=False)[:5]
+    count = Notification.objects.filter(user=request.user, is_read=False).count()
+
+    data = [{
+        'id': n.id,
+        'message': n.message,
+        'created_at': n.created_at.strftime('%d.%m %H:%M')
+    } for n in notifs]
+
+    return JsonResponse({'count': count, 'notifications': data})
+
+
+@login_required
+def mark_notifications_read(request):
+    """Bildirimleri okundu yapar"""
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    return JsonResponse({'status': 'ok'})
