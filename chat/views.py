@@ -5,14 +5,12 @@ from .models import ChatMessage
 import json
 import re
 
-
 # ==========================
 # CHAT SAYFASI
 # ==========================
 @login_required(login_url='/login/')
 def chat_room(request):
     return render(request, 'chat/room.html')
-
 
 @login_required
 def get_messages(request):
@@ -25,9 +23,8 @@ def get_messages(request):
     } for m in reversed(messages)]
     return JsonResponse({'messages': data})
 
-
 # ==========================
-# KÜFÜR FİLTRESİ
+# FİLTRELER (Küfür + Telefon)
 # ==========================
 BAD_WORDS = [
     "aptal", "salak", "gerizekalı", "geri zekalı", "embesil", "ahmak",
@@ -46,41 +43,36 @@ BAD_WORDS = [
     "am", "amcık", "amcik", "godoş", "ibnelik"
 ]
 
-
 def normalize_text(text):
     """Türkçe karakterleri İngilizce karşılıklarına çevirir"""
     replacements = {
-        "ı": "i", "İ": "i",
-        "ş": "s", "Ş": "s",
-        "ğ": "g", "Ğ": "g",
-        "ç": "c", "Ç": "c",
-        "ö": "o", "Ö": "o",
-        "ü": "u", "Ü": "u"
+        "ı": "i", "İ": "i", "ş": "s", "Ş": "s", "ğ": "g", "Ğ": "g",
+        "ç": "c", "Ç": "c", "ö": "o", "Ö": "o", "ü": "u", "Ü": "u"
     }
     text = text.lower()
     for k, v in replacements.items():
         text = text.replace(k, v)
     return text
 
-
 def contains_profanity(text):
-    # Kullanıcının yazdığı metni normalize et (örn: "Göt" -> "got")
     normalized_text = normalize_text(text)
-
     for bad_word in BAD_WORDS:
-        # Yasaklı kelimeyi de normalize et (örn: "göt" -> "got")
         normalized_bad_word = normalize_text(bad_word)
-
-        # Kelime sınırlarını kontrol et (regex ile)
-        # Bu sayede "analiz" kelimesindeki "anal" yüzünden engellemez.
-        # Sadece tam kelime eşleşmesine veya bariz küfürlere bakar.
-
-        # Basit kontrol (Eğer kelime içinde geçiyorsa)
+        # Kelime içinde geçiyor mu? (Basit ve etkili kontrol)
         if normalized_bad_word in normalized_text:
             return True
-
     return False
 
+def contains_phone_number(text):
+    """
+    Telefon numarası formatlarını yakalar:
+    0555 555 55 55, 555-555-5555, 05321234567 vb.
+    """
+    # Regex: 0 veya 5 ile başlayan, içinde boşluk veya tire olabilen 10-11 haneli sayılar
+    pattern = r'(0?5\d{2})[\s-]*(\d{3})[\s-]*(\d{2})[\s-]*(\d{2})'
+    if re.search(pattern, text):
+        return True
+    return False
 
 # ==========================
 # MESAJ GÖNDERME
@@ -95,7 +87,14 @@ def send_message(request):
             if not msg:
                 return JsonResponse({'status': 'empty'})
 
-            # 🚫 Küfür varsa engelle
+            # 1. Telefon Numarası Kontrolü
+            if contains_phone_number(msg):
+                return JsonResponse({
+                    'status': 'blocked',
+                    'error': 'Güvenlik nedeniyle telefon numarası paylaşmak yasaktır.'
+                })
+
+            # 2. Küfür Kontrolü
             if contains_profanity(msg):
                 return JsonResponse({
                     'status': 'blocked',
