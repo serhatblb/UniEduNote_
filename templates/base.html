@@ -8,6 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <style>
         :root {
             --primary: #007AFF;
@@ -70,6 +77,16 @@
             .main-content.authenticated { margin-left: 0; padding: 20px; padding-bottom: 100px; }
             .mobile-nav { display: flex; }
             .landing-hero h1 { font-size: 2.2rem; }
+
+            /* Mobilde bildirim kutusu konumlandırma */
+            #notif-dropdown {
+                position: fixed !important;
+                bottom: 80px;
+                right: 10px;
+                left: 10px;
+                width: auto !important;
+                top: auto !important;
+            }
         }
         @media (min-width: 993px) { .mobile-nav { display: none; } }
     </style>
@@ -172,10 +189,18 @@
     {% if user.is_authenticated %}
     <div class="mobile-nav">
         <a href="{% url 'dashboard' %}" class="nav-icon {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-house"></i></a>
+        <a href="{% url 'premium' %}" class="nav-icon" style="color: #FFD60A;"><i class="fa-solid fa-crown"></i></a>
         <a href="{% url 'note_list' %}" class="nav-icon {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-magnifying-glass"></i></a>
+
+        <div class="nav-icon" onclick="toggleNotifs()" style="position: relative;">
+            <i class="fa-regular fa-bell"></i>
+            <div id="mobile-notif-badge" style="position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: red; border-radius: 50%; display: none;"></div>
+        </div>
+
         <a href="{% url 'upload_note' %}" class="add-btn-mobile"><i class="fa-solid fa-plus"></i></a>
         <a href="{% url 'chat_room' %}" class="nav-icon {% if 'chat' in request.path %}active{% endif %}"><i class="fa-regular fa-comments"></i></a>
         <a href="{% url 'profile' %}" class="nav-icon {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i></a>
+        <a href="{% url 'logout' %}" class="nav-icon" style="color: #FF3B30;"><i class="fa-solid fa-right-from-bracket"></i></a>
     </div>
     {% endif %}
 
@@ -187,17 +212,23 @@
             const res = await fetch('/api/notifications/get/');
             const data = await res.json();
             const badge = document.getElementById('notif-badge');
+            const mobileBadge = document.getElementById('mobile-notif-badge');
             const list = document.getElementById('notif-list');
 
             if (data.count > 0) {
-                badge.style.display = 'block';
+                if(badge) badge.style.display = 'block';
+                if(mobileBadge) mobileBadge.style.display = 'block';
+
                 list.innerHTML = data.notifications.map(n => `
                     <div style="padding: 10px; border-bottom: 1px solid #eee;">
                         <div style="font-size: 0.9rem;">${n.message}</div>
                         <div style="font-size: 0.75rem; color: #999;">${n.created_at}</div>
                     </div>
                 `).join('');
-            } else { badge.style.display = 'none'; }
+            } else {
+                if(badge) badge.style.display = 'none';
+                if(mobileBadge) mobileBadge.style.display = 'none';
+            }
         } catch(e) {}
     }
 
@@ -206,7 +237,10 @@
         dropdown.style.display = (dropdown.style.display === 'none') ? 'block' : 'none';
         if (dropdown.style.display === 'block') {
             fetch('/api/notifications/read/');
-            document.getElementById('notif-badge').style.display = 'none';
+            const badge = document.getElementById('notif-badge');
+            const mobileBadge = document.getElementById('mobile-notif-badge');
+            if(badge) badge.style.display = 'none';
+            if(mobileBadge) mobileBadge.style.display = 'none';
         }
     }
 

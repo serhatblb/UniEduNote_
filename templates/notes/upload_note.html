@@ -3,6 +3,9 @@
 {% block title %}Yeni Not Yükle{% endblock %}
 
 {% block content %}
+<!-- Select2 CSS (Arama Kutusu Tasarımı İçin) -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 <style>
     .upload-container {
         max-width: 800px;
@@ -27,9 +30,8 @@
         font-size: 0.95rem;
     }
 
-    /* Input Stilleri */
+    /* Standart Inputlar */
     input[type="text"],
-    select,
     textarea {
         width: 100%;
         padding: 12px 15px;
@@ -41,10 +43,39 @@
         box-sizing: border-box;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus, textarea:focus {
         outline: none;
         border-color: var(--primary);
         background: white;
+        box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+    }
+
+    /* === SELECT2 (ARANABİLİR KUTU) TASARIMI === */
+    .select2-container .select2-selection--single {
+        height: 50px !important; /* Yükseklik */
+        border: 1px solid rgba(0,0,0,0.1) !important;
+        border-radius: 12px !important;
+        background: rgba(255, 255, 255, 0.5) !important;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Ok İşareti */
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 48px !important;
+    }
+
+    /* Yazı Rengi */
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: var(--text-dark) !important;
+        font-size: 1rem;
+        padding-left: 15px;
+    }
+
+    /* Odaklanınca (Tıklayınca) */
+    .select2-container--open .select2-selection--single {
+        border-color: var(--primary) !important;
+        background: white !important;
         box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
     }
 
@@ -100,6 +131,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>Üniversite</label>
+                    <!-- class="searchable" ekleyerek JS ile yakalayacağız -->
                     {{ form.university }}
                 </div>
                 <div class="form-group">
@@ -139,51 +171,91 @@
     </div>
 </div>
 
+<!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Select2 JS (Arama motoru) -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
-    // Dropdown Zinciri (Senin Orijinal Kodun)
     $(document).ready(function () {
+        // Tüm select kutularını "Aranabilir" (Select2) yap
+        $('select').select2({
+            width: '100%',
+            placeholder: "Seçmek için yazın...",
+            language: {
+                noResults: function() {
+                    return "Sonuç bulunamadı";
+                }
+            }
+        });
+
+        // 1. Üniversite değişince -> Fakülteleri Getir
         $("#id_university").change(function () {
             var url = "{% url 'ajax_load_faculties' %}";
             var universityId = $(this).val();
+
             $.ajax({
                 url: url, data: { 'university': universityId },
                 success: function (data) {
-                    $("#id_faculty").html('<option value="">---------</option>');
-                    $("#id_department").html('<option value="">---------</option>');
-                    $("#id_course").html('<option value="">---------</option>');
+                    var $faculty = $("#id_faculty");
+                    $faculty.empty(); // Temizle
+                    $faculty.append('<option value="">---------</option>');
+
+                    // Diğerlerini de sıfırla
+                    $("#id_department").empty().append('<option value="">---------</option>').trigger('change');
+                    $("#id_course").empty().append('<option value="">---------</option>').trigger('change');
+
                     $.each(data, function (key, value) {
-                        $("#id_faculty").append('<option value="' + value.id + '">' + value.name + '</option>');
+                        $faculty.append('<option value="' + value.id + '">' + value.name + '</option>');
                     });
+
+                    // Select2'ye "Liste değişti, kendini güncelle" diyoruz
+                    $faculty.trigger('change');
                 }
             });
         });
 
+        // 2. Fakülte değişince -> Bölümleri Getir
         $("#id_faculty").change(function () {
             var url = "{% url 'ajax_load_departments' %}";
             var facultyId = $(this).val();
+
             $.ajax({
                 url: url, data: { 'faculty': facultyId },
                 success: function (data) {
-                    $("#id_department").html('<option value="">---------</option>');
-                    $("#id_course").html('<option value="">---------</option>');
+                    var $dept = $("#id_department");
+                    $dept.empty().append('<option value="">---------</option>');
+
+                    // Dersi sıfırla
+                    $("#id_course").empty().append('<option value="">---------</option>').trigger('change');
+
                     $.each(data, function (key, value) {
-                        $("#id_department").append('<option value="' + value.id + '">' + value.name + '</option>');
+                        $dept.append('<option value="' + value.id + '">' + value.name + '</option>');
                     });
+
+                    // Select2 güncelle
+                    $dept.trigger('change');
                 }
             });
         });
 
+        // 3. Bölüm değişince -> Dersleri Getir
         $("#id_department").change(function () {
             var url = "{% url 'ajax_load_courses' %}";
             var departmentId = $(this).val();
+
             $.ajax({
                 url: url, data: { 'department': departmentId },
                 success: function (data) {
-                    $("#id_course").html('<option value="">---------</option>');
+                    var $course = $("#id_course");
+                    $course.empty().append('<option value="">---------</option>');
+
                     $.each(data, function (key, value) {
-                        $("#id_course").append('<option value="' + value.id + '">' + value.name + '</option>');
+                        $course.append('<option value="' + value.id + '">' + value.name + '</option>');
                     });
+
+                    // Select2 güncelle
+                    $course.trigger('change');
                 }
             });
         });

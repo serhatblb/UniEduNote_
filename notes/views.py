@@ -9,6 +9,7 @@ from categories.models import University, Department, Course
 from django.views.decorators.http import require_POST
 from django.shortcuts import redirect
 from django.http import JsonResponse
+from users.models import Notification
 
 # 📤 Not yükleme
 @login_required
@@ -61,24 +62,26 @@ def note_detail(request, pk):
 
 
 # 📥 Not indirme
-# notes/views.py
 @login_required
 def download_note(request, pk):
     note = get_object_or_404(Note, pk=pk)
 
     try:
         if note.file:
-            # İndirme sayısını artır
             note.download_count += 1
             note.save()
 
-            # Eğer dosya varsa Cloudinary URL'sine yönlendir
+            # BİLDİRİM GÖNDER (Kendi notunu indirince gitmesin)
+            if note.user != request.user:
+                Notification.objects.create(
+                    user=note.user,  # Notun sahibine
+                    message=f"Tebrikler! '{note.title}' başlıklı notun {request.user.username} tarafından indirildi. 🎉"
+                )
+
             return redirect(note.file.url)
     except Exception as e:
-        print(f"Dosya hatası: {e}")
-        messages.error(request, "Dosya sunucuda bulunamadı (Silinmiş olabilir).")
+        messages.error(request, "Dosya bulunamadı.")
 
-    # Hata varsa detay sayfasına geri dön
     return redirect('note_detail', pk=pk)
 
 # 🏠 Dashboard

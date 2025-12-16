@@ -77,6 +77,12 @@
         <label>Şifre (En az 8 karakter)</label>
         <input type="password" id="password" placeholder="Güçlü bir şifre" required>
       </div>
+    <div style="margin-bottom: 20px; text-align: left; font-size: 0.9rem;">
+    <input type="checkbox" id="terms" required>
+    <label for="terms" style="display: inline; font-weight: normal;">
+        <a href="#" onclick="openModal()">Kullanım Koşullarını</a> okudum ve kabul ediyorum.
+    </label>
+</div>
       <button type="submit">Kayıt Ol</button>
     </form>
 
@@ -84,7 +90,37 @@
     <p class="bottom-text">Zaten hesabın var mı? <a href="{% url 'login' %}">Giriş Yap</a></p>
   </div>
 </div>
+<div id="termsModal" class="glass" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; padding: 30px; z-index: 3000; background: rgba(255,255,255,0.95); text-align: left;">
+    <h3 style="margin-top: 0;">📜 Kullanım Koşulları & Sorumluluk Reddi</h3>
+    <div style="height: 200px; overflow-y: auto; margin: 15px 0; font-size: 0.9rem; color: #555;">
+        <p>1. UniEduNote, öğrenciler arasında not paylaşımını sağlayan bir aracı platformdur.</p>
+        <p>2. Yüklenen notların telif hakları ve yasal sorumluluğu tamamen yükleyen kullanıcıya aittir.</p>
+        <p>3. Platform, paylaşılan içeriklerin doğruluğunu garanti etmez.</p>
+        <p>4. Telif hakkı ihlali durumunda içerik haber verilmeksizin kaldırılabilir.</p>
+        <p>5. Sohbet alanında küfür, hakaret ve kişisel veri paylaşımı yasaktır.</p>
+    </div>
+    <button onclick="closeModal()" style="width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer;">Anladım, Kapat</button>
+</div>
+<div id="modalBackdrop" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2900;" onclick="closeModal()"></div>
 
+<script>
+    function openModal() {
+        document.getElementById('termsModal').style.display = 'block';
+        document.getElementById('modalBackdrop').style.display = 'block';
+    }
+    function closeModal() {
+        document.getElementById('termsModal').style.display = 'none';
+        document.getElementById('modalBackdrop').style.display = 'none';
+    }
+
+    // Form gönderilmeden önce checkbox kontrolü (HTML5 required zaten yapıyor ama JS ile de bakalım)
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        if(!document.getElementById('terms').checked) {
+            e.preventDefault();
+            alert("Lütfen kullanım koşullarını kabul edin.");
+        }
+    });
+</script>
 <script>
 // Kayıt İşlemi
 document.getElementById('registerForm').addEventListener('submit', async (e) => {

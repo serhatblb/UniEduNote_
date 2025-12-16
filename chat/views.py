@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import ChatMessage
+from django.core.cache import cache
 import json
 import re
 
@@ -104,28 +105,32 @@ def contains_phone_number(text):
 def send_message(request):
     if request.method == 'POST':
         try:
+            # HIZ SINIRI KONTROLÜ (Rate Limiting)
+            user_id = request.user.id
+            cache_key = f"chat_cooldown_{user_id}"
+
+            if cache.get(cache_key):
+                return JsonResponse({'status': 'blocked', 'error': 'Çok hızlı yazıyorsunuz. Biraz yavaşla kovboy! 🤠'})
+
             data = json.loads(request.body)
             msg = data.get('message', '').strip()
 
             if not msg:
                 return JsonResponse({'status': 'empty'})
 
-            # 1. Telefon Numarası Kontrolü (Rakam veya Yazı)
+            # Filtreler (Telefon ve Küfür)
             if contains_phone_number(msg):
-                return JsonResponse({
-                    'status': 'blocked',
-                    'error': 'Güvenlik nedeniyle telefon numarası (yazı veya rakamla) paylaşmak yasaktır.'
-                })
+                return JsonResponse({'status': 'blocked', 'error': 'Telefon numarası paylaşmak yasaktır.'})
 
-            # 2. Küfür Kontrolü
             if contains_profanity(msg):
-                return JsonResponse({
-                    'status': 'blocked',
-                    'error': 'Mesajınız uygunsuz kelimeler içeriyor.'
-                })
+                return JsonResponse({'status': 'blocked', 'error': 'Uygunsuz içerik.'})
 
-            # ✅ Temiz mesajı kaydet
+            # Mesajı kaydet
             ChatMessage.objects.create(user=request.user, message=msg)
+
+            # 3 Saniye Engel Koy
+            cache.set(cache_key, "blocked", timeout=3)
+
             return JsonResponse({'status': 'ok'})
 
         except Exception as e:
