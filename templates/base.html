@@ -16,51 +16,428 @@
     <style>
         :root {
             --primary: #007AFF;
-            --glass-bg: rgba(255, 255, 255, 0.90); /* Mobilde daha net görünsün diye opaklık arttı */
+            --primary-dark: #0051D5;
+            --glass-bg: rgba(255, 255, 255, 0.90);
             --glass-border: rgba(255, 255, 255, 0.6);
             --text-dark: #1D1D1F;
             --text-gray: #86868B;
             --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
             --bg-color: #F2F2F7;
+            --success: #34C759;
+            --error: #FF3B30;
+            --warning: #FF9500;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
             background-size: cover;
             background-attachment: fixed;
             color: var(--text-dark);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         a { text-decoration: none; color: inherit; }
-        .glass { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: var(--shadow); border-radius: 24px; }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow);
+            border-radius: 24px;
+        }
 
         .app-container { display: flex; min-height: 100vh; }
 
-        /* Sidebar (Masaüstü) */
-        .sidebar { width: 260px; height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 24px; z-index: 1000; border-right: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.7); backdrop-filter: blur(30px); }
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
-        .menu-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 8px; color: var(--text-gray); border-radius: 16px; font-weight: 600; transition: 0.2s ease; }
-        .menu-item:hover, .menu-item.active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        /* ============= SIDEBAR (Masaüstü) ============= */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            z-index: 1000;
+            border-right: 1px solid rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(30px);
+            overflow-y: auto;
+        }
 
-        /* İçerik */
-        .main-content { flex: 1; padding: 30px; max-width: 1400px; width: 100%; }
-        .main-content.authenticated { margin-left: 260px; padding-bottom: 100px; }
-        .main-content.guest { margin-left: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        /* Landing Page (Karşılama) */
-        .landing-hero h1 { font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #007AFF, #5856D6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; line-height: 1.2; }
-        .landing-hero p { font-size: 1.1rem; color: var(--text-gray); max-width: 600px; margin: 0 auto 30px; line-height: 1.6; }
-        .landing-btn { padding: 14px 30px; border-radius: 50px; font-weight: 700; font-size: 1rem; transition: 0.3s; display: inline-block; }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 10px 25px rgba(0, 122, 255, 0.3); }
-        .btn-primary:hover { transform: translateY(-3px); }
-        .btn-outline { border: 2px solid var(--primary); color: var(--primary); margin-left: 15px; }
-        .btn-outline:hover { background: var(--primary); color: white; }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            color: var(--text-gray);
+            border-radius: 16px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            position: relative;
+        }
 
-        /* Mobil Nav (Sadeleştirilmiş) */
+        .menu-item:hover {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .menu-item.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .menu-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: var(--primary);
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* ============= ANA İÇERİK ============= */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            max-width: 1400px;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .main-content.authenticated {
+            margin-left: 260px;
+            padding-bottom: 100px;
+        }
+
+        .main-content.guest {
+            margin-left: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ============= ÜST BAR (Hoşgeldin + Bildirim) ============= */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .welcome-text h2 {
+            font-weight: 800;
+            margin: 0;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--text-dark), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-text p {
+            color: var(--text-gray);
+            margin: 4px 0 0;
+            font-size: 0.95rem;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Bildirim Butonu */
+        .notif-btn {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .notif-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .notif-btn .glass {
+            padding: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notif-btn i {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+        }
+
+        #notif-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background: var(--error);
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        /* Bildirim Dropdown */
+        #notif-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 320px;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(20px);
+            padding: 0;
+            z-index: 2001;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            max-height: 400px;
+            overflow: hidden;
+        }
+
+        #notif-dropdown h4 {
+            margin: 0;
+            padding: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        #notif-list {
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .notif-item {
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            background: white;
+            transition: all 0.2s;
+            border-left: 3px solid var(--primary);
+        }
+
+        .notif-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .notif-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-gray);
+        }
+
+        .notif-empty i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.3;
+        }
+
+        /* Profil Butonu (Masaüstü) */
+        .profile-btn {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+        }
+
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .profile-btn .avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .profile-btn .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-btn span {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        /* ============= ALERT MESSAGES ============= */
+        .alert-box {
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            width: 100%;
+            background: white;
+            border-left: 4px solid;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success { border-color: var(--success); color: #1F7A38; }
+        .alert-error { border-color: var(--error); color: #C0392B; }
+        .alert-warning { border-color: var(--warning); color: #C77700; }
+
+        .alert-box i {
+            font-size: 1.3rem;
+        }
+
+        /* ============= LANDING PAGE ============= */
+        .landing-page {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .landing-hero {
+            padding: 60px 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .landing-hero .emoji {
+            font-size: 4rem;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .landing-hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1D1D1F, #007AFF, #5856D6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .landing-hero p {
+            font-size: 1.15rem;
+            color: var(--text-gray);
+            max-width: 600px;
+            margin: 0 auto 20px;
+            line-height: 1.7;
+        }
+
+        .landing-features {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .feature-tag {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .landing-btn {
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: inline-block;
+            margin: 10px 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 25px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            background: var(--primary-dark);
+            box-shadow: 0 15px 35px rgba(0, 122, 255, 0.4);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            background: white;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* ============= MOBİL NAV ============= */
         .mobile-nav {
             display: none;
             position: fixed;
@@ -68,147 +445,308 @@
             left: 50%;
             transform: translateX(-50%);
             width: 92%;
-            max-width: 400px;
-            height: 65px; /* Biraz küçüldü */
-            justify-content: space-between; /* İkonları yay */
+            max-width: 420px;
+            height: 70px;
+            justify-content: space-between;
             padding: 0 20px;
             align-items: center;
             z-index: 2000;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
             border-radius: 24px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.8);
         }
 
-        .nav-icon { color: #999; font-size: 1.3rem; padding: 8px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
-        .nav-icon.active { color: var(--primary); }
+        .nav-icon {
+            color: var(--text-gray);
+            font-size: 1.35rem;
+            padding: 10px;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-icon:active {
+            transform: scale(0.95);
+        }
+
+        .nav-icon.active {
+            color: var(--primary);
+        }
+
+        .nav-icon.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
 
         /* Ortadaki büyük buton */
         .add-btn-mobile {
-            background: var(--primary); color: white; border-radius: 50%;
-            width: 50px; height: 50px;
-            display: flex; justify-content: center; align-items: center;
-            margin-bottom: 35px; /* Yukarı taşma */
-            box-shadow: 0 8px 20px rgba(0,122,255,0.4); font-size: 1.4rem;
-            border: 4px solid var(--bg-color); /* Kenarlık ile ayır */
+            background: linear-gradient(135deg, var(--primary), #5856D6);
+            color: white;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 24px rgba(0,122,255,0.4);
+            font-size: 1.5rem;
+            border: 5px solid var(--bg-color);
+            transition: all 0.2s;
         }
 
-        .alert-box { padding: 15px; border-radius: 16px; margin-bottom: 20px; width: 100%; background: white; border-left: 5px solid; }
-        .alert-success { border-color: #34C759; color: #1F7A38; }
-        .alert-error { border-color: #FF3B30; color: #C0392B; }
+        .add-btn-mobile:active {
+            transform: scale(0.95);
+        }
 
         /* Select2 Modernizasyon */
-        .select2-container .select2-selection--single { height: 50px !important; border-radius: 16px !important; border: 1px solid rgba(255, 255, 255, 0.6) !important; background: rgba(255, 255, 255, 0.6) !important; backdrop-filter: blur(10px) !important; display: flex !important; align-items: center !important; }
-        .select2-container--default .select2-selection--single .select2-selection__rendered { color: #1D1D1F !important; padding-left: 15px !important; }
-        .select2-container--default .select2-selection--single .select2-selection__arrow { height: 48px !important; right: 10px !important; }
-        .select2-dropdown { border-radius: 16px !important; border: none !important; box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important; background: rgba(255, 255, 255, 0.95) !important; overflow: hidden !important; }
+        .select2-container .select2-selection--single {
+            height: 52px !important;
+            border-radius: 16px !important;
+            border: 1px solid rgba(255, 255, 255, 0.6) !important;
+            background: rgba(255, 255, 255, 0.7) !important;
+            backdrop-filter: blur(10px) !important;
+            display: flex !important;
+            align-items: center !important;
+        }
 
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: var(--text-dark) !important;
+            padding-left: 16px !important;
+            line-height: 50px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 50px !important;
+            right: 12px !important;
+        }
+
+        .select2-dropdown {
+            border-radius: 16px !important;
+            border: none !important;
+            box-shadow: var(--shadow-lg) !important;
+            background: rgba(255, 255, 255, 0.98) !important;
+            overflow: hidden !important;
+        }
+
+        /* ============= RESPONSIVE ============= */
         @media (max-width: 992px) {
             .sidebar { display: none; }
-            .main-content.authenticated { margin-left: 0; padding: 20px; padding-bottom: 100px; }
-            .mobile-nav { display: flex; }
-            .landing-hero h1 { font-size: 2.2rem; }
 
-            #notif-dropdown { position: fixed !important; bottom: 80px; right: 20px; left: 20px; width: auto !important; top: auto !important; }
+            .main-content.authenticated {
+                margin-left: 0;
+                padding: 20px;
+                padding-bottom: 110px;
+            }
+
+            .mobile-nav { display: flex; }
+
+            .top-bar {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .welcome-text h2 { font-size: 1.5rem; }
+
+            .top-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .profile-btn { display: none !important; }
+
+            #mobile-logout { display: flex !important; }
+
+            #notif-dropdown {
+                position: fixed !important;
+                bottom: 100px;
+                right: 20px;
+                left: 20px;
+                width: auto !important;
+                top: auto !important;
+            }
+
+            .landing-hero h1 { font-size: 2.2rem; }
+            .landing-hero { padding: 40px 20px; }
         }
-        @media (min-width: 993px) { .mobile-nav { display: none; } }
+
+        @media (min-width: 993px) {
+            .mobile-nav { display: none; }
+            #mobile-logout { display: none; }
+        }
+
+        @media (max-width: 576px) {
+            .landing-btn {
+                display: block;
+                width: 100%;
+                margin: 8px 0;
+            }
+
+            .feature-tag {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+        }
+
+        /* ============= CUSTOM SCROLLBAR ============= */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 122, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 122, 255, 0.5);
+        }
     </style>
+
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
     <div class="app-container">
 
-        <!-- SIDEBAR (Masaüstü) -->
+        <!-- ============= SIDEBAR (Masaüstü) ============= -->
         {% if user.is_authenticated %}
         <aside class="sidebar">
-            <div class="logo"><i class="fa-solid fa-graduation-cap"></i> UniEduNote</div>
+            <div class="logo">
+                <i class="fa-solid fa-graduation-cap"></i> UniEduNote
+            </div>
+
             <nav>
-                <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-grid-2"></i> Paneli</a>
-                <a href="{% url 'note_list' %}" class="menu-item {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-compass"></i> Keşfet</a>
-                <a href="{% url 'upload_note' %}" class="menu-item {% if 'upload' in request.path %}active{% endif %}"><i class="fa-solid fa-cloud-arrow-up"></i> Not Yükle</a>
-                <a href="{% url 'premium' %}" class="menu-item {% if 'premium' in request.path %}active{% endif %}" style="color: #FF9500;"><i class="fa-solid fa-crown"></i> Premium</a>
-                <a href="{% url 'chat_room' %}" class="menu-item {% if 'chat' in request.path %}active{% endif %}"><i class="fa-regular fa-comments"></i> Sohbet</a>
-                <a href="{% url 'profile' %}" class="menu-item {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i> Profil</a>
+                <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}">
+                    <i class="fa-solid fa-grid-2"></i> Paneli
+                </a>
+                <a href="{% url 'note_list' %}" class="menu-item {% if 'notes' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-compass"></i> Keşfet
+                </a>
+                <a href="{% url 'upload_note' %}" class="menu-item {% if 'upload' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Not Yükle
+                </a>
+                <a href="{% url 'premium' %}" class="menu-item {% if 'premium' in request.path %}active{% endif %}" style="color: var(--warning);">
+                    <i class="fa-solid fa-crown"></i> Premium
+                </a>
+                <a href="{% url 'chat_room' %}" class="menu-item {% if 'chat' in request.path %}active{% endif %}">
+                    <i class="fa-regular fa-comments"></i> Sohbet
+                </a>
+                <a href="{% url 'profile' %}" class="menu-item {% if 'profile' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-user"></i> Profil
+                </a>
             </nav>
+
             <div style="margin-top: auto;">
-                <a href="{% url 'logout' %}" class="menu-item" style="color: #FF3B30;"><i class="fa-solid fa-right-from-bracket"></i> Çıkış</a>
+                <a href="{% url 'logout' %}" class="menu-item" style="color: var(--error);">
+                    <i class="fa-solid fa-right-from-bracket"></i> Çıkış
+                </a>
             </div>
         </aside>
         {% endif %}
 
-        <!-- ANA İÇERİK -->
+        <!-- ============= ANA İÇERİK ============= -->
         <main class="main-content {% if user.is_authenticated %}authenticated{% else %}guest{% endif %}">
 
             {% if user.is_authenticated %}
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; width: 100%;">
-                <div>
-                    <h2 style="font-weight: 800; margin: 0; font-size: 1.5rem;">Merhaba, {{ user.username|title }} 👋</h2>
-                    <p style="color: var(--text-gray); margin: 2px 0 0; font-size: 0.9rem;">İyi çalışmalar.</p>
+            <!-- ÜST BAR -->
+            <div class="top-bar">
+                <div class="welcome-text">
+                    <h2>Merhaba, {{ user.username|title }} 👋</h2>
+                    <p>İyi çalışmalar dileriz.</p>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <!-- Bildirim Zili -->
-                    <div style="position: relative; cursor: pointer;" onclick="toggleNotifs()">
-                        <div class="glass" style="padding: 10px; border-radius: 50%;">
-                            <i class="fa-regular fa-bell" style="font-size: 1.2rem;"></i>
+                <div class="top-actions">
+                    <!-- Bildirim -->
+                    <div class="notif-btn" onclick="toggleNotifs()">
+                        <div class="glass">
+                            <i class="fa-regular fa-bell"></i>
                         </div>
-                        <div id="notif-badge" style="position: absolute; top: 0; right: 0; width: 10px; height: 10px; background: #FF3B30; border-radius: 50%; display: none;"></div>
+                        <div id="notif-badge" style="display: none;"></div>
 
-                        <!-- Bildirim Kutusu -->
-                        <div id="notif-dropdown" class="glass" style="position: absolute; top: 50px; right: 0; width: 300px; background: rgba(255,255,255,0.95); display: none; padding: 15px; z-index: 2000;">
-                            <h4 style="margin: 0 0 10px;">Bildirimler</h4>
-                            <div id="notif-list" style="max-height: 200px; overflow-y: auto;">
-                                <p style="color: #999; font-size: 0.9rem;">Bildirim yok.</p>
+                        <!-- Bildirim Dropdown -->
+                        <div id="notif-dropdown" class="glass" style="display: none;">
+                            <h4><i class="fa-solid fa-bell"></i> Bildirimler</h4>
+                            <div id="notif-list">
+                                <div class="notif-empty">
+                                    <i class="fa-regular fa-bell-slash"></i>
+                                    <p>Henüz bildirim yok</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Çıkış Butonu (Sadece Mobilde Üstte Görünsün) -->
-                    <a href="{% url 'logout' %}" class="glass" style="padding: 10px; border-radius: 50%; color: #FF3B30; display: none;" id="mobile-logout">
-                        <i class="fa-solid fa-power-off" style="font-size: 1.1rem;"></i>
+                    <!-- Mobil Çıkış -->
+                    <a href="{% url 'logout' %}" class="glass" id="mobile-logout" style="padding: 12px; border-radius: 50%; color: var(--error); display: none;">
+                        <i class="fa-solid fa-power-off"></i>
                     </a>
-                    <style> @media(max-width: 992px) { #mobile-logout { display: block !important; } } </style>
 
                     <!-- Masaüstü Profil -->
-                    <a href="{% url 'profile' %}" style="background: white; padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow);" class="glass desktop-profile">
-                        <div style="width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                    <a href="{% url 'profile' %}" class="profile-btn">
+                        <div class="avatar">
                             {% if user.avatar %}
-                                <img src="{{ user.avatar.url }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                                <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
                             {% else %}
                                 {{ user.username|make_list|first|upper }}
                             {% endif %}
                         </div>
-                        <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark);">Hesabım</span>
+                        <span>Hesabım</span>
                     </a>
-                    <style> @media(max-width: 992px) { .desktop-profile { display: none !important; } } </style>
                 </div>
             </div>
 
+            <!-- Alert Messages -->
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert-box alert-{{ message.tags }}">{{ message }}</div>
+                    <div class="alert-box alert-{{ message.tags }}">
+                        <i class="fa-solid fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                        <span>{{ message }}</span>
+                    </div>
                 {% endfor %}
             {% endif %}
             {% endif %}
 
+            <!-- Landing Page (Misafir için) -->
             {% if not user.is_authenticated and request.resolver_match.url_name == 'home' %}
-                <!-- === YENİLENMİŞ LANDING PAGE === -->
-                <div class="landing-page" style="text-align: center; padding: 20px;">
-                    <div class="landing-hero glass" style="padding: 40px; max-width: 800px;">
-                        <div style="font-size: 3rem; margin-bottom: 20px;">📚 🚀 🎓</div>
-                        <h1 style="background: linear-gradient(135deg, #1D1D1F, #007AFF); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Akademik Başarının Anahtarı: UniEduNote</h1>
-                        <p style="margin-bottom: 15px;">
+                <div class="landing-page">
+                    <div class="landing-hero glass">
+                        <div class="emoji">📚 🚀 🎓</div>
+                        <h1>Akademik Başarının Anahtarı: UniEduNote</h1>
+                        <p>
                             Üniversite notlarına ulaşmak hiç bu kadar kolay olmamıştı!
                             Binlerce öğrenci arasına katıl, ders notlarını paylaş, eksiklerini tamamla.
                         </p>
-                        <p style="font-size: 0.95rem; color: #555; margin-bottom: 30px;">
-                            ✅ Ders Notu Yükle & İndir <br>
-                            ✅ Bölümüne Özel İçerikler <br>
-                            ✅ Öğrenci Topluluğu ile Sohbet
-                        </p>
+
+                        <div class="landing-features">
+                            <span class="feature-tag">✅ Ders Notu Yükle & İndir</span>
+                            <span class="feature-tag">✅ Bölümüne Özel İçerikler</span>
+                            <span class="feature-tag">✅ Öğrenci Topluluğu</span>
+                        </div>
+
                         <div>
-                            <a href="{% url 'register' %}" class="landing-btn btn-primary">Hemen Başla (Ücretsiz)</a>
-                            <a href="{% url 'login' %}" class="landing-btn btn-outline">Giriş Yap</a>
+                            <a href="{% url 'register' %}" class="landing-btn btn-primary">
+                                <i class="fa-solid fa-rocket"></i> Hemen Başla (Ücretsiz)
+                            </a>
+                            <a href="{% url 'login' %}" class="landing-btn btn-outline">
+                                <i class="fa-solid fa-right-to-bracket"></i> Giriş Yap
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -219,58 +757,98 @@
         </main>
     </div>
 
-    <!-- MOBİL ALT MENÜ (SADE 5 İKON) -->
+    <!-- ============= MOBİL ALT NAV ============= -->
     {% if user.is_authenticated %}
     <div class="mobile-nav">
-        <!-- 1. Ana Sayfa -->
-        <a href="{% url 'dashboard' %}" class="nav-icon {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-house"></i></a>
+        <a href="{% url 'dashboard' %}" class="nav-icon {% if request.path == '/dashboard/' %}active{% endif %}">
+            <i class="fa-solid fa-house"></i>
+        </a>
 
-        <!-- 2. Keşfet -->
-        <a href="{% url 'note_list' %}" class="nav-icon {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-compass"></i></a>
+        <a href="{% url 'note_list' %}" class="nav-icon {% if 'notes' in request.path %}active{% endif %}">
+            <i class="fa-solid fa-compass"></i>
+        </a>
 
-        <!-- 3. Yükle (ORTA) -->
-        <a href="{% url 'upload_note' %}" class="add-btn-mobile"><i class="fa-solid fa-plus"></i></a>
+        <a href="{% url 'upload_note' %}" class="add-btn-mobile">
+            <i class="fa-solid fa-plus"></i>
+        </a>
 
-        <!-- 4. Sohbet -->
-        <a href="{% url 'chat_room' %}" class="nav-icon {% if 'chat' in request.path %}active{% endif %}"><i class="fa-regular fa-comments"></i></a>
+        <a href="{% url 'chat_room' %}" class="nav-icon {% if 'chat' in request.path %}active{% endif %}">
+            <i class="fa-regular fa-comments"></i>
+        </a>
 
-        <!-- 5. Profil (Premium ve Çıkış Burada) -->
-        <a href="{% url 'profile' %}" class="nav-icon {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i></a>
+        <a href="{% url 'profile' %}" class="nav-icon {% if 'profile' in request.path %}active{% endif %}">
+            <i class="fa-solid fa-user"></i>
+        </a>
     </div>
     {% endif %}
 
-    <!-- Bildirim Scripti -->
+    <!-- ============= JAVASCRIPT ============= -->
     {% if user.is_authenticated %}
     <script>
+    // Bildirim Sistemi
     async function checkNotifications() {
         try {
             const res = await fetch('/api/notifications/get/');
             const data = await res.json();
             const badge = document.getElementById('notif-badge');
             const list = document.getElementById('notif-list');
+
             if (data.count > 0) {
                 badge.style.display = 'block';
                 list.innerHTML = data.notifications.map(n => `
-                    <div style="padding: 10px; border-bottom: 1px solid #eee;">
-                        <div style="font-size: 0.9rem;">${n.message}</div>
-                        <div style="font-size: 0.75rem; color: #999;">${n.created_at}</div>
+                    <div class="notif-item">
+                        <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">
+                            ${n.message}
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-gray);">
+                            <i class="fa-regular fa-clock"></i> ${n.created_at}
+                        </div>
                     </div>
                 `).join('');
-            } else { badge.style.display = 'none'; }
-        } catch(e) {}
+            } else {
+                badge.style.display = 'none';
+                list.innerHTML = `
+                    <div class="notif-empty">
+                        <i class="fa-regular fa-bell-slash"></i>
+                        <p>Henüz bildirim yok</p>
+                    </div>
+                `;
+            }
+        } catch(e) {
+            console.error('Bildirim hatası:', e);
+        }
     }
+
     function toggleNotifs() {
         const dropdown = document.getElementById('notif-dropdown');
-        dropdown.style.display = (dropdown.style.display === 'none') ? 'block' : 'none';
-        if (dropdown.style.display === 'block') {
+        const isVisible = dropdown.style.display === 'block';
+
+        dropdown.style.display = isVisible ? 'none' : 'block';
+
+        if (!isVisible) {
+            // Bildirimleri okundu olarak işaretle
             fetch('/api/notifications/read/');
             document.getElementById('notif-badge').style.display = 'none';
         }
     }
+
+    // Dışarı tıklanınca kapat
+    document.addEventListener('click', function(e) {
+        const notifBtn = document.querySelector('.notif-btn');
+        const notifDropdown = document.getElementById('notif-dropdown');
+
+        if (notifBtn && !notifBtn.contains(e.target)) {
+            notifDropdown.style.display = 'none';
+        }
+    });
+
+    // 10 saniyede bir kontrol et
     setInterval(checkNotifications, 10000);
     checkNotifications();
     </script>
     {% endif %}
+
+    {% block extra_js %}{% endblock %}
 
 </body>
 </html>
