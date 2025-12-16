@@ -5,6 +5,80 @@ from .models import ChatMessage
 from django.core.cache import cache
 import json
 import re
+import time
+
+# ==========================
+# RATE LIMITING AYARLARI
+# ==========================
+RATE_LIMIT_CONFIG = {
+    'COOLDOWN_SECONDS': 2,  # Her mesaj arası minimum süre (saniye)
+    'MAX_MESSAGES': 5,  # Belirli sürede max mesaj sayısı
+    'TIME_WINDOW': 10,  # Zaman penceresi (saniye)
+    'BLOCK_DURATION': 30  # Limit aşımında engelleme süresi (saniye)
+}
+
+
+def check_rate_limit(user_id):
+    """
+    Gelişmiş rate limiting kontrolü
+    - Basit cooldown (her mesaj arası X saniye)
+    - Sliding window (Y saniyede en fazla Z mesaj)
+
+    Returns:
+        tuple: (is_allowed: bool, error_message: str, wait_time: int)
+    """
+    # 1. BASİT COOLDOWN KONTROLÜ
+    cooldown_key = f"chat_cooldown_{user_id}"
+    last_message_time = cache.get(cooldown_key)
+
+    if last_message_time:
+        elapsed = time.time() - last_message_time
+        remaining = RATE_LIMIT_CONFIG['COOLDOWN_SECONDS'] - elapsed
+
+        if remaining > 0:
+            return (False, f'Biraz yavaşla kovboy! 🤠 ({int(remaining) + 1} saniye bekle)', int(remaining) + 1)
+
+    # 2. SLIDING WINDOW KONTROLÜ (Spam koruması)
+    window_key = f"chat_window_{user_id}"
+    message_times = cache.get(window_key, [])
+
+    # Eski mesajları temizle (zaman penceresi dışındakiler)
+    current_time = time.time()
+    message_times = [t for t in message_times if current_time - t < RATE_LIMIT_CONFIG['TIME_WINDOW']]
+
+    # Limit kontrolü
+    if len(message_times) >= RATE_LIMIT_CONFIG['MAX_MESSAGES']:
+        # Kullanıcı spamcı olarak işaretle
+        block_key = f"chat_blocked_{user_id}"
+        cache.set(block_key, True, timeout=RATE_LIMIT_CONFIG['BLOCK_DURATION'])
+        return (False, f'Çok fazla mesaj gönderdin! {RATE_LIMIT_CONFIG["BLOCK_DURATION"]} saniye engellendin. ⏰',
+                RATE_LIMIT_CONFIG['BLOCK_DURATION'])
+
+        # 3. BLOKE KONTROLÜ
+        block_key = f"chat_blocked_{user_id}"
+        if cache.get(block_key):
+            # block_ttl = cache.ttl(block_key)  <-- BU SATIR RISKLI
+            # return (False, f'Hala engellisin! Kalan süre: {block_ttl} saniye ⛔', block_ttl)
+
+            # Yerine bunu kullan (Daha güvenli):
+            return (False, f'Çok fazla mesaj attığın için geçici olarak engellendin! ⛔', 30)
+
+    return (True, '', 0)
+
+
+def update_rate_limit(user_id):
+    """Rate limit verilerini güncelle"""
+    current_time = time.time()
+
+    # Cooldown süresini kaydet
+    cooldown_key = f"chat_cooldown_{user_id}"
+    cache.set(cooldown_key, current_time, timeout=RATE_LIMIT_CONFIG['COOLDOWN_SECONDS'])
+
+    # Sliding window'a ekle
+    window_key = f"chat_window_{user_id}"
+    message_times = cache.get(window_key, [])
+    message_times.append(current_time)
+    cache.set(window_key, message_times, timeout=RATE_LIMIT_CONFIG['TIME_WINDOW'])
 
 
 # ==========================
@@ -76,19 +150,16 @@ def contains_phone_number(text):
     normalized = normalize_text(text)
 
     # 1. RAKAM KONTROLÜ (0532... veya 532...)
-    # Regex: 0 veya 5 ile başlayan, içinde boşluk/tire olan 10-11 haneli sayılar
     digit_pattern = r'(0?5\d{2})[\s-]*(\d{3})[\s-]*(\d{2})[\s-]*(\d{2})'
     if re.search(digit_pattern, text):
         return True
 
     # 2. YAZI KONTROLÜ (sıfır beş yüz..., beş yüz...)
-    # "sifir bes" veya "bes yuz" kalıplarını arar.
-    # \s* boşluk olsa da olmasa da yakalar (sifirbes veya sifir bes)
     text_patterns = [
-        r"sifir\s*bes",  # "sıfır beş"
-        r"bes\s*yuz",  # "beş yüz"
-        r"sifir\s*5",  # "sıfır 5"
-        r"0\s*bes"  # "0 beş"
+        r"sifir\s*bes",
+        r"bes\s*yuz",
+        r"sifir\s*5",
+        r"0\s*bes"
     ]
 
     for p in text_patterns:
@@ -105,12 +176,16 @@ def contains_phone_number(text):
 def send_message(request):
     if request.method == 'POST':
         try:
-            # HIZ SINIRI KONTROLÜ (Rate Limiting)
             user_id = request.user.id
-            cache_key = f"chat_cooldown_{user_id}"
 
-            if cache.get(cache_key):
-                return JsonResponse({'status': 'blocked', 'error': 'Çok hızlı yazıyorsunuz. Biraz yavaşla kovboy! 🤠'})
+            # RATE LIMIT KONTROLÜ
+            is_allowed, error_msg, wait_time = check_rate_limit(user_id)
+            if not is_allowed:
+                return JsonResponse({
+                    'status': 'blocked',
+                    'error': error_msg,
+                    'wait_time': wait_time
+                })
 
             data = json.loads(request.body)
             msg = data.get('message', '').strip()
@@ -120,16 +195,22 @@ def send_message(request):
 
             # Filtreler (Telefon ve Küfür)
             if contains_phone_number(msg):
-                return JsonResponse({'status': 'blocked', 'error': 'Telefon numarası paylaşmak yasaktır.'})
+                return JsonResponse({
+                    'status': 'blocked',
+                    'error': 'Telefon numarası paylaşmak yasaktır. 📵'
+                })
 
             if contains_profanity(msg):
-                return JsonResponse({'status': 'blocked', 'error': 'Uygunsuz içerik.'})
+                return JsonResponse({
+                    'status': 'blocked',
+                    'error': 'Uygunsuz içerik tespit edildi. 🚫'
+                })
 
             # Mesajı kaydet
             ChatMessage.objects.create(user=request.user, message=msg)
 
-            # 3 Saniye Engel Koy
-            cache.set(cache_key, "blocked", timeout=3)
+            # Rate limit verilerini güncelle
+            update_rate_limit(user_id)
 
             return JsonResponse({'status': 'ok'})
 
