@@ -11,8 +11,8 @@ import time
 # RATE LIMITING AYARLARI
 # ==========================
 RATE_LIMIT_CONFIG = {
-    'COOLDOWN_SECONDS': 2,  # Her mesaj arası minimum süre (saniye)
-    'MAX_MESSAGES': 5,  # Belirli sürede max mesaj sayısı
+    'COOLDOWN_SECONDS': 4,  # Her mesaj arası minimum süre (saniye)
+    'MAX_MESSAGES': 3,  # Belirli sürede max mesaj sayısı
     'TIME_WINDOW': 10,  # Zaman penceresi (saniye)
     'BLOCK_DURATION': 30  # Limit aşımında engelleme süresi (saniye)
 }
