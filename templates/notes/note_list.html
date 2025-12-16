@@ -186,4 +186,14 @@ async function toggleLike(noteId, btn){
   }
 }
 </script>
+    <script>
+    $(document).ready(function() {
+        // Sayfadaki tüm select kutularını modernleştir
+        $('select').select2({
+            width: '100%',
+            placeholder: "Seçiniz...",
+            minimumResultsForSearch: 0 // Her zaman arama kutusu çıksın
+        });
+    });
+</script>
 {% endblock %}

@@ -28,7 +28,7 @@ def upload_note(request):
 
 # 📋 Not listesi (filtreli)
 def note_list(request):
-    notes = Note.objects.all().order_by('-uploaded_at')
+    notes = Note.objects.all().order_by('-likes', '-uploaded_at')
 
     university = request.GET.get('university')
     department = request.GET.get('department')

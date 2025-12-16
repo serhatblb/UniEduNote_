@@ -76,22 +76,31 @@ class PasswordResetRequestAPIView(APIView):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            # Güvenlik için kullanıcı yoksa bile "Gönderildi" diyelim (User Enumeration engellemek için)
-            # Ama test aşamasında hata dönebiliriz. Şimdilik hata dönelim:
-            return Response({"error": "Bu e-posta adresi kayıtlı değil."}, status=400)
+            # Güvenlik için hata vermiyoruz, var gibi davranıyoruz
+            return Response({"message": "Eğer kayıtlıysa, şifre sıfırlama e-postası gönderildi."})
 
-        # Token ve UID oluştur
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = account_activation_token.make_token(user)
-
-        # Linki settings'den alalım (Daha güvenli)
         reset_link = f"{settings.BACKEND_BASE_URL}/password-reset-confirm/{uid}/{token}/"
 
         subject = "UniEduNote Şifre Sıfırlama"
-        message = f"Merhaba {user.username},\n\nŞifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:\n\n{reset_link}\n\nEğer bu isteği siz yapmadıysanız dikkate almayın."
+
+        # HTML TASARIMLI MAİL İÇERİĞİ
+        html_message = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+            <h2 style="color: #007AFF;">Şifre Sıfırlama İsteği 🔒</h2>
+            <p>Merhaba {user.username},</p>
+            <p>Hesabınız için şifre sıfırlama talebinde bulundunuz.</p>
+            <p style="margin: 30px 0;">
+                <a href="{reset_link}" style="background-color: #007AFF; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Şifremi Sıfırla</a>
+            </p>
+            <p style="font-size: 12px; color: #888;">Bu butona tıklayamazsanız, aşağıdaki linki tarayıcınıza yapıştırın:<br>{reset_link}</p>
+        </div>
+        """
 
         try:
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email], fail_silently=False)
+            # html_message parametresini ekliyoruz
+            send_mail(subject, "", settings.DEFAULT_FROM_EMAIL, [email], fail_silently=False, html_message=html_message)
             return Response({"message": "Şifre sıfırlama e-postası gönderildi."})
         except Exception as e:
             return Response({"error": f"Mail gönderilemedi: {str(e)}"}, status=500)

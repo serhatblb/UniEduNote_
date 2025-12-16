@@ -77,12 +77,13 @@
         <label>Şifre (En az 8 karakter)</label>
         <input type="password" id="password" placeholder="Güçlü bir şifre" required>
       </div>
-    <div style="margin-bottom: 20px; text-align: left; font-size: 0.9rem;">
-    <input type="checkbox" id="terms" required>
-    <label for="terms" style="display: inline; font-weight: normal;">
-        <a href="#" onclick="openModal()">Kullanım Koşullarını</a> okudum ve kabul ediyorum.
-    </label>
-</div>
+    <!-- Modern Checkbox Alanı -->
+        <div style="margin-bottom: 25px; display: flex; align-items: flex-start; gap: 10px; text-align: left;">
+            <input type="checkbox" id="terms" required style="width: 20px; height: 20px; margin-top: 2px; accent-color: var(--primary);">
+            <label for="terms" style="font-size: 0.9rem; font-weight: normal; color: var(--text-dark); line-height: 1.4;">
+                <a href="#" onclick="openModal()" style="color: #FF9500; font-weight: 700; text-decoration: underline;">Kullanım Koşulları ve Gizlilik Politikası</a>'nı okudum ve kabul ediyorum.
+            </label>
+        </div>
       <button type="submit">Kayıt Ol</button>
     </form>
 
