@@ -96,6 +96,14 @@ DATABASES = {
     )
 }
 
+# CACHE AYARLARI (Veritabanı Tabanlı)
+# Gunicorn işçilerinin ortak çalışması için şart!
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
+    }
+}
 AUTH_USER_MODEL = "users.User"
 LANGUAGE_CODE = "tr"
 TIME_ZONE = "Europe/Istanbul"
