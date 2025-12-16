@@ -54,14 +54,12 @@ def check_rate_limit(user_id):
         return (False, f'Çok fazla mesaj gönderdin! {RATE_LIMIT_CONFIG["BLOCK_DURATION"]} saniye engellendin. ⏰',
                 RATE_LIMIT_CONFIG['BLOCK_DURATION'])
 
-        # 3. BLOKE KONTROLÜ
-        block_key = f"chat_blocked_{user_id}"
-        if cache.get(block_key):
-            # block_ttl = cache.ttl(block_key)  <-- BU SATIR RISKLI
-            # return (False, f'Hala engellisin! Kalan süre: {block_ttl} saniye ⛔', block_ttl)
-
-            # Yerine bunu kullan (Daha güvenli):
-            return (False, f'Çok fazla mesaj attığın için geçici olarak engellendin! ⛔', 30)
+    # 3. BLOKE KONTROLÜ (Daha önce spam yaptıysa)
+    block_key = f"chat_blocked_{user_id}"
+    if cache.get(block_key):
+        #block_ttl = cache.ttl(block_key)
+        #return (False, f'Hala engellisin! Kalan süre: {block_ttl} saniye ⛔', block_ttl)
+        return (False, f'Çok fazla mesaj attığın için geçici olarak engellendin! ⛔', 30)
 
     return (True, '', 0)
 
