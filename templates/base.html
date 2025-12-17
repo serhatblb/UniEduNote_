@@ -59,7 +59,25 @@
         .nav-icon { color: #999; font-size: 1.4rem; padding: 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
         .nav-icon.active { color: var(--primary); }
         .add-btn-mobile { background: var(--primary); color: white; border-radius: 50%; width: 54px; height: 54px; display: flex; justify-content: center; align-items: center; margin-bottom: 40px; box-shadow: 0 8px 20px rgba(0,122,255,0.4); font-size: 1.5rem; }
+        /* Mobilde görünen çıkış butonu */
+.mobile-logout-btn {
+    display: none; /* Masaüstünde gizli */
+    padding: 10px;
+    border-radius: 50%;
+    color: #FF3B30; /* Kırmızı */
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    margin-left: 10px;
+}
 
+@media (max-width: 992px) {
+    .mobile-logout-btn {
+        display: flex; /* Mobilde göster */
+    }
+}
         .alert-box { padding: 15px; border-radius: 16px; margin-bottom: 20px; width: 100%; background: white; border-left: 5px solid; }
         .alert-success { border-color: #34C759; color: #1F7A38; }
         .alert-error { border-color: #FF3B30; color: #C0392B; }
@@ -173,6 +191,9 @@
         <a href="{% url 'note_list' %}" class="nav-icon {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-magnifying-glass"></i></a>
         <a href="{% url 'upload_note' %}" class="add-btn-mobile"><i class="fa-solid fa-plus"></i></a>
         <a href="{% url 'chat_room' %}" class="nav-icon {% if 'chat' in request.path %}active{% endif %}"><i class="fa-regular fa-comments"></i></a>
+    <a href="{% url 'logout' %}" class="mobile-logout-btn">
+    <i class="fa-solid fa-right-from-bracket"></i>
+</a>
         <a href="{% url 'profile' %}" class="nav-icon {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i></a>
     </div>
     {% endif %}

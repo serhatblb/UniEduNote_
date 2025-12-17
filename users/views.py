@@ -119,14 +119,22 @@ def dashboard(request):
 
 @login_required(login_url="/login/")
 def profile(request):
-    # Yükledikleri
+    # Kullanıcının notları
     my_notes = request.user.note_set.all().order_by('-uploaded_at')
 
-    # Beğendikleri (Doğrudan Like modelinden çekiyoruz, ilişki adına güvenmiyoruz)
-    user_likes = Like.objects.filter(user=request.user)
-    liked_notes = [like.note for like in user_likes]
+    # Beğendikleri (Hata riskine karşı modelden çekiyoruz)
+    from notes.models import Like
+    liked_notes = [l.note for l in Like.objects.filter(user=request.user)]
 
+    # İstatistikler
     total_downloads = sum(note.download_count for note in my_notes)
+    total_uploads = my_notes.count()
+
+    # --- PUAN HESAPLAMA (XP) ---
+    # Formül: (Yükleme Sayısı * 10) + (Toplam İndirilme Sayısı)
+    total_xp = (total_uploads * 10) + total_downloads
+
+    # Üniversiteler
     universities = University.objects.all().order_by('name')
 
     context = {
@@ -134,6 +142,7 @@ def profile(request):
         'uploaded_notes': my_notes,
         'liked_notes': liked_notes,
         'total_downloads': total_downloads,
+        'total_xp': total_xp,  # Yeni puan değişkeni
         'universities': universities,
     }
     return render(request, "users/profile.html", context)
