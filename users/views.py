@@ -13,7 +13,7 @@ from .email_utils import send_activation_email
 from categories.models import University
 from .models import Notification
 from .models import Contact
-from notes.models import Note
+from notes.models import Note, Like
 
 User = get_user_model()
 
@@ -21,7 +21,7 @@ User = get_user_model()
 def home(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
-    return render(request, 'base.html')
+    return render(request, 'index.html')
 
 
 # users/views.py
