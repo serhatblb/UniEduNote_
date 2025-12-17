@@ -134,7 +134,7 @@ def profile(request):
         'total_downloads': total_downloads,
         'universities': universities,
     }
-    return render(request, "users/profile.html", context)
+    return render(request, "profile.html", context)
 
 @login_required
 def premium_page(request):
