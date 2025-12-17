@@ -1,116 +1,140 @@
 {% extends "base.html" %}
-{% block title %}Sohbet Odası{% endblock %}
+{% block title %}Kampüs Sohbeti{% endblock %}
+
 {% block content %}
 <style>
-    .chat-container { height: 70vh; display: flex; flex-direction: column; }
-    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; background: rgba(255,255,255,0.5); border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.5); }
-    .message { margin-bottom: 15px; display: flex; flex-direction: column; }
+    /* ... Senin attığın CSS'lerin aynısı (kopyalayıp buraya koydum) ... */
+    /* Sadece sayfa içi stil çakışmasını önlemek için scoped tutuyoruz */
+    
+    .chat-wrapper { max-width: 900px; margin: 0 auto; height: calc(100vh - 150px); display: flex; flex-direction: column; }
+    .chat-header { margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+    .chat-header h2 { font-size: 1.8rem; font-weight: 800; color: #1a202c; }
+    .chat-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3); }
+
+    .chat-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    
+    .chat-messages { 
+        flex: 1; overflow-y: auto; padding: 20px; 
+        background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); 
+        border-radius: 20px; margin-bottom: 15px; 
+        border: 1px solid rgba(255, 255, 255, 0.6); 
+    }
+    
+    .message { margin-bottom: 15px; display: flex; flex-direction: column; animation: fadeIn 0.3s ease; }
     .message.mine { align-items: flex-end; }
-    .msg-bubble { background: white; padding: 10px 15px; border-radius: 12px; max-width: 70%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .message.mine .msg-bubble { background: var(--primary); color: white; }
-    .msg-info { font-size: 0.75rem; color: #888; margin-top: 4px; }
-    /* Modern Chat Input Alanı */
-    .chat-input-area {
-        display: flex;
-        gap: 10px;
-        background: white;
-        padding: 10px;
-        border-radius: 50px; /* Tam oval */
-        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        border: 1px solid rgba(0,0,0,0.05);
-        align-items: center;
-    }
+    
+    .msg-bubble { background: white; padding: 10px 16px; border-radius: 18px; max-width: 75%; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .message.mine .msg-bubble { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    
+    .msg-info { font-size: 0.7rem; color: #888; margin-top: 4px; padding: 0 5px; }
+    
+    .chat-input-area { display: flex; gap: 10px; background: white; padding: 10px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); align-items: center; }
+    #chatInput { border: none; background: transparent; padding: 10px 15px; font-size: 1rem; outline: none; width: 100%; }
+    .chat-send-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .chat-send-btn:hover { transform: scale(1.05); }
 
-    #chatInput {
-        border: none;
-        background: transparent;
-        padding: 10px 15px;
-        font-size: 1rem;
-        outline: none;
-        width: 100%;
-    }
-
-    /* Gönder Butonu */
-    .chat-send-btn {
-        background: var(--primary);
-        color: white;
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.3s;
-        flex-shrink: 0; /* Küçülmesini engelle */
-    }
-    .chat-send-btn:hover { transform: scale(1.1); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
-<div class="glass" style="padding: 20px; max-width: 800px; margin: 0 auto;">
-    <h2 style="margin-bottom: 20px; color: var(--text-dark);">💬 Kampüs Sohbeti</h2>
+<div class="glass chat-wrapper" style="padding: 30px;">
+    <div class="chat-header">
+        <div class="chat-icon"><i class="fa-solid fa-comments"></i></div>
+        <h2>Kampüs Sohbeti</h2>
+    </div>
 
     <div class="chat-container">
         <div class="chat-messages" id="chatBox">
             <!-- Mesajlar Buraya Gelecek -->
+            <div style="text-align: center; color: #888; margin-top: 50px;">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem;"></i>
+                <p>Mesajlar yükleniyor...</p>
+            </div>
         </div>
 
         <div class="chat-input-area">
-    <input type="text" id="chatInput" placeholder="Mesajınızı yazın...">
-    <button onclick="sendMessage()" class="chat-send-btn">
-        <i class="fa-solid fa-paper-plane"></i>
-    </button>
-</div>
+            <input type="text" id="chatInput" placeholder="Mesajınızı yazın..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()" class="chat-send-btn">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
     </div>
 </div>
 
 <script>
     const chatBox = document.getElementById('chatBox');
+    const currentUser = "{{ user.username }}"; // Django'dan gelen veri
 
     async function loadMessages() {
         try {
             const res = await fetch('/chat/get/');
             const data = await res.json();
-            const currentHTML = chatBox.innerHTML;
+            
+            if (data.messages.length === 0) {
+                chatBox.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #888;">
+                        <i class="fa-regular fa-comment-dots" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>Henüz mesaj yok. İlk mesajı sen gönder! 👋</p>
+                    </div>`;
+                return;
+            }
 
+            const currentHTML = chatBox.innerHTML;
             let newHTML = data.messages.map(m => `
-                <div class="message ${m.user === '{{ user.username }}' ? 'mine' : ''}">
+                <div class="message ${m.user === currentUser ? 'mine' : ''}">
                     <div class="msg-bubble">
-                        <strong style="font-size:0.8rem; display:block; margin-bottom:2px;">${m.user}</strong>
+                        <strong style="font-size:0.8rem; display:block; margin-bottom:2px; opacity:0.8;">${m.user}</strong>
                         ${m.message}
                     </div>
                     <span class="msg-info">${m.created_at}</span>
                 </div>
             `).join('');
 
-            // Sadece değişiklik varsa güncelle (Basit kontrol)
-            if (chatBox.childElementCount !== data.messages.length) {
+            // Sadece yeni mesaj varsa güncelle (Titreşimi önler)
+            if (chatBox.childElementCount !== data.messages.length && !chatBox.innerHTML.includes("spinner")) {
                 chatBox.innerHTML = newHTML;
-                chatBox.scrollTop = chatBox.scrollHeight; // En alta kaydır
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } else if (chatBox.innerHTML.includes("spinner")) {
+                 chatBox.innerHTML = newHTML;
+                 chatBox.scrollTop = chatBox.scrollHeight;
             }
-        } catch(e) {}
+        } catch(e) { console.error(e); }
     }
 
     async function sendMessage() {
         const input = document.getElementById('chatInput');
         const text = input.value.trim();
         if(!text) return;
-
-        await fetch('/chat/send/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ message: text })
-        });
-
-        input.value = '';
-        loadMessages();
+        
+        // Optimistik UI (Hemen ekle)
+        const now = new Date();
+        const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        
+        // Geçici mesaj ekle (Gri renkte, gönderiliyor gibi)
+        /* Burayı kapattım çünkü sunucu validasyonu (küfür/hız) önemli.
+           Direkt sunucu cevabını beklemek daha sağlıklı */
+        
+        try {
+            const res = await fetch('/chat/send/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ message: text })
+            });
+            
+            const data = await res.json();
+            
+            if(data.status === 'ok') {
+                input.value = '';
+                loadMessages();
+            } else if (data.status === 'blocked') {
+                alert("⛔ " + data.error);
+            }
+        } catch(e) { alert("Bağlantı hatası!"); }
     }
 
-    // Her 3 saniyede bir mesajları yenile (Basit Polling)
+    // 3 saniyede bir yenile
     setInterval(loadMessages, 3000);
     loadMessages();
 </script>

@@ -2,20 +2,42 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Hesabını Aktifleştir</title>
+  <style>
+    /* (Senin attığın CSS'leri buraya inline olarak gömdüm, mail için en iyisi budur) */
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 40px 20px; }
+    .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 24px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 1px solid #eee; }
+    .logo { text-align: center; font-size: 24px; font-weight: 900; color: #667eea; margin-bottom: 30px; }
+    .btn { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white !important; padding: 16px 40px; text-decoration: none; border-radius: 16px; font-weight: bold; margin: 20px 0; }
+    h2 { color: #1a202c; margin-bottom: 10px; }
+    p { color: #4a5568; line-height: 1.6; font-size: 16px; }
+    li { margin-bottom: 8px; }
+  </style>
 </head>
-<body style="font-family:Arial,sans-serif;background:#f6f9fc;padding:40px;">
-  <div style="max-width:600px;margin:auto;background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1)">
-    <h2 style="color:#1a2b6b;">Merhaba {{ user.username }} 👋</h2>
-    <p>UniEduNote’a kayıt olduğun için teşekkürler!</p>
-    <p>Hesabını aktifleştirmek için aşağıdaki butona tıklayabilirsin 👇</p>
-    <p style="text-align:center;margin:30px 0;">
-      <a href="http://{{ domain }}/activate/{{ uid }}/{{ token }}/"
-         style="background:#1a2b6b;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;">
-        Hesabımı Aktifleştir
-      </a>
-    </p>
-    <p style="color:#555;">Eğer bu işlemi sen başlatmadıysan, bu e-postayı görmezden gelebilirsin.</p>
+<body>
+  <div class="email-container">
+    <div class="logo">📚 UniEduNote</div>
+
+    <h2>👋 Merhaba {{ user.username }}!</h2>
+
+    <p>UniEduNote'a kayıt olduğun için teşekkürler! Binlerce öğrencinin notlarını paylaştığı topluluğa hoş geldin.</p>
+
+    <p>Hesabını aktifleştirmek için aşağıdaki butona tıkla:</p>
+
+    <div style="text-align: center;">
+      <a href="{{ activation_link }}" class="btn">✨ Hesabımı Aktifleştir</a>
+    </div>
+
+    <p><strong>Neler yapabilirsin?</strong></p>
+    <ul style="color: #4a5568;">
+      <li>📤 Ders notlarını paylaş ve puan kazan</li>
+      <li>📥 Binlerce notu indir</li>
+      <li>💬 Toplulukla sohbet et</li>
+    </ul>
+
+    <div style="border-top: 1px solid #eee; margin-top: 30px; padding-top: 20px; font-size: 13px; color: #a0aec0; text-align: center;">
+      <p>Bu isteği sen yapmadıysan, bu maili görmezden gelebilirsin.</p>
+      <p>© 2025 UniEduNote. Tüm hakları saklıdır.</p>
+    </div>
   </div>
 </body>
 </html>

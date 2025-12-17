@@ -119,16 +119,14 @@ def dashboard(request):
 
 @login_required(login_url="/login/")
 def profile(request):
-    # Sekmeler için veriler
+    # Yükledikleri
     my_notes = request.user.note_set.all().order_by('-uploaded_at')
 
-    # DÜZELTİLEN SATIR BURASI (like_set):
-    liked_notes = [like.note for like in request.user.like_set.all()]
+    # Beğendikleri (Doğrudan Like modelinden çekiyoruz, ilişki adına güvenmiyoruz)
+    user_likes = Like.objects.filter(user=request.user)
+    liked_notes = [like.note for like in user_likes]
 
-    # Toplam indirme sayısı
     total_downloads = sum(note.download_count for note in my_notes)
-
-    # Üniversiteler
     universities = University.objects.all().order_by('name')
 
     context = {
