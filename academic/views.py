@@ -135,4 +135,4 @@ def profile(request):
         'p_form': p_form,
         'user_notes': Note.objects.filter(uploader=request.user)
     }
-    return render(request, 'profile.html', context)
+    return render(request, 'users/profile.html', context)
