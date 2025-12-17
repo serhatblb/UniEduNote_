@@ -3,19 +3,20 @@
 {% block title %}Yeni Not Yükle{% endblock %}
 
 {% block content %}
-<!-- Select2 CSS (Arama Kutusu Tasarımı İçin) -->
+<!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <style>
     .upload-container {
-        max-width: 800px;
+        max-width: 850px;
         margin: 0 auto;
+        animation: fadeInUp 0.6s ease;
     }
 
     .form-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 20px;
+        gap: 22px;
     }
 
     .full-width {
@@ -24,104 +25,132 @@
 
     .form-group label {
         display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
+        margin-bottom: 10px;
+        font-weight: 700;
         color: var(--text-dark);
         font-size: 0.95rem;
+        letter-spacing: -0.3px;
     }
 
     /* Standart Inputlar */
     input[type="text"],
     textarea {
         width: 100%;
-        padding: 12px 15px;
-        border: 1px solid rgba(0,0,0,0.1);
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.5);
+        padding: 14px 18px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
         font-size: 1rem;
-        transition: 0.3s;
+        transition: all 0.3s ease;
         box-sizing: border-box;
+        font-family: inherit;
     }
 
-    input:focus, textarea:focus {
+    input:focus,
+    textarea:focus {
         outline: none;
         border-color: var(--primary);
         background: white;
-        box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
     }
 
-    /* === SELECT2 (ARANABİLİR KUTU) TASARIMI === */
+    /* === SELECT2 Tasarımı === */
     .select2-container .select2-selection--single {
-        height: 50px !important; /* Yükseklik */
-        border: 1px solid rgba(0,0,0,0.1) !important;
-        border-radius: 12px !important;
-        background: rgba(255, 255, 255, 0.5) !important;
+        height: 52px !important;
+        border: 1px solid rgba(102, 126, 234, 0.2) !important;
+        border-radius: 14px !important;
+        background: rgba(255, 255, 255, 0.6) !important;
+        backdrop-filter: blur(10px);
         display: flex;
         align-items: center;
+        transition: all 0.3s ease;
     }
 
-    /* Ok İşareti */
     .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 48px !important;
+        height: 50px !important;
     }
 
-    /* Yazı Rengi */
     .select2-container--default .select2-selection--single .select2-selection__rendered {
         color: var(--text-dark) !important;
         font-size: 1rem;
-        padding-left: 15px;
+        padding-left: 18px;
+        font-weight: 500;
     }
 
-    /* Odaklanınca (Tıklayınca) */
     .select2-container--open .select2-selection--single {
         border-color: var(--primary) !important;
         background: white !important;
-        box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
     }
 
-    /* Dosya Yükleme Alanı */
+    /* Dosya Yükleme */
     input[type="file"] {
         background: white;
-        padding: 10px;
-        border-radius: 12px;
-        border: 1px dashed var(--primary);
+        padding: 12px;
+        border-radius: 14px;
+        border: 2px dashed var(--primary);
         width: 100%;
         cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    input[type="file"]:hover {
+        border-color: #764ba2;
+        background: rgba(102, 126, 234, 0.05);
     }
 
     /* Buton */
     .submit-btn {
-        background: var(--primary);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
-        padding: 15px;
-        border-radius: 14px;
-        font-weight: 700;
-        font-size: 1.1rem;
+        padding: 16px;
+        border-radius: 16px;
+        font-weight: 800;
+        font-size: 1.15rem;
         width: 100%;
         cursor: pointer;
-        transition: 0.3s;
-        margin-top: 20px;
+        transition: all 0.3s ease;
+        margin-top: 25px;
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        letter-spacing: -0.5px;
     }
 
     .submit-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     @media (max-width: 768px) {
-        .form-grid { grid-template-columns: 1fr; }
-        .full-width { grid-column: span 1; }
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .full-width {
+            grid-column: span 1;
+        }
     }
 </style>
 
 <div class="upload-container">
-    <div class="glass" style="padding: 30px;">
-        <h2 style="margin-bottom: 25px; color: var(--primary); display: flex; align-items: center; gap: 10px;">
+    <div class="glass" style="padding: 40px;">
+        <h2 style="margin-bottom: 30px; color: var(--primary); display: flex; align-items: center; gap: 12px; font-weight: 900; font-size: 1.9rem; letter-spacing: -1px;">
             <i class="fa-solid fa-cloud-arrow-up"></i> Yeni Not Yükle
         </h2>
 
@@ -131,7 +160,6 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>Üniversite</label>
-                    <!-- class="searchable" ekleyerek JS ile yakalayacağız -->
                     {{ form.university }}
                 </div>
                 <div class="form-group">
@@ -173,12 +201,10 @@
 
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Select2 JS (Arama motoru) -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
     $(document).ready(function () {
-        // Tüm select kutularını "Aranabilir" (Select2) yap
         $('select').select2({
             width: '100%',
             placeholder: "Seçmek için yazın...",
@@ -189,7 +215,7 @@
             }
         });
 
-        // 1. Üniversite değişince -> Fakülteleri Getir
+        // Üniversite değişince -> Fakülteleri Getir
         $("#id_university").change(function () {
             var url = "{% url 'ajax_load_faculties' %}";
             var universityId = $(this).val();
@@ -198,10 +224,8 @@
                 url: url, data: { 'university': universityId },
                 success: function (data) {
                     var $faculty = $("#id_faculty");
-                    $faculty.empty(); // Temizle
-                    $faculty.append('<option value="">---------</option>');
+                    $faculty.empty().append('<option value="">---------</option>');
 
-                    // Diğerlerini de sıfırla
                     $("#id_department").empty().append('<option value="">---------</option>').trigger('change');
                     $("#id_course").empty().append('<option value="">---------</option>').trigger('change');
 
@@ -209,13 +233,12 @@
                         $faculty.append('<option value="' + value.id + '">' + value.name + '</option>');
                     });
 
-                    // Select2'ye "Liste değişti, kendini güncelle" diyoruz
                     $faculty.trigger('change');
                 }
             });
         });
 
-        // 2. Fakülte değişince -> Bölümleri Getir
+        // Fakülte değişince -> Bölümleri Getir
         $("#id_faculty").change(function () {
             var url = "{% url 'ajax_load_departments' %}";
             var facultyId = $(this).val();
@@ -226,20 +249,18 @@
                     var $dept = $("#id_department");
                     $dept.empty().append('<option value="">---------</option>');
 
-                    // Dersi sıfırla
                     $("#id_course").empty().append('<option value="">---------</option>').trigger('change');
 
                     $.each(data, function (key, value) {
                         $dept.append('<option value="' + value.id + '">' + value.name + '</option>');
                     });
 
-                    // Select2 güncelle
                     $dept.trigger('change');
                 }
             });
         });
 
-        // 3. Bölüm değişince -> Dersleri Getir
+        // Bölüm değişince -> Dersleri Getir
         $("#id_department").change(function () {
             var url = "{% url 'ajax_load_courses' %}";
             var departmentId = $(this).val();
@@ -254,7 +275,6 @@
                         $course.append('<option value="' + value.id + '">' + value.name + '</option>');
                     });
 
-                    // Select2 güncelle
                     $course.trigger('change');
                 }
             });
