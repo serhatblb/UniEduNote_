@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Destek{% endblock %}
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="glass" style="padding: 40px;">
+        <h2 style="color: var(--primary); margin-bottom: 20px;"><i class="fa-solid fa-headset"></i> Bize Ulaşın</h2>
+        <p style="color: var(--text-gray); margin-bottom: 30px;">Hata bildirimi, öneri veya şikayetleriniz için aşağıdaki formu doldurun.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            {% if not user.is_authenticated %}
+            <div style="margin-bottom: 15px;">
+                <label>Adınız</label>
+                <input type="text" name="name" required style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>E-posta</label>
+                <input type="email" name="email" required style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
+            </div>
+            {% endif %}
+
+            <div style="margin-bottom: 15px;">
+                <label>Konu</label>
+                <select name="subject" style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;">
+                    <option value="bug">🐛 Hata Bildirimi</option>
+                    <option value="suggestion">💡 Öneri / İstek</option>
+                    <option value="copyright">©️ Telif Hakkı</option>
+                    <option value="other">Diğer</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label>Mesajınız</label>
+                <textarea name="message" rows="5" required style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd;"></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;">Gönder</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

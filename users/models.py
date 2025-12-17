@@ -43,3 +43,24 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.message}"
+
+
+class Contact(models.Model):
+    """Destek ve İletişim Mesajları"""
+    SUBJECT_CHOICES = [
+        ('bug', 'Hata Bildirimi'),
+        ('suggestion', 'Öneri / İstek'),
+        ('copyright', 'Telif Hakkı / Şikayet'),
+        ('other', 'Diğer'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=20, choices=SUBJECT_CHOICES)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_resolved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name} - {self.get_subject_display()}"

@@ -159,3 +159,9 @@ SIMPLE_JWT = {
 
 BACKEND_BASE_URL = os.environ.get("BACKEND_BASE_URL", "http://127.0.0.1:8000")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# OTOMATİK ÇIKIŞ (GÜVENLİK)
+# 30 dakika (1800 saniye) işlem yapmazsa çıkış yap
+SESSION_COOKIE_AGE = 1800
+# Her işlemde süreyi sıfırla (Aktifse atmasın)
+SESSION_SAVE_EVERY_REQUEST = True

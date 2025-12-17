@@ -17,8 +17,9 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .tokens import account_activation_token
 from .serializers import UserSerializer
-from django.views.decorators.csrf import csrf_exempt
 from .email_utils import send_activation_email
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 User = get_user_model()
 
@@ -147,24 +148,35 @@ def session_login(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-        except Exception:
-            return JsonResponse({"error": "JSON bekleniyor"}, status=400)
+            login_input = data.get("username")  # Bu email de olabilir, username de
+            password = data.get("password")
 
-        username = data.get("username")
-        password = data.get("password")
+            if not login_input or not password:
+                return JsonResponse({"error": "Kullanıcı adı ve şifre zorunlu"}, status=400)
 
-        if not username or not password:
-            return JsonResponse({"error": "Kullanıcı adı ve şifre zorunlu"}, status=400)
+            # --- Zeka Burada: Email mi Username mi? ---
+            username_to_auth = login_input
+            if '@' in login_input:
+                try:
+                    user_obj = User.objects.get(email=login_input)
+                    username_to_auth = user_obj.username
+                except User.DoesNotExist:
+                    # Email bulunamazsa rastgele bişey ata ki authenticate fail olsun
+                    username_to_auth = "bulunamayan_kullanici"
+            # ------------------------------------------
 
-        user = authenticate(request, username=username, password=password)
-        if user and user.is_active:
-            login(request, user)
-            return JsonResponse({"message": "Login başarılı", "username": user.username})
-        else:
-            return JsonResponse({"error": "Geçersiz kullanıcı adı veya şifre"}, status=401)
+            user = authenticate(request, username=username_to_auth, password=password)
 
-    return JsonResponse({"error": "Yalnızca POST isteği destekleniyor"}, status=405)
+            if user and user.is_active:
+                login(request, user)
+                return JsonResponse({"message": "Login başarılı", "username": user.username})
+            else:
+                return JsonResponse({"error": "Giriş bilgileri hatalı!"}, status=401)
 
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "POST required"}, status=405)
 
 # ✅ Profil Güncelleme (JWT zorunlu)
 class UserProfileUpdateAPIView(APIView):

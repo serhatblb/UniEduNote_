@@ -1,19 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User
+from .models import User, Contact, Notification
 
 
 class CustomUserAdmin(UserAdmin):
     model = User
-    # Admin panelinde görünecek sütunlar
     list_display = ['username', 'email', 'university', 'rank', 'is_staff']
-
-    # Hangi alanlara göre link verileceği
     list_display_links = ['username', 'email']
-
-    # Düzenleme sayfasındaki alanlar (fieldsets)
     fieldsets = UserAdmin.fieldsets + (
-        ('Ekstra Bilgiler', {'fields': ('university', 'avatar')}),
+        ('Ekstra Bilgiler', {'fields': ('university', 'avatar', 'is_premium')}),
     )
 
     # Yeni kullanıcı ekleme sayfasındaki alanlar
@@ -21,5 +16,12 @@ class CustomUserAdmin(UserAdmin):
         ('Ekstra Bilgiler', {'fields': ('university', 'avatar')}),
     )
 
+# Contact Admin (YENİ)
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ['subject', 'name', 'email', 'created_at', 'is_resolved']
+    list_filter = ['is_resolved', 'subject']
+    search_fields = ['message', 'email']
 
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(Notification)

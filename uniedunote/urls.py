@@ -50,6 +50,8 @@ urlpatterns = [
     # Premium
     path('premium/', user_views.premium_page, name='premium'),
 
+    path('contact/', user_views.contact_view, name='contact'),
+
     # Bildirimler
     path('api/notifications/get/', user_views.get_notifications, name='get_notifications'),
     path('api/notifications/read/', user_views.mark_notifications_read, name='mark_notifications_read'),

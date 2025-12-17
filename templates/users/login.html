@@ -4,107 +4,184 @@
 
 {% block content %}
 <style>
-  .auth-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: calc(100vh - 150px);
-  }
+    /* === MODERN SPLIT LAYOUT === */
+    .auth-container-modern {
+        display: flex;
+        max-width: 1000px;
+        min-height: 600px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        position: relative;
+    }
 
-  .auth-card {
-    width: 100%;
-    max-width: 450px;
-    padding: 40px;
-    text-align: center;
-  }
+    /* Sol Taraf (İllüstrasyon) */
+    .auth-visual {
+        flex: 1;
+        background: linear-gradient(135deg, #E0F2FF 0%, #F0F9FF 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+    }
 
-  .form-group {
-    text-align: left;
-    margin-bottom: 20px;
-  }
+    /* Dekoratif Daireler */
+    .circle { position: absolute; border-radius: 50%; opacity: 0.6; }
+    .circle-1 { width: 300px; height: 300px; background: #BFDBFE; top: -50px; left: -50px; filter: blur(60px); }
+    .circle-2 { width: 200px; height: 200px; background: #93C5FD; bottom: -30px; right: -30px; filter: blur(40px); }
 
-  label {
-    font-weight: 600;
-    margin-bottom: 8px;
-    display: block;
-    color: var(--text-dark);
-  }
+    .auth-visual img {
+        width: 100%;
+        max-width: 350px;
+        z-index: 2;
+        animation: float 6s ease-in-out infinite;
+    }
 
-  input {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    border: 1px solid rgba(0,0,0,0.1);
-    background: rgba(255,255,255,0.6);
-    font-size: 1rem;
-    transition: 0.3s;
-    box-sizing: border-box;
-  }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
 
-  input:focus {
-    outline: none;
-    border-color: var(--primary);
-    background: white;
-    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
-  }
+    /* Sağ Taraf (Form) */
+    .auth-form-side {
+        flex: 1;
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
 
-  button {
-    width: 100%;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 14px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-top: 10px;
-  }
+    .auth-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e3a8a;
+        margin-bottom: 10px;
+        text-align: center;
+    }
 
-  button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0, 122, 255, 0.3);
-  }
+    .auth-subtitle {
+        text-align: center;
+        color: #64748b;
+        margin-bottom: 30px;
+        font-size: 0.95rem;
+    }
 
-  .bottom-text {
-    margin-top: 20px;
-    font-size: 0.9rem;
-    color: var(--text-gray);
-  }
+    /* Modern Input Grubu */
+    .input-group-modern {
+        position: relative;
+        margin-bottom: 20px;
+    }
 
-  .bottom-text a {
-    color: var(--primary);
-    font-weight: 600;
-  }
+    .input-group-modern i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 1.1rem;
+        transition: 0.3s;
+    }
 
-  .msg { margin-top: 15px; font-weight: 600; font-size: 0.95rem; }
+    .input-modern {
+        width: 100%;
+        padding: 15px 15px 15px 45px; /* İkon boşluğu */
+        border: 2px solid #f1f5f9;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: 0.3s;
+        background: #f8fafc;
+        color: #334155;
+    }
+
+    .input-modern:focus {
+        border-color: #3b82f6;
+        background: #fff;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .input-modern:focus + i { color: #3b82f6; }
+
+    /* Buton */
+    .btn-modern {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
+    }
+
+    .extra-links {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        font-size: 0.9rem;
+    }
+
+    .extra-links a { color: #3b82f6; font-weight: 600; text-decoration: none; }
+    .extra-links a:hover { text-decoration: underline; }
+
+    .msg { text-align: center; margin-top: 15px; font-weight: 600; font-size: 0.95rem; }
+
+    /* Mobil Uyumluluk */
+    @media (max-width: 768px) {
+        .auth-container-modern { flex-direction: column; margin: 20px; }
+        .auth-visual { display: none; } /* Mobilde resmi gizle, sadece form kalsın */
+        .auth-form-side { padding: 30px 20px; }
+    }
 </style>
 
-<div class="auth-wrapper">
-  <div class="glass auth-card">
-    <div style="font-size: 3rem; margin-bottom: 10px;">👋</div>
-    <h2 style="margin-bottom: 30px; color: var(--text-dark);">Tekrar Hoşgeldin!</h2>
-
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="username">Kullanıcı Adı</label>
-        <input type="text" id="username" placeholder="Kullanıcı adın" required>
-      </div>
-      <div class="form-group">
-        <label for="password">Şifre</label>
-        <input type="password" id="password" placeholder="••••••••" required>
-      </div>
-      <button type="submit">Giriş Yap</button>
-    </form>
-
-    <p id="msg" class="msg"></p>
-
-    <div class="bottom-text">
-      Hesabın yok mu? <a href="{% url 'register' %}">Kayıt Ol</a> <br><br>
-      <a href="{% url 'password_reset' %}" style="color: var(--text-gray); font-size: 0.85rem;">Şifremi Unuttum</a>
+<div class="auth-container-modern">
+    <!-- Sol Taraf: Görsel -->
+    <div class="auth-visual">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <!-- Eğitim ile ilgili online vektör -->
+        <img src="https://cdni.iconscout.com/illustration/premium/thumb/online-education-5954605-4927538.png" alt="Education">
     </div>
-  </div>
+
+    <!-- Sağ Taraf: Form -->
+    <div class="auth-form-side">
+        <h2 class="auth-title">Hoşgeldiniz 👋</h2>
+        <p class="auth-subtitle">Eğitim notlarınıza ulaşmak için giriş yapın.</p>
+
+        <form id="loginForm">
+            <div class="input-group-modern">
+                <input type="text" id="username" class="input-modern" placeholder="E-posta veya Kullanıcı Adı" required>
+                <i class="fa-regular fa-envelope"></i>
+            </div>
+
+            <div class="input-group-modern">
+                <input type="password" id="password" class="input-modern" placeholder="Şifre" required>
+                <i class="fa-solid fa-lock"></i>
+            </div>
+
+            <button type="submit" class="btn-modern">Giriş Yap</button>
+        </form>
+
+        <p id="msg" class="msg"></p>
+
+        <div class="extra-links">
+            <a href="{% url 'password_reset' %}"><i class="fa-solid fa-key"></i> Şifremi Unuttum</a>
+            <span>Hesabın yok mu? <a href="{% url 'register' %}">Kayıt Ol</a></span>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -117,35 +194,46 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   msg.innerText = '⏳ Giriş yapılıyor...';
 
   try {
-    // 1. Token Al
-    const res = await fetch('/api/auth/token/', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
+    // 1. Token Al (JWT) - Eğer JWT'yi email ile desteklemiyorsak burası patlayabilir.
+    // O yüzden önce session login deniyoruz, orası kullanıcı adını çözümleyecek.
 
-    if (res.ok) {
-      localStorage.setItem('access', data.access);
-      localStorage.setItem('refresh', data.refresh);
-
-      // 2. Session Başlat (Django girişi)
-      await fetch('/api/auth/session-login/', {
+    // Asıl giriş işlemi (Session Login - Backend'de düzelttik)
+    const resSession = await fetch('/api/auth/session-login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
-      });
+    });
 
-      msg.style.color = '#34C759';
-      msg.innerText = '✅ Giriş başarılı! Yönlendiriliyorsunuz...';
-      setTimeout(() => window.location.href='/dashboard/', 1000);
+    const dataSession = await resSession.json();
+
+    if (resSession.ok) {
+        // Başarılı ise token almaya çalışalım (opsiyonel ama iyi olur)
+        // Burada username yerine backend'den dönen "gerçek username"i kullanabiliriz
+        const realUsername = dataSession.username || username;
+
+        try {
+            const resToken = await fetch('/api/auth/token/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username: realUsername, password })
+            });
+            if(resToken.ok) {
+                const dataToken = await resToken.json();
+                localStorage.setItem('access', dataToken.access);
+                localStorage.setItem('refresh', dataToken.refresh);
+            }
+        } catch(e) {} // Token hatası session'ı bozmasın
+
+        msg.style.color = '#34C759';
+        msg.innerText = '✅ Giriş başarılı! Yönlendiriliyorsunuz...';
+        setTimeout(() => window.location.href='/dashboard/', 1000);
     } else {
-      msg.style.color = '#FF3B30';
-      msg.innerText = '⚠️ ' + (data.detail || 'Kullanıcı adı veya şifre hatalı.');
+        msg.style.color = '#FF3B30';
+        msg.innerText = '⚠️ ' + (dataSession.error || 'Bilgiler hatalı.');
     }
   } catch (err) {
     msg.style.color = '#FF3B30';
-    msg.innerText = '⚠️ Sunucu hatası, lütfen tekrar deneyin.';
+    msg.innerText = '⚠️ Sunucu hatası.';
   }
 });
 </script>

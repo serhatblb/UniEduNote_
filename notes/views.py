@@ -28,6 +28,15 @@ def upload_note(request):
 
 # 📋 Not listesi (filtreli)
 def note_list(request):
+    sort_by = request.GET.get('sort', 'newest')
+
+    if sort_by == 'popular':
+        ordering = '-download_count'
+    elif sort_by == 'liked':
+        ordering = '-likes'
+    else:
+        ordering = '-uploaded_at'  # Varsayılan: En yeni
+
     notes = Note.objects.all().order_by('-likes', '-uploaded_at')
 
     university = request.GET.get('university')

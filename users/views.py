@@ -12,6 +12,9 @@ from .tokens import account_activation_token
 from .email_utils import send_activation_email
 from categories.models import University
 from .models import Notification
+from .models import Contact
+from notes.models import Note
+
 User = get_user_model()
 
 # --- EKSİK OLAN HOME FONKSİYONU ---
@@ -116,21 +119,22 @@ def dashboard(request):
 
 @login_required(login_url="/login/")
 def profile(request):
-    uploaded_notes = request.user.note_set.all()
-    total_downloads = sum(note.download_count for note in uploaded_notes)
+    # Sekmeler için veriler
+    my_notes = Note.objects.filter(user=request.user).order_by('-uploaded_at')
+    # Kullanıcının beğendiği notlar (Like modelinden ters ilişki)
+    liked_notes = [like.note for like in request.user.likes_set.all()]
+
+    total_downloads = sum(note.download_count for note in my_notes)
     universities = University.objects.all().order_by('name')
 
     context = {
         'user': request.user,
-        'uploaded_notes': uploaded_notes,
+        'uploaded_notes': my_notes,
+        'liked_notes': liked_notes,
         'total_downloads': total_downloads,
         'universities': universities,
     }
-
-    # ESKİSİ: return render(request, "users/profile.html", context)
-    # YENİSİ (Eğer dosya ana dizindeyse):
-    return render(request, "profile.html", context)
-
+    return render(request, "users/profile.html", context)
 
 @login_required
 def premium_page(request):
@@ -158,3 +162,22 @@ def mark_notifications_read(request):
     """Bildirimleri okundu yapar"""
     Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
     return JsonResponse({'status': 'ok'})
+
+
+# --- DESTEK (YENİ) ---
+def contact_view(request):
+    if request.method == "POST":
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        # Giriş yapmışsa bilgilerini otomatik al, yoksa formdan al
+        name = request.user.username if request.user.is_authenticated else request.POST.get('name')
+        email = request.user.email if request.user.is_authenticated else request.POST.get('email')
+
+        Contact.objects.create(
+            user=request.user if request.user.is_authenticated else None,
+            name=name, email=email, subject=subject, message=message
+        )
+        messages.success(request, "Mesajınız alındı! En kısa sürede dönüş yapacağız.")
+        return redirect('contact')
+
+    return render(request, "users/contact.html")
