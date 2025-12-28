@@ -112,7 +112,7 @@
         <aside class="sidebar">
             <div class="logo"><i class="fa-solid fa-graduation-cap"></i> UniEduNote</div>
             <nav>
-                <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-grid-2"></i> Paneli</a>
+                <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-grid-2"></i> Paneliniz</a>
                 <a href="{% url 'note_list' %}" class="menu-item {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-compass"></i> Keşfet</a>
                 <a href="{% url 'upload_note' %}" class="menu-item {% if 'upload' in request.path %}active{% endif %}"><i class="fa-solid fa-cloud-arrow-up"></i> Not Yükle</a>
                 <a href="{% url 'premium' %}" class="menu-item {% if 'premium' in request.path %}active{% endif %}" style="color: #FF9500;"><i class="fa-solid fa-crown"></i> Premium</a>
