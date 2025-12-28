@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 # .env dosyasını yükle
 load_dotenv()
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ------------------------------------------------------------------
