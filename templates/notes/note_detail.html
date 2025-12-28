@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }}{% endblock %}
+
+{% block content %}
+<style>
+    .detail-container {
+        max-width: 950px;
+        margin: 0 auto;
+        animation: fadeInUp 0.6s ease;
+    }
+
+    .meta-tag {
+        display: inline-block;
+        padding: 8px 16px;
+        background: rgba(102, 126, 234, 0.12);
+        color: var(--primary);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-right: 10px;
+        margin-bottom: 12px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .meta-tag:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .action-row {
+        display: flex;
+        gap: 15px;
+        margin-top: 35px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 14px 28px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .btn-main {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-main:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-sec {
+        background: rgba(0, 0, 0, 0.06);
+        color: var(--text-dark);
+    }
+
+    .btn-sec:hover {
+        background: rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .btn-danger {
+        background: rgba(255, 59, 48, 0.12);
+        color: #FF3B30;
+        font-weight: 700;
+    }
+
+    .btn-danger:hover {
+        background: #FF3B30;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* === Yorumlar === */
+    .comment-box {
+        margin-top: 45px;
+        animation: fadeInUp 0.8s ease;
+    }
+
+    .comment-item {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(15px);
+        padding: 20px;
+        border-radius: 18px;
+        margin-bottom: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        transition: all 0.3s ease;
+    }
+
+    .comment-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .comment-user {
+        font-weight: 800;
+        font-size: 0.95rem;
+        color: var(--text-dark);
+        letter-spacing: -0.3px;
+    }
+
+    .comment-date {
+        font-size: 0.75rem;
+        color: var(--text-gray);
+    }
+
+    .comment-text {
+        margin-top: 10px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--text-dark);
+    }
+
+    textarea {
+        width: 100%;
+        padding: 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        resize: vertical;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+    }
+
+    /* === Animasyonlar === */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* === Responsive === */
+    @media (max-width: 768px) {
+        .action-row {
+            flex-direction: column;
+        }
+
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="detail-container">
+    <div class="glass" style="padding: 45px;">
+        <a href="{% url 'note_list' %}" style="color: var(--text-gray); font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: 0.3s;">
+            <i class="fa-solid fa-arrow-left"></i> Geri Dön
+        </a>
+
+        <h1 style="margin: 25px 0 15px; color: var(--text-dark); font-weight: 900; font-size: 2.2rem; letter-spacing: -1.5px; line-height: 1.2;">
+            {{ note.title }}
+        </h1>
+
+        <div style="margin-bottom: 25px;">
+            <span class="meta-tag"><i class="fa-solid fa-building-columns"></i> {{ note.university.name }}</span>
+            <span class="meta-tag"><i class="fa-solid fa-book"></i> {{ note.course.name }}</span>
+            <span class="meta-tag"><i class="fa-regular fa-calendar"></i> {{ note.semester }}</span>
+        </div>
+
+        <p style="line-height: 1.7; color: var(--text-dark); margin-bottom: 35px; font-size: 1.05rem;">
+            {{ note.description|default:"Bu not için açıklama girilmemiş." }}
+        </p>
+
+        <div style="font-size: 0.9rem; color: var(--text-gray); font-weight: 600;">
+            Yükleyen: <strong style="color: var(--primary);">{{ note.user.username }}</strong> • {{ note.uploaded_at|date:"d M Y" }}
+        </div>
+
+        <!-- Butonlar -->
+        <div class="action-row">
+            <a href="{% url 'download_note' note.pk %}" class="btn-action btn-main">
+                <i class="fa-solid fa-download"></i> İndir ({{ note.download_count }})
+            </a>
+
+            <button id="likeBtn" class="btn-action btn-sec">
+                <i class="fa-regular fa-heart"></i> Beğen (<span id="likeCount">{{ note.likes }}</span>)
+            </button>
+
+            {% if note.user.id == request.user.id %}
+                <a href="{% url 'edit_note' note.id %}" class="btn-action btn-sec">
+                    <i class="fa-solid fa-pen"></i> Düzenle
+                </a>
+                <form action="{% url 'delete_note' note.id %}" method="post" onsubmit="return confirm('Silmek istediğine emin misin?');" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-action btn-danger">
+                        <i class="fa-solid fa-trash"></i> Sil
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Yorumlar -->
+    <div class="glass comment-box" style="padding: 35px;">
+        <h3 style="margin-bottom: 25px; font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; color: var(--text-dark);">
+            <i class="fa-regular fa-comments"></i> Yorumlar
+        </h3>
+
+        <div id="commentList">Yükleniyor...</div>
+
+        <div style="margin-top: 25px;">
+            <textarea id="commentText" rows="3" placeholder="Yorumunu yaz..."></textarea>
+            <button class="btn-action btn-main" id="sendComment" style="width: auto;">
+                <i class="fa-solid fa-paper-plane"></i> Gönder
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const noteId = {{ note.id }};
+    const token = localStorage.getItem('access');
+    const currentUserId = {{ request.user.id }};
+
+    // Yorumları Yükle
+    async function loadComments(){
+      const list = document.getElementById('commentList');
+      try{
+        const headers = token ? {'Authorization':'Bearer '+token} : {};
+        const res = await fetch(`/api/notes/${noteId}/comments/`, {headers});
+        const data = await res.json();
+
+        if(data.length === 0) {
+            list.innerHTML = "<p style='color:#999; text-align:center; padding:20px;'>Henüz yorum yok. İlk yorumu sen yap!</p>";
+            return;
+        }
+
+        list.innerHTML = data.map(c => `
+          <div class='comment-item' id='comment-${c.id}'>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class='comment-user'>${c.user} <span class='comment-date'>• ${new Date(c.created_at).toLocaleDateString()}</span></div>
+
+                ${c.user_id == currentUserId ? `
+                <div style="font-size:0.85rem; display:flex; gap:8px;">
+                    <button onclick="editMode(${c.id}, '${c.content.replace(/'/g, "\\'")}')" style="background:none; border:none; color:#007AFF; cursor:pointer; font-weight:600;">Düzenle</button>
+                    <button onclick="deleteComment(${c.id})" style="background:none; border:none; color:#FF3B30; cursor:pointer; font-weight:600;">Sil</button>
+                </div>
+                ` : ''}
+            </div>
+            <div class='comment-text' id='text-${c.id}'>${c.content}</div>
+          </div>`).join('');
+
+      } catch(e) {
+          console.error(e);
+          list.innerHTML='<p style="color:#FF3B30; text-align:center;">Yorumlar yüklenemedi.</p>';
+      }
+    }
+
+    // Yorum Gönder
+    document.getElementById('sendComment').addEventListener('click', async()=>{
+      const text = document.getElementById('commentText').value.trim();
+      if(!text) return;
+
+      try {
+          await fetch(`/api/notes/${noteId}/comments/`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+            body:JSON.stringify({content:text})
+          });
+          document.getElementById('commentText').value='';
+          loadComments();
+      } catch(e) { alert("Yorum gönderilemedi."); }
+    });
+
+    // Düzenleme Modunu Aç
+    window.editMode = function(id, content) {
+        const div = document.getElementById(`comment-${id}`);
+        div.innerHTML = `
+            <textarea id="edit-input-${id}" rows="3" style="width:100%; padding:12px; border-radius:12px;">${content}</textarea>
+            <div style="margin-top:10px; display:flex; gap:10px;">
+                <button onclick="saveEdit(${id})" class="btn-action btn-main" style="padding:10px 20px; font-size:0.85rem;">Kaydet</button>
+                <button onclick="loadComments()" class="btn-action btn-sec" style="padding:10px 20px; font-size:0.85rem;">İptal</button>
+            </div>
+        `;
+    }
+
+    // Düzenlemeyi Kaydet
+    window.saveEdit = async function(id) {
+        const newText = document.getElementById(`edit-input-${id}`).value.trim();
+        if(!newText) return;
+
+        try {
+            await fetch(`/api/notes/${noteId}/comments/`,{
+                method:'PUT',
+                headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+                body:JSON.stringify({id: id, content: newText})
+            });
+            loadComments();
+        } catch(e) { alert("Düzenleme başarısız."); }
+    }
+
+    // Yorum Sil
+    window.deleteComment = async function(id) {
+        if(!confirm('Yorumu silmek istediğine emin misin?')) return;
+
+        try {
+            await fetch(`/api/notes/${noteId}/comments/`,{
+                method:'DELETE',
+                headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+                body:JSON.stringify({id: id})
+            });
+            loadComments();
+        } catch(e) { alert("Silme başarısız."); }
+    }
+
+    loadComments();
+</script>
+{% endblock %}

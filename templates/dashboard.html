@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    /* Dashboard Widget Stilleri */
+    .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .card {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s ease;
+        min-height: 200px;
+        position: relative;
+    }
+
+    .card:active { transform: scale(0.98); }
+
+    .card-big { grid-column: span 2; }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #86868B;
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #1D1D1F;
+        letter-spacing: -1px;
+    }
+
+    .action-btn {
+        margin-top: auto;
+        background: #007AFF;
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+    .action-btn:hover { background: #0056b3; }
+
+    /* Mobilde büyük kartı tek sütun yap */
+    @media (max-width: 768px) {
+        .card-big { grid-column: span 1; }
+        .bento-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="bento-grid">
+
+    <!-- Büyük Aksiyon Kartı -->
+    <div class="card glass card-big">
+        <div class="card-title">
+            <span>🚀 Hızlı İşlem</span>
+            <i class="fa-solid fa-bolt" style="color: #FFD60A; font-size: 1.2rem;"></i>
+        </div>
+        <div>
+            <h3 style="margin-bottom: 8px; font-size: 1.4rem; font-weight: 700;">Bilgi Paylaştıkça Çoğalır</h3>
+            <p style="color: #86868B; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
+                Ders notlarını yükle, arkadaşlarına yardımcı ol ve toplulukta öne çık.
+            </p>
+        </div>
+        <a href="{% url 'upload_note' %}" class="action-btn">
+            <i class="fa-solid fa-plus"></i> Yeni Not Yükle
+        </a>
+    </div>
+
+    <!-- Keşfet Kartı -->
+    <div class="card glass">
+        <div class="card-title">
+            <span>📚 Kütüphane</span>
+            <i class="fa-solid fa-book-open" style="color: #30D158;"></i>
+        </div>
+        <p style="color: #86868B; font-size: 0.9rem; margin-bottom: 10px;">
+            Üniversite, fakülte ve bölümlere göre notları incele.
+        </p>
+        <a href="{% url 'note_list' %}" class="action-btn" style="background: rgba(0,0,0,0.05); color: #1D1D1F;">
+            Notları Keşfet
+        </a>
+    </div>
+
+    <!-- Puan Kartı -->
+    <div class="card glass">
+        <div class="card-title">
+            <span>🏆 Puanım</span>
+            <i class="fa-solid fa-star" style="color: #FF9500;"></i>
+        </div>
+        <!-- Puan verisi veritabanından gelecek, şimdilik statik -->
+        <div class="card-value">0</div>
+        <div style="color: #34C759; font-size: 0.9rem; margin-top: 5px; font-weight: 600;">
+            <i class="fa-solid fa-arrow-trend-up"></i> Başlangıç Seviyesi
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Notu Düzenle{% endblock %}
+
+{% block content %}
+<style>
+    .edit-container {
+        max-width: 650px;
+        margin: 0 auto;
+        animation: fadeInUp 0.6s ease;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+        letter-spacing: -0.3px;
+    }
+
+    .form-group input[type="text"],
+    .form-group textarea {
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 14px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        font-size: 1rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+    }
+
+    .form-group input[type="file"] {
+        background: white;
+        padding: 12px;
+        border-radius: 14px;
+        border: 2px dashed var(--primary);
+        width: 100%;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    .button-row {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+    }
+
+    .btn-submit {
+        flex: 1;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        border: none;
+        border-radius: 14px;
+        font-weight: 800;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-cancel {
+        flex: 1;
+        background: rgba(0, 0, 0, 0.06);
+        color: var(--text-dark);
+        padding: 15px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-cancel:hover {
+        background: rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .button-row {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="edit-container">
+    <div class="glass" style="padding: 40px;">
+        <h2 style="color: var(--primary); margin-bottom: 30px; font-weight: 900; font-size: 1.8rem; letter-spacing: -1px; display: flex; align-items: center; gap: 12px;">
+            <i class="fa-solid fa-pen-to-square"></i> Notu Düzenle
+        </h2>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Başlık</label>
+                <input type="text" name="title" value="{{ note.title }}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Açıklama</label>
+                <textarea name="description" rows="5">{{ note.description }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Yeni Dosya (İsteğe Bağlı)</label>
+                <input type="file" name="file">
+            </div>
+
+            <div class="button-row">
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-check"></i> Kaydet
+                </button>
+                <a href="{% url 'note_detail' note.id %}" class="btn-cancel">
+                    <i class="fa-solid fa-xmark"></i> İptal
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}Profilim{% endblock %}
+
+{% block content %}
+<style>
+    /* Profil Header */
+    .profile-card { padding: 30px; display: flex; align-items: center; gap: 30px; position: relative; overflow: hidden; }
+    .profile-avatar-xl { width: 120px; height: 120px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; border: 5px solid white; box-shadow: 0 10px 30px rgba(0,122,255,0.3); z-index: 2; position: relative; }
+    .profile-avatar-xl img { width: 100%; height: 100%; object-fit: cover; }
+
+    .rank-tag { background: #FFD60A; color: black; font-weight: 700; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; display: inline-block; margin-top: 5px; box-shadow: 0 4px 10px rgba(255, 214, 10, 0.4); }
+
+    /* İstatistikler */
+    .stats-row { display: flex; gap: 20px; margin-top: 15px; }
+    .stat-item { text-align: center; }
+    .stat-val { font-size: 1.4rem; font-weight: 800; color: var(--text-dark); display: block; }
+    .stat-label { font-size: 0.8rem; color: var(--text-gray); font-weight: 600; }
+
+    /* Sekmeler (Tabs) */
+    .tabs { display: flex; gap: 10px; margin: 30px 0 20px; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 10px; overflow-x: auto; }
+    .tab-btn { padding: 10px 20px; background: none; border: none; font-size: 1rem; font-weight: 600; color: var(--text-gray); cursor: pointer; border-radius: 12px; transition: 0.3s; white-space: nowrap; }
+    .tab-btn:hover { background: rgba(0,0,0,0.05); }
+    .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+    /* İçerik Kartları */
+    .note-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .mini-card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.3s; border: 1px solid rgba(0,0,0,0.02); position: relative; }
+    .mini-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+    .card-actions { position: absolute; top: 15px; right: 15px; opacity: 0; transition: 0.3s; display: flex; gap: 8px; }
+    .mini-card:hover .card-actions { opacity: 1; }
+
+    @media (max-width: 768px) {
+        .profile-card { flex-direction: column; text-align: center; padding: 20px; }
+        .stats-row { justify-content: center; width: 100%; }
+        .card-actions { opacity: 1; } /* Mobilde hep görünsün */
+    }
+</style>
+
+<!-- Profil Kartı -->
+<div class="glass profile-card">
+    <div class="profile-avatar-xl">
+        {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" style="border-radius: 50%;">
+        {% else %}
+            {{ user.username|make_list|first|upper }}
+        {% endif %}
+    </div>
+    <div style="flex: 1;">
+        <h1 style="margin: 0; font-size: 2rem; color: var(--text-dark);">{{ user.username }}</h1>
+        <div class="rank-tag">{{ user.rank }}</div>
+        <p style="color: var(--text-gray); margin: 5px 0;">{{ user.university.name|default:"Üniversite Seçilmedi" }}</p>
+
+        <div class="stats-row">
+            <div class="stat-item">
+                <span class="stat-val">{{ uploaded_notes.count }}</span>
+                <span class="stat-label">Yükleme</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">{{ total_downloads }}</span>
+                <span class="stat-label">İndirilme</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val" style="color: #34C759; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <i class="fa-solid fa-bolt" style="font-size: 1rem;"></i> {{ total_xp }}
+                </span>
+                <span class="stat-label">Seviye Puanı (XP)</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">{{ liked_notes|length }}</span>
+                <span class="stat-label">Favori</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sekmeler -->
+<div class="tabs">
+    <button class="tab-btn active" onclick="openTab('uploads')"><i class="fa-solid fa-cloud-arrow-up"></i> Yüklediklerim</button>
+    <button class="tab-btn" onclick="openTab('likes')"><i class="fa-solid fa-heart"></i> Beğendiklerim</button>
+    <button class="tab-btn" onclick="openTab('settings')"><i class="fa-solid fa-gear"></i> Ayarlar</button>
+</div>
+
+<!-- Sekme İçerikleri -->
+<div id="uploads" class="tab-content">
+    <div class="note-list-grid">
+        {% for note in uploaded_notes %}
+        <div class="mini-card">
+            <div style="font-weight: 700; margin-bottom: 5px; color: var(--text-dark);">{{ note.title }}</div>
+            <div style="font-size: 0.85rem; color: var(--text-gray);">
+                <i class="fa-solid fa-book"></i> {{ note.course.name }} <br>
+                <span style="color: #34C759;"><i class="fa-solid fa-download"></i> {{ note.download_count }}</span> •
+                <span style="color: #FF3B30;"><i class="fa-solid fa-heart"></i> {{ note.likes }}</span>
+            </div>
+            <div class="card-actions">
+                <a href="{% url 'edit_note' note.id %}" style="background: var(--warning); color: black; padding: 6px 10px; border-radius: 8px; font-size: 0.8rem;"><i class="fa-solid fa-pen"></i></a>
+                <a href="{% url 'note_detail' note.id %}" style="background: var(--primary); color: white; padding: 6px 10px; border-radius: 8px; font-size: 0.8rem;"><i class="fa-solid fa-eye"></i></a>
+            </div>
+        </div>
+        {% empty %}
+        <p style="grid-column: 1/-1; text-align: center; color: #999;">Henüz not yüklemedin.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="likes" class="tab-content" style="display: none;">
+    <div class="note-list-grid">
+        {% for note in liked_notes %}
+        <div class="mini-card">
+            <div style="font-weight: 700; margin-bottom: 5px; color: var(--text-dark);">{{ note.title }}</div>
+            <div style="font-size: 0.85rem; color: var(--text-gray);">
+                <i class="fa-regular fa-user"></i> {{ note.user.username }}
+            </div>
+            <a href="{% url 'note_detail' note.id %}" style="display: block; margin-top: 10px; text-align: center; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 8px; font-size: 0.9rem; font-weight: 600;">Görüntüle</a>
+        </div>
+        {% empty %}
+        <p style="grid-column: 1/-1; text-align: center; color: #999;">Henüz hiçbir notu beğenmedin.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="settings" class="tab-content" style="display: none;">
+    <!-- Ayarlar Formu (Eski profile.html'deki form buraya) -->
+    <div class="glass" style="padding: 30px;">
+        <h3 style="margin-bottom: 20px;">Profili Düzenle</h3>
+        <!-- Buraya önceki mesajdaki AJAX'lı formunu koyabilirsin veya iframe gibi çağırabiliriz.
+             Şimdilik basitçe düzenleme sayfasına yönlendirelim veya önceki AJAX formunu buraya taşı. -->
+        {% include 'users/profile_edit_form.html' %}
+        <!-- NOT: Aşağıdaki script içinde formu tanımlayacağız -->
+    </div>
+</div>
+
+<!-- Ayarlar Formu İçin Template (Dosya oluşturmana gerek yok, buraya gömdüm) -->
+<script type="text/template" id="editFormTemplate">
+    <form id="profileForm" enctype="multipart/form-data">
+        <div style="display: grid; gap: 15px;">
+            <input type="text" id="username" value="{{ user.username }}" placeholder="Kullanıcı Adı">
+            <input type="email" id="email" value="{{ user.email }}" placeholder="E-posta">
+            <select id="university">
+                <option value="">Üniversite Seç</option>
+                {% for uni in universities %}
+                    <option value="{{ uni.id }}" {% if user.university.id == uni.id %}selected{% endif %}>{{ uni.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="file" id="avatarInput">
+            <button type="submit" class="btn-primary" style="padding: 12px; border-radius: 10px; border: none; color: white; cursor: pointer;">Kaydet</button>
+        </div>
+        <p id="msg" style="margin-top: 10px;"></p>
+    </form>
+</script>
+
+<script>
+    // Tab Geçişleri
+    function openTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+        document.getElementById(tabName).style.display = 'block';
+        event.currentTarget.classList.add('active');
+    }
+
+    // Settings Tab'ına Formu Yükle
+    const settingsDiv = document.querySelector('#settings .glass');
+    if(settingsDiv && !settingsDiv.querySelector('form')) {
+        settingsDiv.innerHTML += document.getElementById('editFormTemplate').innerHTML;
+
+        // Form Event Listener (AJAX Kayıt)
+        setTimeout(() => {
+            const form = settingsDiv.querySelector('form');
+            if(form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const msg = form.querySelector('#msg');
+                    msg.innerText = "⏳ Kaydediliyor...";
+
+                    const formData = new FormData();
+                    formData.append('username', form.querySelector('#username').value);
+                    formData.append('email', form.querySelector('#email').value);
+                    if(form.querySelector('#university').value) formData.append('university', form.querySelector('#university').value);
+                    const file = form.querySelector('#avatarInput').files[0];
+                    if(file) formData.append('avatar', file);
+
+                    try {
+                        const res = await fetch('/api/auth/profile/update/', {
+                            method: 'POST',
+                            headers: {'Authorization': 'Bearer ' + localStorage.getItem('access'), 'X-CSRFToken': '{{ csrf_token }}'},
+                            body: formData
+                        });
+                        if(res.ok) { msg.innerText = "✅ Kaydedildi!"; setTimeout(() => location.reload(), 1000); }
+                        else { msg.innerText = "⚠️ Hata oluştu."; }
+                    } catch { msg.innerText = "⚠️ Sunucu hatası."; }
+                });
+            }
+        }, 500);
+    }
+</script>
+{% endblock %}

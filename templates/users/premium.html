@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Premium Üyelik{% endblock %}
+{% block content %}
+<style>
+    .pricing-container { text-align: center; max-width: 900px; margin: 0 auto; }
+    .pricing-cards { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
+
+    .price-card {
+        background: white; padding: 40px; border-radius: 24px; width: 300px;
+        position: relative; transition: 0.3s;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .price-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+
+    .card-pro {
+        background: linear-gradient(135deg, #007AFF, #0051ff); color: white;
+        transform: scale(1.05); border: none; box-shadow: 0 10px 30px rgba(0,122,255,0.3);
+    }
+
+    .price { font-size: 3rem; font-weight: 800; margin: 20px 0; }
+    .features { list-style: none; padding: 0; margin: 30px 0; text-align: left; }
+    .features li { margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+
+    .btn-buy {
+        width: 100%; padding: 15px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer;
+    }
+    .btn-white { background: white; color: #007AFF; }
+    .btn-dark { background: #1D1D1F; color: white; }
+</style>
+
+<div class="pricing-container">
+    <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Akademik Kariyerine Yatırım Yap 🚀</h1>
+    <p style="color: #86868B;">Sınırsız bilgiye erişim sağla, rakiplerinin önüne geç.</p>
+
+    <div class="pricing-cards">
+        <!-- Ücretsiz -->
+        <div class="glass price-card">
+            <h3>Öğrenci</h3>
+            <div class="price">₺0</div>
+            <ul class="features">
+                <li>✅ Günlük 5 Not İndirme</li>
+                <li>✅ Not Yükleme</li>
+                <li>✅ Yorum Yapma</li>
+                <li>❌ Reklamlı Deneyim</li>
+            </ul>
+            <button class="btn-buy btn-dark">Mevcut Plan</button>
+        </div>
+
+        <!-- Premium -->
+        <div class="price-card card-pro">
+            <div style="position: absolute; top: 15px; right: 15px; background: #FFD60A; color: black; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 800;">POPÜLER</div>
+            <h3>UniEdu Pro</h3>
+            <div class="price">₺49<span style="font-size: 1rem; opacity: 0.8">/ay</span></div>
+            <ul class="features">
+                <li>✨ <strong>Sınırsız</strong> İndirme</li>
+                <li>🚀 <strong>2x Hızlı</strong> İndirme</li>
+                <li>🛡️ <strong>Reklamsız</strong> Deneyim</li>
+                <li>👑 İsminin Yanında <strong>Altın Rozet</strong></li>
+            </ul>
+            <button class="btn-buy btn-white" onclick="alert('Ödeme sistemi yakında aktif olacak!')">Hemen Yükselt</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
