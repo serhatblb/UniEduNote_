@@ -4,12 +4,18 @@
 
 {% block content %}
 <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     /* Animated Background Blobs */
     .blob {
         position: fixed;
         border-radius: 50%;
         filter: blur(80px);
-        opacity: 0.7;
+        opacity: 0.6;
         animation: blob 20s infinite;
         z-index: 0;
     }
@@ -48,18 +54,19 @@
     }
 
     .landing-page {
-        text-align: center;
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 80vh;
         position: relative;
         z-index: 1;
+        overflow: hidden;
     }
 
-    .badge {
+    /* Hero Section */
+    .hero-section {
+        text-align: center;
+        padding: 100px 20px;
+        position: relative;
+    }
+
+    .hero-badge {
         display: inline-flex;
         align-items: center;
         gap: 8px;
@@ -76,7 +83,7 @@
         animation: fadeInUp 0.8s ease-out 0.1s both;
     }
 
-    .badge-dot {
+    .hero-badge-dot {
         width: 8px;
         height: 8px;
         background: #667eea;
@@ -85,35 +92,17 @@
     }
 
     @keyframes pulse-dot {
-        0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-        }
-        50% {
-            opacity: 0.5;
-            transform: scale(1.2);
-        }
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
     }
 
     @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    .landing-hero {
-        animation: fadeInUp 0.8s ease-out;
-        position: relative;
-        z-index: 1;
-    }
-
-    .landing-hero h1 {
-        font-size: 3.5rem;
+    .hero-title {
+        font-size: 4rem;
         line-height: 1.1;
         margin-bottom: 24px;
         font-weight: 900;
@@ -136,23 +125,30 @@
         50% { background-position: 100% 50%; }
     }
 
-    .landing-hero p {
-        font-size: 1.2rem;
+    .hero-description {
+        font-size: 1.3rem;
         color: #4a5568;
-        max-width: 600px;
+        max-width: 700px;
         margin: 0 auto 40px;
         line-height: 1.7;
         animation: fadeInUp 0.8s ease-out 0.3s both;
     }
 
-    .landing-btn {
+    .hero-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .btn {
         padding: 18px 36px;
         border-radius: 16px;
         font-weight: 700;
         font-size: 1.1rem;
         transition: all 0.3s ease;
         display: inline-block;
-        margin: 10px;
         text-decoration: none;
         border: none;
         cursor: pointer;
@@ -197,44 +193,38 @@
         transform: translateY(-2px);
     }
 
-    .button-container {
-        margin-top: 30px;
-        animation: fadeInUp 0.8s ease-out 0.4s both;
-    }
-
-    /* Floating Ticker Bar */
-    .ticker-wrapper {
-        margin-top: 80px;
-        padding: 24px 0;
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(20px) saturate(180%);
-        border-radius: 20px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.9);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    /* Stats Ticker */
+    .stats-section {
+        padding: 60px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
         animation: fadeInUp 0.8s ease-out 0.5s both;
     }
 
-    .ticker {
-        display: flex;
-        gap: 60px;
-        animation: ticker-scroll 30s linear infinite;
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 32px;
+        text-align: center;
     }
 
-    @keyframes ticker-scroll {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-50%); }
+    .stat-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 24px;
+        padding: 32px;
+        transition: all 0.4s;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
     }
 
-    .ticker-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-width: 150px;
+    .stat-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
     }
 
-    .ticker-number {
-        font-size: 2.5rem;
+    .stat-number {
+        font-size: 3rem;
         font-weight: 900;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
@@ -243,82 +233,127 @@
         margin-bottom: 8px;
     }
 
-    .ticker-label {
+    .stat-label {
         color: #4a5568;
-        font-size: 14px;
+        font-size: 1rem;
         font-weight: 600;
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 100px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .section-header {
         text-align: center;
+        margin-bottom: 80px;
     }
 
-    /* Hero Visual Cards */
-    .hero-visual {
-        position: relative;
-        height: 500px;
-        margin-top: 80px;
-        animation: fadeInUp 0.8s ease-out 0.6s both;
+    .section-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 20px;
+        letter-spacing: -1.5px;
+        color: #1a202c;
     }
 
-    .glass-card {
-        position: absolute;
+    .section-description {
+        font-size: 1.2rem;
+        color: #4a5568;
+        line-height: 1.7;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+    }
+
+    .feature-card {
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(20px) saturate(180%);
         border: 1px solid rgba(255, 255, 255, 0.8);
         border-radius: 24px;
-        padding: 28px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 40px;
+        transition: all 0.4s;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
     }
 
-    .glass-card:hover {
+    .feature-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+    }
+
+    .feature-icon {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        margin-bottom: 24px;
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    }
+
+    .feature-title {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+        font-weight: 800;
+        color: #1a202c;
+    }
+
+    .feature-description {
+        color: #4a5568;
+        line-height: 1.7;
+        font-size: 1rem;
+    }
+
+    /* Preview Cards Section */
+    .preview-section {
+        padding: 100px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+        margin-top: 60px;
+    }
+
+    .preview-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 24px;
+        padding: 32px;
+        transition: all 0.4s;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        text-align: left;
+    }
+
+    .preview-card:hover {
         transform: translateY(-12px) scale(1.02);
         box-shadow: 0 30px 80px rgba(102, 126, 234, 0.25);
     }
 
-    .card-1 {
-        width: 340px;
-        top: 20px;
-        left: 10%;
-        animation: float-1 6s ease-in-out infinite;
-    }
-
-    .card-2 {
-        width: 320px;
-        top: 180px;
-        right: 10%;
-        animation: float-2 7s ease-in-out infinite;
-    }
-
-    .card-3 {
-        width: 300px;
-        bottom: 40px;
-        left: 35%;
-        animation: float-3 8s ease-in-out infinite;
-    }
-
-    @keyframes float-1 {
-        0%, 100% { transform: translateY(0) rotate(-1deg); }
-        50% { transform: translateY(-25px) rotate(1deg); }
-    }
-
-    @keyframes float-2 {
-        0%, 100% { transform: translateY(0) rotate(1deg); }
-        50% { transform: translateY(-30px) rotate(-1deg); }
-    }
-
-    @keyframes float-3 {
-        0%, 100% { transform: translateY(0) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(2deg); }
-    }
-
-    .card-header {
+    .preview-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 16px;
     }
 
-    .card-title {
-        font-size: 18px;
+    .preview-title {
+        font-size: 1.2rem;
         font-weight: 700;
         color: #1a202c;
         display: flex;
@@ -326,7 +361,7 @@
         gap: 8px;
     }
 
-    .card-badge {
+    .preview-badge {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         padding: 6px 14px;
@@ -336,73 +371,180 @@
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
 
-    .card-content {
+    .preview-content {
         color: #4a5568;
-        font-size: 14px;
+        font-size: 0.95rem;
         line-height: 1.6;
         margin-bottom: 16px;
     }
 
-    .card-stats {
+    .preview-stats {
         display: flex;
         gap: 24px;
         padding-top: 16px;
         border-top: 1px solid rgba(102, 126, 234, 0.15);
     }
 
-    .stat {
+    .preview-stat {
         display: flex;
         align-items: center;
         gap: 6px;
-        font-size: 14px;
+        font-size: 0.9rem;
         font-weight: 600;
         color: #2d3748;
     }
 
-    .stat-icon {
+    .preview-stat-icon {
         color: #667eea;
         font-size: 16px;
     }
 
-    @media (max-width: 768px) {
-        .landing-hero h1 {
+    /* CTA Section */
+    .cta-section {
+        padding: 120px 20px;
+        text-align: center;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .cta-box {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        backdrop-filter: blur(20px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 32px;
+        padding: 80px 40px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.15);
+    }
+
+    .cta-box::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .cta-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .cta-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 20px;
+        letter-spacing: -1.5px;
+        color: #1a202c;
+    }
+
+    .cta-description {
+        font-size: 1.2rem;
+        color: #4a5568;
+        margin-bottom: 40px;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+.version-info {
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(74, 85, 104, 0.6);
+    padding: 20px 0 30px;
+    letter-spacing: 0.5px;
+    z-index: 2;
+    position: relative;
+}
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .features-grid, .preview-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .hero-title {
+            font-size: 3rem;
+        }
+
+        .section-title, .cta-title {
             font-size: 2.5rem;
         }
+    }
 
-        .landing-hero p {
-            font-size: 1rem;
+    @media (max-width: 768px) {
+        .blob-1, .blob-2, .blob-3 {
+            filter: blur(60px);
+            opacity: 0.4;
         }
 
-        .landing-btn {
-            padding: 14px 28px;
-            font-size: 1rem;
-            width: 100%;
+        .hero-section {
+            padding: 60px 20px;
         }
 
-        .button-container {
-            display: flex;
+        .hero-title {
+            font-size: 2.2rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+        }
+
+        .hero-buttons {
             flex-direction: column;
             width: 100%;
         }
 
-        .hero-visual {
-            height: 400px;
+        .btn {
+            width: 100%;
+            padding: 14px 28px;
+            font-size: 1rem;
         }
 
-        .glass-card {
-            padding: 20px;
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
         }
 
-        .card-1, .card-2, .card-3 {
-            width: 85%;
+        .stat-card {
+            padding: 24px;
         }
 
-        .ticker {
-            gap: 40px;
+        .stat-number {
+            font-size: 2.5rem;
         }
 
-        .ticker-number {
+        .features-section, .preview-section, .cta-section {
+            padding: 60px 20px;
+        }
+
+        .features-grid, .preview-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-title, .cta-title {
             font-size: 2rem;
+        }
+
+        .section-description, .cta-description {
+            font-size: 1rem;
+        }
+
+        .cta-box {
+            padding: 60px 24px;
         }
     }
 </style>
@@ -413,128 +555,187 @@
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
 
-    <div class="landing-hero glass" style="padding: 40px; max-width: 900px; width: 100%;">
-        <div class="badge">
-            <span class="badge-dot"></span>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
             <span>1000+ aktif öğrenci bize güveniyor</span>
         </div>
 
-        <h1>
-            Üniversite Notları<br>
-            <span class="gradient-text">Artık Cebinde!</span>
+        <h1 class="hero-title">
+            Notlarını Paylaş,<br>
+            <span class="gradient-text">Ödül Kazan</span>
         </h1>
 
-        <p>
-            Ders notlarını paylaş, arkadaşlarının notlarını indir ve akademik topluluğun bir parçası ol.
-            Binlerce öğrenci arasına katılmak için hemen başla.
+        <p class="hero-description">
+            Üniversite hayatını kolaylaştıran, katkı verdikçe seni ödüllendiren yeni nesil akademik platform. Hemen katıl, topluluğa dahil ol.
         </p>
 
-        <div class="button-container">
-            <a href="{% url 'register' %}" class="landing-btn btn-primary">🚀 Hemen Kayıt Ol</a>
-            <a href="{% url 'login' %}" class="landing-btn btn-outline">Giriş Yap →</a>
+        <div class="hero-buttons">
+            <a href="{% url 'register' %}" class="btn btn-primary">🚀 Ücretsiz Başla</a>
+            <a href="{% url 'login' %}" class="btn btn-outline">Giriş Yap →</a>
         </div>
-    </div>
+    </section>
 
-    <!-- Floating Ticker Bar -->
-    <div class="ticker-wrapper">
-        <div class="ticker">
-            <div class="ticker-item">
-                <div class="ticker-number">500+</div>
-                <div class="ticker-label">Ders Notu</div>
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">10+</div>
+                <div class="stat-label">Üniversite</div>
             </div>
-            <div class="ticker-item">
-                <div class="ticker-number">1000+</div>
-                <div class="ticker-label">Aktif Öğrenci</div>
+            <div class="stat-card">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Ders Notu</div>
             </div>
-            <div class="ticker-item">
-                <div class="ticker-number">10+</div>
-                <div class="ticker-label">Üniversite</div>
+            <div class="stat-card">
+                <div class="stat-number">1K+</div>
+                <div class="stat-label">Aktif Öğrenci</div>
             </div>
-            <div class="ticker-item">
-                <div class="ticker-number">2.5K+</div>
-                <div class="ticker-label">İndirme</div>
-            </div>
-            <!-- Duplicate for seamless loop -->
-            <div class="ticker-item">
-                <div class="ticker-number">500+</div>
-                <div class="ticker-label">Ders Notu</div>
-            </div>
-            <div class="ticker-item">
-                <div class="ticker-number">1000+</div>
-                <div class="ticker-label">Aktif Öğrenci</div>
-            </div>
-            <div class="ticker-item">
-                <div class="ticker-number">10+</div>
-                <div class="ticker-label">Üniversite</div>
-            </div>
-            <div class="ticker-item">
-                <div class="ticker-number">2.5K+</div>
-                <div class="ticker-label">İndirme</div>
+            <div class="stat-card">
+                <div class="stat-number">4.9⭐</div>
+                <div class="stat-label">Ortalama Puan</div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Hero Visual Cards -->
-    <div class="hero-visual">
-        <div class="glass-card card-1">
-            <div class="card-header">
-                <span class="card-title">📊 Veri Yapıları</span>
-                <span class="card-badge">✓ Onaylı</span>
-            </div>
-            <div class="card-content">
-                Final sınav notları ve özet dökümanı. Binary tree implementasyonu ile ilgili detaylı açıklamalar...
-            </div>
-            <div class="card-stats">
-                <div class="stat">
-                    <span class="stat-icon">⭐</span>
-                    <span>234</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-icon">📥</span>
-                    <span>1.2K</span>
-                </div>
-            </div>
+    <!-- Preview Cards Section -->
+    <section class="preview-section">
+        <div class="section-header">
+            <h2 class="section-title">Neler Bulabilirsin?</h2>
+            <p class="section-description">
+                Binlerce kaliteli ders notuna anında ulaş. Tüm notlar öğrenci topluluğu tarafından paylaşılıyor ve onaylanıyor.
+            </p>
         </div>
 
-        <div class="glass-card card-2">
-            <div class="card-header">
-                <span class="card-title">🧮 Diferansiyel</span>
-                <span class="card-badge">Popüler</span>
-            </div>
-            <div class="card-content">
-                Türev ve integral formülleri özet tablosu. Tüm sınav soruları ve çözümleri dahil...
-            </div>
-            <div class="card-stats">
-                <div class="stat">
-                    <span class="stat-icon">⭐</span>
-                    <span>189</span>
+        <div class="preview-grid">
+            <div class="preview-card">
+                <div class="preview-header">
+                    <span class="preview-title">📊 Veri Yapıları</span>
+                    <span class="preview-badge">✓ Onaylı</span>
                 </div>
-                <div class="stat">
-                    <span class="stat-icon">📥</span>
-                    <span>856</span>
+                <div class="preview-content">
+                    Final sınav notları ve özet dökümanı. Binary tree implementasyonu ile ilgili detaylı açıklamalar...
+                </div>
+                <div class="preview-stats">
+                    <div class="preview-stat">
+                        <span class="preview-stat-icon">⭐</span>
+                        <span>234</span>
+                    </div>
+                    <div class="preview-stat">
+                        <span class="preview-stat-icon">📥</span>
+                        <span>1.2K</span>
+                    </div>
                 </div>
             </div>
+
+            <div class="preview-card">
+                <div class="preview-header">
+                    <span class="preview-title">🧮 Diferansiyel</span>
+                    <span class="preview-badge">Popüler</span>
+                </div>
+                <div class="preview-content">
+                    Türev ve integral formülleri özet tablosu. Tüm sınav soruları ve çözümleri dahil...
+                </div>
+                <div class="preview-stats">
+                    <div class="preview-stat">
+                        <span class="preview-stat-icon">⭐</span>
+                        <span>189</span>
+                    </div>
+                    <div class="preview-stat">
+                        <span class="preview-stat-icon">📥</span>
+                        <span>856</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-card">
+                <div class="preview-header">
+                    <span class="preview-title">🎨 UI/UX Tasarım</span>
+                    <span class="preview-badge">Yeni</span>
+                </div>
+                <div class="preview-content">
+                    Figma prototipleri ve tasarım prensipleri özeti. Örnek vakalar ve best practices...
+                </div>
+                <div class="preview-stats">
+                    <div class="preview-stat">
+                        <span class="preview-stat-icon">⭐</span>
+                        <span>92</span>
+                    </div>
+                    <div class="preview-stat">
+                        <span class="preview-stat-icon">📥</span>
+                        <span>445</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="section-header">
+            <h2 class="section-title">Neden Bizimle Başlamalısın?</h2>
+            <p class="section-description">
+                Akademik başarını destekleyen, topluluğunla bağlantı kurmana yardımcı olan güçlü özellikler.
+            </p>
         </div>
 
-        <div class="glass-card card-3">
-            <div class="card-header">
-                <span class="card-title">🎨 UI/UX Tasarım</span>
-                <span class="card-badge">Yeni</span>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Anında Erişim</h3>
+                <p class="feature-description">Tüm notlara hızlı ve organize bir şekilde ulaş. Kategorik yapı sayesinde aradığın dersi saniyeler içinde bul.</p>
             </div>
-            <div class="card-content">
-                Figma prototipleri ve tasarım prensipleri özeti. Örnek vakalar ve best practices...
+
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Puan Sistemi</h3>
+                <p class="feature-description">Her katkın puan kazandırır. Seviyeni yükselt, lider tablolarında yerini al ve özel ödülleri kap.</p>
             </div>
-            <div class="card-stats">
-                <div class="stat">
-                    <span class="stat-icon">⭐</span>
-                    <span>92</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-icon">📥</span>
-                    <span>445</span>
+
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3 class="feature-title">Topluluk</h3>
+                <p class="feature-description">Not sahipleriyle direkt iletişim kur, sorularını sor, deneyimlerini paylaş. Akademik ağını genişlet.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3 class="feature-title">Akıllı Arama</h3>
+                <p class="feature-description">Gelişmiş filtreleme ve arama algoritmaları ile tam ihtiyacın olan içeriği bul. Zaman kaybetme.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">✓</div>
+                <h3 class="feature-title">Doğrulanmış İçerik</h3>
+                <p class="feature-description">Topluluk onayı ve moderasyon sistemiyle kaliteli, güvenilir notlara ulaş. Hatalı içerikten uzak dur.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Güvenli Platform</h3>
+                <p class="feature-description">Verileriniz SSL ile korunur. Gizliliğiniz bizim için öncelik. 7/24 destek ekibimiz yanınızda.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-box">
+            <div class="cta-content">
+                <h2 class="cta-title">Hemen Başla</h2>
+                <p class="cta-description">
+                    Binlerce öğrenci zaten notlarını paylaşıyor ve topluluğun bir parçası oluyor. Sıra sende!
+                </p>
+                <div class="hero-buttons">
+                    <a href="{% url 'register' %}" class="btn btn-primary">🎓 Ücretsiz Kayıt Ol</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline">Giriş Yap</a>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+<div class="version-info">
+    UniEduNote · v1.0.1
+</div>
 </div>
 {% endblock %}
