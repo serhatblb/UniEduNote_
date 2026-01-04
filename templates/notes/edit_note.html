@@ -1,7 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Notu Düzenle{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
 <style>
     .edit-container {
         max-width: 650px;
@@ -9,26 +12,40 @@
         animation: fadeInUp 0.6s ease;
     }
 
+    .edit-header {
+        margin-bottom: var(--spacing-xl);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
+
+    .edit-header h2 {
+        color: var(--primary-purple);
+        font-weight: 900;
+        font-size: 1.8rem;
+        letter-spacing: -0.02em;
+        margin: 0;
+    }
+
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: var(--spacing-md);
     }
 
     .form-group label {
         display: block;
         font-weight: 700;
-        margin-bottom: 8px;
-        color: var(--text-dark);
+        margin-bottom: var(--spacing-xs);
+        color: var(--text-primary);
         font-size: 0.95rem;
-        letter-spacing: -0.3px;
     }
 
     .form-group input[type="text"],
     .form-group textarea {
         width: 100%;
         padding: 14px 18px;
-        border-radius: 14px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        background: rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: var(--bg-glass-light);
         backdrop-filter: blur(10px);
         font-size: 1rem;
         font-family: inherit;
@@ -39,52 +56,62 @@
     .form-group input:focus,
     .form-group textarea:focus {
         outline: none;
-        border-color: var(--primary);
+        border-color: var(--primary-purple);
         background: white;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
     }
 
     .form-group input[type="file"] {
         background: white;
         padding: 12px;
-        border-radius: 14px;
-        border: 2px dashed var(--primary);
+        border-radius: var(--radius-md);
+        border: 2px dashed var(--primary-purple);
         width: 100%;
         cursor: pointer;
         font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input[type="file"]:hover {
+        border-color: var(--primary-dark-purple);
+        background: rgba(102, 126, 234, 0.05);
     }
 
     .button-row {
         display: flex;
-        gap: 12px;
-        margin-top: 30px;
+        gap: var(--spacing-sm);
+        margin-top: var(--spacing-xl);
     }
 
     .btn-submit {
         flex: 1;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%);
         color: white;
         padding: 15px;
         border: none;
-        border-radius: 14px;
+        border-radius: var(--radius-md);
         font-weight: 800;
         font-size: 1.05rem;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        box-shadow: var(--shadow-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--spacing-xs);
     }
 
     .btn-submit:hover {
         transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        box-shadow: var(--shadow-lg);
     }
 
     .btn-cancel {
         flex: 1;
         background: rgba(0, 0, 0, 0.06);
-        color: var(--text-dark);
+        color: var(--text-primary);
         padding: 15px;
-        border-radius: 14px;
+        border-radius: var(--radius-md);
         font-weight: 700;
         font-size: 1.05rem;
         text-align: center;
@@ -93,6 +120,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: var(--spacing-xs);
     }
 
     .btn-cancel:hover {
@@ -100,29 +128,24 @@
         transform: translateY(-2px);
     }
 
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
+    /* Responsive - Mobile First */
     @media (max-width: 768px) {
         .button-row {
             flex-direction: column;
+        }
+
+        .edit-header h2 {
+            font-size: 1.5rem;
         }
     }
 </style>
 
 <div class="edit-container">
-    <div class="glass" style="padding: 40px;">
-        <h2 style="color: var(--primary); margin-bottom: 30px; font-weight: 900; font-size: 1.8rem; letter-spacing: -1px; display: flex; align-items: center; gap: 12px;">
-            <i class="fa-solid fa-pen-to-square"></i> Notu Düzenle
-        </h2>
+    <div class="glass" style="padding: var(--spacing-2xl);">
+        <div class="edit-header">
+            <i class="fa-solid fa-pen-to-square" style="font-size: 1.5rem; color: var(--primary-purple);"></i>
+            <h2>Notu Düzenle</h2>
+        </div>
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}

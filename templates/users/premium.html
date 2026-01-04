@@ -1,36 +1,172 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Premium Üyelik{% endblock %}
+
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
 <style>
-    .pricing-container { text-align: center; max-width: 900px; margin: 0 auto; }
-    .pricing-cards { display: flex; gap: 20px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
+    .pricing-container {
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .pricing-header {
+        margin-bottom: var(--spacing-2xl);
+    }
+
+    .pricing-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: var(--spacing-sm);
+        font-weight: 900;
+        color: var(--text-primary);
+    }
+
+    .pricing-header p {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+    }
+
+    .pricing-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-lg);
+        margin-top: var(--spacing-2xl);
+    }
 
     .price-card {
-        background: white; padding: 40px; border-radius: 24px; width: 300px;
-        position: relative; transition: 0.3s;
-        border: 1px solid rgba(0,0,0,0.05);
+        background: white;
+        padding: var(--spacing-2xl);
+        border-radius: var(--radius-lg);
+        position: relative;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: var(--shadow-sm);
     }
-    .price-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+
+    .price-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+    }
 
     .card-pro {
-        background: linear-gradient(135deg, #007AFF, #0051ff); color: white;
-        transform: scale(1.05); border: none; box-shadow: 0 10px 30px rgba(0,122,255,0.3);
+        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%);
+        color: white;
+        transform: scale(1.05);
+        border: none;
+        box-shadow: var(--shadow-lg);
     }
 
-    .price { font-size: 3rem; font-weight: 800; margin: 20px 0; }
-    .features { list-style: none; padding: 0; margin: 30px 0; text-align: left; }
-    .features li { margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .card-pro h3,
+    .card-pro .price,
+    .card-pro .features li {
+        color: white;
+    }
+
+    .popular-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: var(--warning);
+        color: black;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        font-size: 0.8rem;
+        font-weight: 800;
+    }
+
+    .price-card h3 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: var(--spacing-md);
+        color: var(--text-primary);
+    }
+
+    .price {
+        font-size: 3rem;
+        font-weight: 800;
+        margin: var(--spacing-md) 0;
+        color: var(--text-primary);
+    }
+
+    .price span {
+        font-size: 1rem;
+        opacity: 0.8;
+    }
+
+    .features {
+        list-style: none;
+        padding: 0;
+        margin: var(--spacing-xl) 0;
+        text-align: left;
+    }
+
+    .features li {
+        margin-bottom: var(--spacing-sm);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
 
     .btn-buy {
-        width: 100%; padding: 15px; border-radius: 12px; font-weight: 700; border: none; cursor: pointer;
+        width: 100%;
+        padding: 15px;
+        border-radius: var(--radius-md);
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
     }
-    .btn-white { background: white; color: #007AFF; }
-    .btn-dark { background: #1D1D1F; color: white; }
+
+    .btn-white {
+        background: white;
+        color: var(--primary-purple);
+    }
+
+    .btn-white:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-dark {
+        background: var(--text-primary);
+        color: white;
+    }
+
+    .btn-dark:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Responsive - Mobile First */
+    @media (max-width: 768px) {
+        .pricing-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .card-pro {
+            transform: scale(1);
+        }
+
+        .pricing-header h1 {
+            font-size: 2rem;
+        }
+
+        .price {
+            font-size: 2.5rem;
+        }
+    }
 </style>
 
 <div class="pricing-container">
-    <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Akademik Kariyerine Yatırım Yap 🚀</h1>
-    <p style="color: #86868B;">Sınırsız bilgiye erişim sağla, rakiplerinin önüne geç.</p>
+    <div class="pricing-header">
+        <h1>Akademik Kariyerine Yatırım Yap 🚀</h1>
+        <p>Sınırsız bilgiye erişim sağla, rakiplerinin önüne geç.</p>
+    </div>
 
     <div class="pricing-cards">
         <!-- Ücretsiz -->
@@ -48,9 +184,9 @@
 
         <!-- Premium -->
         <div class="price-card card-pro">
-            <div style="position: absolute; top: 15px; right: 15px; background: #FFD60A; color: black; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 800;">POPÜLER</div>
+            <div class="popular-badge">POPÜLER</div>
             <h3>UniEdu Pro</h3>
-            <div class="price">₺49<span style="font-size: 1rem; opacity: 0.8">/ay</span></div>
+            <div class="price">₺49<span>/ay</span></div>
             <ul class="features">
                 <li>✨ <strong>Sınırsız</strong> İndirme</li>
                 <li>🚀 <strong>2x Hızlı</strong> İndirme</li>
