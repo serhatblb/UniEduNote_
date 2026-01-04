@@ -14,7 +14,7 @@
     }
 
     /* Filtre Alanı */
-    /* Filtre Alanı - Kompakt Versiyon */
+    /* Filtre Alanı - Yatay Kompakt Versiyon */
     .filter-section {
         margin-bottom: var(--spacing-lg);
         padding: var(--spacing-md);
@@ -33,14 +33,17 @@
     
     .filter-form {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: flex-end;
         gap: var(--spacing-sm);
+        flex-wrap: wrap;
     }
     
-    /* Arama Input Wrapper */
+    /* Arama Input Wrapper - Yatay */
     .search-input-wrapper {
         position: relative;
-        width: 100%;
+        flex: 1;
+        min-width: 200px;
     }
     
     .search-input-wrapper .search-icon {
@@ -64,6 +67,7 @@
         color: var(--text-primary);
         transition: all 0.3s ease;
         height: 40px;
+        box-sizing: border-box;
     }
     
     .search-input-wrapper input:focus {
@@ -73,23 +77,18 @@
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
     
-    /* Akademik Hiyerarşi Wrapper - Yan yana, kompakt */
+    /* Akademik Hiyerarşi Wrapper - Yatay, yan yana */
     .academic-hierarchy-wrapper {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        display: flex;
+        flex-direction: row;
         gap: var(--spacing-xs);
+        flex: 1;
+        min-width: 0;
     }
     
-    @media (max-width: 1200px) {
-        .academic-hierarchy-wrapper {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .academic-hierarchy-wrapper {
-            grid-template-columns: 1fr;
-        }
+    .academic-hierarchy-wrapper .form-group {
+        flex: 1;
+        min-width: 150px;
     }
     
     .academic-hierarchy-wrapper .form-group {
@@ -101,7 +100,7 @@
         margin-bottom: 4px;
         font-weight: 600;
         color: var(--text-primary);
-        font-size: 0.8rem;
+        font-size: 0.75rem;
     }
     
     .academic-hierarchy-wrapper label .required {
@@ -147,16 +146,16 @@
         background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%) !important;
     }
     
-    /* Filtre Butonları */
+    /* Filtre Butonları - Yatay */
     .filter-buttons {
         display: flex;
-        gap: var(--spacing-sm);
-        justify-content: flex-end;
+        gap: var(--spacing-xs);
+        flex-shrink: 0;
     }
     
     .filter-btn,
     .filter-btn-reset {
-        padding: 10px 20px;
+        padding: 10px 18px;
         font-size: 0.85rem;
         font-weight: 700;
         border-radius: var(--radius-md);
@@ -168,6 +167,7 @@
         align-items: center;
         gap: var(--spacing-xs);
         height: 40px;
+        white-space: nowrap;
     }
     
     .filter-btn {
@@ -189,19 +189,6 @@
     .filter-btn-reset:hover {
         background: var(--error);
         color: white;
-    }
-    
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-        .filter-buttons {
-            flex-direction: column;
-        }
-    
-        .filter-btn,
-        .filter-btn-reset {
-            width: 100%;
-            justify-content: center;
-        }
     }
 
     /* Sıralama Butonları */
@@ -416,22 +403,31 @@
         }
 
         .filter-form {
-            grid-template-columns: 1fr;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-input-wrapper {
+            min-width: 100%;
         }
 
         .academic-hierarchy-wrapper {
-            grid-template-columns: 1fr;
-            gap: var(--spacing-sm);
-        }
-
-        .filter-buttons {
             flex-direction: column;
             width: 100%;
         }
 
+        .academic-hierarchy-wrapper .form-group {
+            min-width: 100%;
+        }
+
+        .filter-buttons {
+            width: 100%;
+            justify-content: stretch;
+        }
+
         .filter-btn,
         .filter-btn-reset {
-            width: 100%;
+            flex: 1;
         }
 
         .filter-btn,
