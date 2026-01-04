@@ -24,10 +24,24 @@ User = get_user_model()
 
 
 # ✅ Kullanıcı Kaydı (API)
+from uniedunote.rate_limit import check_rate_limit, get_client_ip
+from uniedunote.logger_config import get_logger, sanitize_log_data
+
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        logger = get_logger('uniedunote')
+        
+        # Rate limit kontrolü
+        is_allowed, error_msg, wait_time = check_rate_limit(request, 'register')
+        if not is_allowed:
+            logger.warning(f"Rate limit aşıldı (register) - IP: {get_client_ip(request)}")
+            return Response({
+                'error': error_msg,
+                'wait_time': wait_time
+            }, status=429)
+        
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save(is_active=False)
@@ -38,8 +52,12 @@ class RegisterAPIView(APIView):
             activation_link = f"{settings.BACKEND_BASE_URL}/activate/{uid}/{token}/"
 
             send_activation_email(user, activation_link)
+            
+            logger.info(f"Yeni kullanıcı kaydı - Kullanıcı: {user.username}, Email: {user.email}, IP: {get_client_ip(request)}")
 
             return Response({"message": "Kayıt başarılı! Aktivasyon e-postası gönderildi."}, status=201)
+        
+        logger.warning(f"Geçersiz kayıt denemesi - IP: {get_client_ip(request)}, Hatalar: {sanitize_log_data(serializer.errors)}")
         return Response(serializer.errors, status=400)
 
 
@@ -148,11 +166,24 @@ class SessionLoginAPIView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
+        from uniedunote.logger_config import get_logger, sanitize_log_data
+        logger = get_logger('uniedunote.security')
+        
+        # Rate limit kontrolü
+        is_allowed, error_msg, wait_time = check_rate_limit(request, 'login')
+        if not is_allowed:
+            logger.warning(f"Rate limit aşıldı - IP: {get_client_ip(request)}")
+            return Response({
+                'error': error_msg,
+                'wait_time': wait_time
+            }, status=429)
+        
         try:
             login_input = request.data.get("username")  # Bu email de olabilir, username de
             password = request.data.get("password")
 
             if not login_input or not password:
+                logger.warning(f"Eksik giriş bilgisi - IP: {get_client_ip(request)}")
                 return Response({"error": "Kullanıcı adı ve şifre zorunlu"}, status=400)
 
             # --- Zeka Burada: Email mi Username mi? ---
@@ -170,11 +201,14 @@ class SessionLoginAPIView(APIView):
 
             if user and user.is_active:
                 login(request, user)
+                logger.info(f"Başarılı giriş - Kullanıcı: {user.username}, IP: {get_client_ip(request)}")
                 return Response({"message": "Login başarılı", "username": user.username})
             else:
+                logger.warning(f"Başarısız giriş denemesi - Kullanıcı: {login_input}, IP: {get_client_ip(request)}")
                 return Response({"error": "Giriş bilgileri hatalı!"}, status=401)
 
         except Exception as e:
+            logger.error(f"Giriş hatası - IP: {get_client_ip(request)}, Hata: {str(e)}", exc_info=True)
             return Response({"error": str(e)}, status=400)
 
 # ✅ Profil Güncelleme (JWT zorunlu)

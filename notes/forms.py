@@ -1,6 +1,7 @@
 from django import forms
 from .models import Note
 from django.core.exceptions import ValidationError
+from uniedunote.file_security import get_file_validation_error
 
 
 class NoteForm(forms.ModelForm):
@@ -11,15 +12,7 @@ class NoteForm(forms.ModelForm):
     def clean_file(self):
         file = self.cleaned_data.get('file')
         if file:
-            # İzin verilen uzantılar
-            allowed_extensions = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'jpg', 'jpeg', 'png', 'zip', 'rar']
-            ext = file.name.split('.')[-1].lower()
-
-            if ext not in allowed_extensions:
-                raise ValidationError("Sadece belge ve görsel yükleyebilirsiniz. Video yüklenemez.")
-
-            # Boyut kontrolü (Örn: 20MB)
-            if file.size > 20 * 1024 * 1024:
-                raise ValidationError("Dosya boyutu 20MB'dan büyük olamaz.")
-
+            error_message = get_file_validation_error(file)
+            if error_message:
+                raise ValidationError(error_message)
         return file

@@ -74,7 +74,13 @@ def activate_account(request, uidb64, token):
         return redirect("register")
 
 
+from uniedunote.rate_limit import rate_limit_decorator, get_client_ip
+from uniedunote.logger_config import get_logger
+
+@rate_limit_decorator('login')
 def login_view(request):
+    logger = get_logger('uniedunote.security')
+    
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -82,8 +88,10 @@ def login_view(request):
 
         if user and user.is_active:
             login(request, user)
+            logger.info(f"Başarılı giriş (web) - Kullanıcı: {user.username}, IP: {get_client_ip(request)}")
             return redirect("dashboard")
         else:
+            logger.warning(f"Başarısız giriş denemesi (web) - Kullanıcı: {username}, IP: {get_client_ip(request)}")
             messages.error(request, "Kullanıcı adı veya şifre hatalı ya da hesap aktif değil.")
     return render(request, "users/login.html")
 

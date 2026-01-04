@@ -12,15 +12,24 @@ from django.http import JsonResponse
 from users.models import Notification
 
 # 📤 Not yükleme
+from uniedunote.rate_limit import rate_limit_decorator, get_client_ip
+from uniedunote.logger_config import get_logger
+
 @login_required
+@rate_limit_decorator('upload')
 def upload_note(request):
+    logger = get_logger('uniedunote')
+    
     if request.method == 'POST':
         form = NoteForm(request.POST, request.FILES)
         if form.is_valid():
             note = form.save(commit=False)
             note.user = request.user
             note.save()
+            logger.info(f"Not yüklendi - Kullanıcı: {request.user.username}, Not: {note.title}, IP: {get_client_ip(request)}")
             return redirect('note_list')
+        else:
+            logger.warning(f"Geçersiz not yükleme denemesi - Kullanıcı: {request.user.username}, IP: {get_client_ip(request)}, Hatalar: {form.errors}")
     else:
         form = NoteForm()
     return render(request, 'notes/upload_note.html', {'form': form})
@@ -30,6 +39,8 @@ def upload_note(request):
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def note_list(request):
+    from django.db.models import Q
+    
     sort_by = request.GET.get('sort', 'newest')
 
     if sort_by == 'popular':
@@ -44,8 +55,18 @@ def note_list(request):
         'user', 'university', 'faculty', 'department', 'course'
     ).prefetch_related(
         'comments', 'likes_set'
-    ).order_by(ordering)
+    )
 
+    # Text bazlı arama (büyük/küçük harf duyarsız)
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        notes = notes.filter(
+            Q(title__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(course__name__icontains=search_query)
+        )
+
+    # Filtreleme (mevcut filtreler)
     university = request.GET.get('university')
     department = request.GET.get('department')
     course = request.GET.get('course')
@@ -56,6 +77,9 @@ def note_list(request):
         notes = notes.filter(department__id=department)
     if course:
         notes = notes.filter(course__id=course)
+
+    # Sıralama
+    notes = notes.order_by(ordering)
 
     # Pagination: Sayfa başına 20 not
     paginator = Paginator(notes, 20)
@@ -78,6 +102,7 @@ def note_list(request):
         'departments': departments,
         'courses': courses,
         'sort_by': sort_by,
+        'search_query': search_query,  # Arama sorgusu template'e gönder
     }
     request.session['last_notes_list_url'] = request.get_full_path()
     return render(request, 'notes/note_list.html', context)
@@ -125,13 +150,23 @@ def dashboard(request):
 # ✏️ Not düzenleme
 @login_required(login_url="/login/")
 def edit_note(request, pk):
+    logger = get_logger('uniedunote')
     note = get_object_or_404(Note, pk=pk, user=request.user)
     if request.method == "POST":
         note.title = request.POST.get("title")
         note.description = request.POST.get("description")
         if "file" in request.FILES:
-            note.file = request.FILES["file"]
+            new_file = request.FILES["file"]
+            # Dosya validasyonu
+            from uniedunote.file_security import get_file_validation_error
+            error_message = get_file_validation_error(new_file)
+            if error_message:
+                logger.warning(f"Geçersiz dosya yükleme (edit) - Kullanıcı: {request.user.username}, Not: {note.id}, Hata: {error_message}")
+                messages.error(request, error_message)
+                return render(request, "notes/edit_note.html", {"note": note})
+            note.file = new_file
         note.save()
+        logger.info(f"Not güncellendi - Kullanıcı: {request.user.username}, Not: {note.id}")
         messages.success(request, "Not başarıyla güncellendi.")
         return redirect("note_detail", pk=note.pk)
     return render(request, "notes/edit_note.html", {"note": note})

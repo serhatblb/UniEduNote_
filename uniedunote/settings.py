@@ -97,6 +97,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "uniedunote.middleware.GlobalExceptionLoggingMiddleware",  # Global exception logging
 ]
 
 ROOT_URLCONF = "uniedunote.urls"
@@ -225,3 +226,12 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000  # 1 yıl
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# ------------------------------------------------------------------
+# LOGGING YAPILANDIRMASI
+# ------------------------------------------------------------------
+from uniedunote.logger_config import LOGGING_CONFIG
+LOGGING = LOGGING_CONFIG
+
+# SUPPORT EMAIL
+SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", "ai.serhat78@gmail.com")
