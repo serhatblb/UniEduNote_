@@ -13,95 +13,349 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
     <style>
-        :root {
-            --primary: #007AFF;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --text-dark: #1D1D1F;
-            --text-gray: #86868B;
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
-            --bg-color: #F2F2F7;
-            --success: #34C759;
-            --error: #FF3B30;
-            --warning: #FF9500;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-
+        /* Base Layout Stilleri */
         body {
             background-color: var(--bg-color);
-            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
+            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,0.05) 0, transparent 50%), 
+                            radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
+                            radial-gradient(at 100% 0%, hsla(339,49%,30%,0.05) 0, transparent 50%);
             background-size: cover;
             background-attachment: fixed;
-            color: var(--text-dark);
             min-height: 100vh;
         }
 
-        a { text-decoration: none; color: inherit; }
-        .glass { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: var(--shadow); border-radius: 24px; }
-
-        .app-container { display: flex; min-height: 100vh; }
+        .app-container { 
+            display: flex; 
+            min-height: 100vh; 
+        }
 
         /* Sidebar */
-        .sidebar { width: 260px; height: 100vh; position: fixed; top: 0; left: 0; display: flex; flex-direction: column; padding: 24px; z-index: 1000; border-right: 1px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.7); backdrop-filter: blur(30px); }
-        .logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
-        .menu-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 8px; color: var(--text-gray); border-radius: 16px; font-weight: 600; transition: 0.2s ease; }
-        .menu-item:hover, .menu-item.active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .sidebar { 
+            width: 260px; 
+            height: 100vh; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            display: flex; 
+            flex-direction: column; 
+            padding: var(--spacing-lg); 
+            z-index: 1000; 
+            border-right: 1px solid rgba(255,255,255,0.5); 
+            background: var(--bg-glass); 
+            backdrop-filter: blur(30px); 
+        }
+
+        .logo { 
+            font-size: 1.4rem; 
+            font-weight: 800; 
+            color: var(--primary-purple); 
+            margin-bottom: var(--spacing-2xl); 
+            display: flex; 
+            align-items: center; 
+            gap: var(--spacing-sm); 
+        }
+
+        .menu-item { 
+            display: flex; 
+            align-items: center; 
+            gap: var(--spacing-sm); 
+            padding: var(--spacing-sm) var(--spacing-md); 
+            margin-bottom: var(--spacing-xs); 
+            color: var(--text-secondary); 
+            border-radius: var(--radius-md); 
+            font-weight: 600; 
+            transition: all 0.2s ease; 
+        }
+
+        .menu-item:hover, 
+        .menu-item.active { 
+            background: white; 
+            color: var(--primary-purple); 
+            box-shadow: var(--shadow-sm); 
+        }
 
         /* İçerik */
-        .main-content { flex: 1; padding: 30px; max-width: 1400px; width: 100%; }
-        .main-content.authenticated { margin-left: 260px; padding-bottom: 100px; }
-        .main-content.guest { margin-left: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .main-content { 
+            flex: 1; 
+            padding: var(--spacing-xl); 
+            max-width: 1400px; 
+            width: 100%; 
+        }
+
+        .main-content.authenticated { 
+            margin-left: 260px; 
+            padding-bottom: 100px; 
+        }
+
+        .main-content.guest { 
+            margin-left: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        /* Header Bar */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            width: 100%;
+        }
+
+        .header-greeting h2 {
+            font-weight: 800;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .header-greeting p {
+            color: var(--text-secondary);
+            margin: var(--spacing-xs) 0 0;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .notification-btn {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            background: var(--error);
+            border-radius: 50%;
+            display: none;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 320px;
+            padding: var(--spacing-md);
+            z-index: 9999;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+
+        .notification-dropdown h4 {
+            margin: 0 0 var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .notification-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .profile-link {
+            background: white;
+            padding: 8px 15px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .profile-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-link span {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
 
         /* Mobil Nav */
-        .mobile-nav { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 70px; justify-content: space-around; align-items: center; z-index: 2000; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        .nav-icon { color: #999; font-size: 1.4rem; padding: 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
-        .nav-icon.active { color: var(--primary); }
-        .add-btn-mobile { background: var(--primary); color: white; border-radius: 50%; width: 54px; height: 54px; display: flex; justify-content: center; align-items: center; margin-bottom: 40px; box-shadow: 0 8px 20px rgba(0,122,255,0.4); font-size: 1.5rem; }
-        /* Mobilde görünen çıkış butonu */
-.mobile-logout-btn {
-    display: none; /* Masaüstünde gizli */
-    padding: 10px;
-    border-radius: 50%;
-    color: #FF3B30; /* Kırmızı */
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    margin-left: 10px;
-}
+        .mobile-nav { 
+            display: none; 
+            position: fixed; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 90%; 
+            max-width: 400px; 
+            height: 70px; 
+            justify-content: space-around; 
+            align-items: center; 
+            z-index: 2000; 
+            background: var(--bg-glass-light); 
+            backdrop-filter: blur(20px); 
+            border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow-lg); 
+        }
 
-@media (max-width: 992px) {
-    .mobile-logout-btn {
-        display: flex; /* Mobilde göster */
-    }
-}
-        .alert-box { padding: 15px; border-radius: 16px; margin-bottom: 20px; width: 100%; background: white; border-left: 5px solid; }
-        .alert-success { border-color: #34C759; color: #1F7A38; }
-        .alert-error { border-color: #FF3B30; color: #C0392B; }
+        .nav-icon { 
+            color: var(--text-light); 
+            font-size: 1.4rem; 
+            padding: var(--spacing-sm); 
+            border-radius: var(--radius-sm); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            transition: all 0.3s ease;
+        }
 
-        /* Bildirim Dropdown (CSS Fix: Z-Index Artırıldı) */
-        #notif-dropdown {
-            position: absolute; top: 60px; right: 0; width: 320px;
-            background: rgba(255,255,255,0.98); backdrop-filter: blur(20px);
-            padding: 0; z-index: 9999 !important; border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.8);
+        .nav-icon.active { 
+            color: var(--primary-purple); 
+        }
+
+        .add-btn-mobile { 
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%); 
+            color: white; 
+            border-radius: 50%; 
+            width: 54px; 
+            height: 54px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin-bottom: 40px; 
+            box-shadow: var(--shadow-md); 
+            font-size: 1.5rem; 
+        }
+
+        .mobile-logout-btn {
+            display: none;
+            padding: var(--spacing-sm);
+            border-radius: 50%;
+            color: var(--error);
+            background: var(--bg-glass);
+            box-shadow: var(--shadow-sm);
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            margin-left: var(--spacing-sm);
+        }
+
+        /* Alert Boxes */
+        .alert-box { 
+            padding: var(--spacing-md); 
+            border-radius: var(--radius-md); 
+            margin-bottom: var(--spacing-md); 
+            width: 100%; 
+            background: white; 
+            border-left: 5px solid; 
+        }
+
+        .alert-success { 
+            border-color: var(--success); 
+            color: #1F7A38; 
+        }
+
+        .alert-error { 
+            border-color: var(--error); 
+            color: #C0392B; 
+        }
+
+        .alert-warning {
+            border-color: var(--warning);
+            color: #B8860B;
+        }
+
+        .alert-info {
+            border-color: var(--info);
+            color: #0056b3;
         }
 
         /* Select2 Style */
-        .select2-container .select2-selection--single { height: 50px !important; border-radius: 16px !important; border: 1px solid rgba(255, 255, 255, 0.6) !important; background: rgba(255, 255, 255, 0.6) !important; display: flex !important; align-items: center !important; }
-        .select2-dropdown { border-radius: 16px !important; border: none !important; box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important; background: rgba(255, 255, 255, 0.95) !important; }
-
-        @media (max-width: 992px) {
-            .sidebar { display: none; }
-            .main-content.authenticated { margin-left: 0; padding: 20px; padding-bottom: 100px; }
-            .mobile-nav { display: flex; }
-
-            #notif-dropdown { position: fixed !important; bottom: 80px; right: 10px; left: 10px; width: auto !important; top: auto !important; }
+        .select2-container .select2-selection--single { 
+            height: 50px !important; 
+            border-radius: var(--radius-md) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.6) !important; 
+            background: var(--bg-glass) !important; 
+            display: flex !important; 
+            align-items: center !important; 
         }
-        @media (min-width: 993px) { .mobile-nav { display: none; } }
+
+        .select2-dropdown { 
+            border-radius: var(--radius-md) !important; 
+            border: none !important; 
+            box-shadow: var(--shadow-lg) !important; 
+            background: var(--bg-glass-light) !important; 
+        }
+
+        /* Responsive - Mobile First */
+        @media (max-width: 992px) {
+            .sidebar { 
+                display: none; 
+            }
+
+            .main-content.authenticated { 
+                margin-left: 0; 
+                padding: var(--spacing-md); 
+                padding-bottom: 100px; 
+            }
+
+            .mobile-nav { 
+                display: flex; 
+            }
+
+            .mobile-logout-btn {
+                display: flex;
+            }
+
+            .notification-dropdown { 
+                position: fixed !important; 
+                bottom: 80px; 
+                right: 10px; 
+                left: 10px; 
+                width: auto !important; 
+                top: auto !important; 
+            }
+
+            .header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-md);
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .profile-link span {
+                display: none;
+            }
+        }
+
+        @media (min-width: 993px) { 
+            .mobile-nav { 
+                display: none; 
+            }
+        }
     </style>
 </head>
 <body>
@@ -110,22 +364,40 @@
         <!-- SIDEBAR -->
         {% if user.is_authenticated %}
         <aside class="sidebar">
-            <div class="logo"><i class="fa-solid fa-graduation-cap"></i> UniEduNote</div>
+            <div class="logo">
+                <i class="fa-solid fa-graduation-cap"></i> UniEduNote
+            </div>
             <nav>
-                <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-grid-2"></i> Paneliniz</a>
-                <a href="{% url 'note_list' %}" class="menu-item {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-compass"></i> Keşfet</a>
-                <a href="{% url 'upload_note' %}" class="menu-item {% if 'upload' in request.path %}active{% endif %}"><i class="fa-solid fa-cloud-arrow-up"></i> Not Yükle</a>
-                <a href="{% url 'premium' %}" class="menu-item {% if 'premium' in request.path %}active{% endif %}" style="color: #FF9500;"><i class="fa-solid fa-crown"></i> Premium</a>
-                <a href="{% url 'chat_room' %}" class="menu-item {% if 'chat' in request.path %}active{% endif %}"><i class="fa-regular fa-comments"></i> Sohbet</a>
-                <a href="{% url 'profile' %}" class="menu-item {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i> Profil</a>
+                <a href="{% url 'dashboard' %}" class="menu-item {% if request.path == '/dashboard/' %}active{% endif %}">
+                    <i class="fa-solid fa-grid-2"></i> Paneliniz
+                </a>
+                <a href="{% url 'note_list' %}" class="menu-item {% if 'notes' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-compass"></i> Keşfet
+                </a>
+                <a href="{% url 'upload_note' %}" class="menu-item {% if 'upload' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Not Yükle
+                </a>
+                <a href="{% url 'premium' %}" class="menu-item {% if 'premium' in request.path %}active{% endif %}" style="color: var(--warning);">
+                    <i class="fa-solid fa-crown"></i> Premium
+                </a>
+                <a href="{% url 'chat_room' %}" class="menu-item {% if 'chat' in request.path %}active{% endif %}">
+                    <i class="fa-regular fa-comments"></i> Sohbet
+                </a>
+                <a href="{% url 'profile' %}" class="menu-item {% if 'profile' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-user"></i> Profil
+                </a>
             </nav>
             <div style="margin-top: auto;">
-                <a href="{% url 'contact' %}" class="menu-item"><i class="fa-solid fa-headset"></i> Destek</a>
-                <a href="{% url 'logout' %}" class="menu-item" style="color: #FF3B30;"><i class="fa-solid fa-right-from-bracket"></i> Çıkış</a>
+                <a href="{% url 'contact' %}" class="menu-item">
+                    <i class="fa-solid fa-headset"></i> Destek
+                </a>
+                <a href="{% url 'logout' %}" class="menu-item" style="color: var(--error);">
+                    <i class="fa-solid fa-right-from-bracket"></i> Çıkış
+                </a>
             </div>
 
             <!-- Reklam Alanı -->
-            <div style="margin-top: 20px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 12px; text-align: center; font-size: 0.8rem; color: #aaa; border: 1px dashed #ccc;">
+            <div style="margin-top: var(--spacing-md); padding: var(--spacing-sm); background: rgba(0,0,0,0.05); border-radius: var(--radius-sm); text-align: center; font-size: 0.8rem; color: var(--text-light); border: 1px dashed rgba(0,0,0,0.1);">
                 Reklam Alanı<br>(160x600)
             </div>
         </aside>
@@ -135,41 +407,42 @@
         <main class="main-content {% if user.is_authenticated %}authenticated{% else %}guest{% endif %}">
 
             {% if user.is_authenticated %}
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; width: 100%;">
-                <div>
-                    <h2 style="font-weight: 800; margin: 0;">Merhaba, {{ user.username|title }} 👋</h2>
-                    <p style="color: var(--text-gray); margin: 5px 0 0;">İyi çalışmalar dileriz.</p>
+            <div class="header-bar">
+                <div class="header-greeting">
+                    <h2>Merhaba, {{ user.username|title }} 👋</h2>
+                    <p>İyi çalışmalar dileriz.</p>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 15px;">
-
+                <div class="header-actions">
                     <!-- Bildirim Zili -->
-                    <div style="position: relative; cursor: pointer;" onclick="toggleNotifs()">
-                        <div class="glass" style="padding: 10px; border-radius: 50%;">
+                    <div class="notification-btn" onclick="toggleNotifs()">
+                        <div class="glass" style="padding: var(--spacing-sm); border-radius: 50%;">
                             <i class="fa-regular fa-bell" style="font-size: 1.2rem;"></i>
                         </div>
-                        <div id="notif-badge" style="position: absolute; top: 0; right: 0; width: 10px; height: 10px; background: #FF3B30; border-radius: 50%; display: none;"></div>
+                        <div id="notif-badge" class="notification-badge"></div>
 
                         <!-- Bildirim Kutusu -->
-                        <div id="notif-dropdown" class="glass" style="display: none;">
-                            <h4 style="margin: 0 0 10px;">Bildirimler</h4>
-                            <div id="notif-list" style="max-height: 200px; overflow-y: auto;">
-                                <p style="color: #999; font-size: 0.9rem;">Bildirim yok.</p>
+                        <div id="notif-dropdown" class="glass notification-dropdown">
+                            <h4>Bildirimler</h4>
+                            <div id="notif-list" class="notification-list">
+                                <p style="color: var(--text-light); font-size: 0.9rem;">Bildirim yok.</p>
                             </div>
                         </div>
                     </div>
-<a href="{% url 'logout' %}" class="mobile-logout-btn">
-    <i class="fa-solid fa-right-from-bracket"></i>
-</a>
-                    <a href="{% url 'profile' %}" style="background: white; padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow);" class="glass">
-                        <div style="width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+
+                    <a href="{% url 'logout' %}" class="mobile-logout-btn">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+
+                    <a href="{% url 'profile' %}" class="profile-link glass">
+                        <div class="profile-avatar">
                             {% if user.avatar %}
-                                <img src="{{ user.avatar.url }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                                <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
                             {% else %}
                                 {{ user.username|make_list|first|upper }}
                             {% endif %}
                         </div>
-                        <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark); display: none; md:display: block;">Hesabım</span>
+                        <span>Hesabım</span>
                     </a>
                 </div>
             </div>
@@ -190,11 +463,21 @@
     <!-- MOBİL ALT MENÜ -->
     {% if user.is_authenticated %}
     <div class="mobile-nav">
-        <a href="{% url 'dashboard' %}" class="nav-icon {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fa-solid fa-house"></i></a>
-        <a href="{% url 'note_list' %}" class="nav-icon {% if 'notes' in request.path %}active{% endif %}"><i class="fa-solid fa-magnifying-glass"></i></a>
-        <a href="{% url 'upload_note' %}" class="add-btn-mobile"><i class="fa-solid fa-plus"></i></a>
-        <a href="{% url 'chat_room' %}" class="nav-icon {% if 'chat' in request.path %}active{% endif %}"><i class="fa-regular fa-comments"></i></a>
-        <a href="{% url 'profile' %}" class="nav-icon {% if 'profile' in request.path %}active{% endif %}"><i class="fa-solid fa-user"></i></a>
+        <a href="{% url 'dashboard' %}" class="nav-icon {% if request.path == '/dashboard/' %}active{% endif %}">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <a href="{% url 'note_list' %}" class="nav-icon {% if 'notes' in request.path %}active{% endif %}">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </a>
+        <a href="{% url 'upload_note' %}" class="add-btn-mobile">
+            <i class="fa-solid fa-plus"></i>
+        </a>
+        <a href="{% url 'chat_room' %}" class="nav-icon {% if 'chat' in request.path %}active{% endif %}">
+            <i class="fa-regular fa-comments"></i>
+        </a>
+        <a href="{% url 'profile' %}" class="nav-icon {% if 'profile' in request.path %}active{% endif %}">
+            <i class="fa-solid fa-user"></i>
+        </a>
     </div>
     {% endif %}
 
@@ -210,27 +493,36 @@
             if (data.count > 0) {
                 badge.style.display = 'block';
                 list.innerHTML = data.notifications.map(n => `
-                    <div style="padding: 10px; border-bottom: 1px solid #eee;">
-                        <div style="font-size: 0.9rem;">${n.message}</div>
-                        <div style="font-size: 0.75rem; color: #999;">${n.created_at}</div>
+                    <div style="padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                        <div style="font-size: 0.9rem; color: var(--text-primary);">${n.message}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 4px;">${n.created_at}</div>
                     </div>
                 `).join('');
-            } else { badge.style.display = 'none'; }
-        } catch(e) {}
+            } else { 
+                badge.style.display = 'none'; 
+            }
+        } catch(e) {
+            console.error('Bildirim hatası:', e);
+        }
     }
+    
     function toggleNotifs() {
         const dropdown = document.getElementById('notif-dropdown');
-        dropdown.style.display = (dropdown.style.display === 'none') ? 'block' : 'none';
+        dropdown.style.display = (dropdown.style.display === 'none' || dropdown.style.display === '') ? 'block' : 'none';
         if (dropdown.style.display === 'block') {
             fetch('/api/notifications/read/');
             document.getElementById('notif-badge').style.display = 'none';
         }
     }
+    
     document.addEventListener('click', function(e) {
-        const btn = document.querySelector('.notif-btn'); // Kapsayıcıya tıklandıysa kapatma
+        const btn = document.querySelector('.notification-btn');
         const dropdown = document.getElementById('notif-dropdown');
-        if (btn && !btn.contains(e.target)) dropdown.style.display = 'none';
+        if (btn && !btn.contains(e.target) && dropdown) {
+            dropdown.style.display = 'none';
+        }
     });
+    
     setInterval(checkNotifications, 10000);
     checkNotifications();
     </script>

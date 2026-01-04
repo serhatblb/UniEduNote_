@@ -1,76 +1,110 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
 <style>
-    /* Dashboard Widget Stilleri */
-    .bento-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-        margin-bottom: 40px;
+    /* Dashboard Özel Stilleri */
+    .dashboard-container {
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
     }
 
-    .card {
-        padding: 24px;
+    /* Bento Grid - Dashboard Kartları */
+    .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-2xl);
+    }
+
+    .dashboard-card {
+        padding: var(--spacing-lg);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        transition: transform 0.2s ease;
         min-height: 200px;
-        position: relative;
+        transition: all 0.3s ease;
     }
 
-    .card:active { transform: scale(0.98); }
+    .dashboard-card:active {
+        transform: scale(0.98);
+    }
 
-    .card-big { grid-column: span 2; }
+    .dashboard-card-big {
+        grid-column: span 2;
+    }
 
-    .card-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #86868B;
-        margin-bottom: 12px;
+    .card-header-dashboard {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .card-header-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+    }
+
+    .card-icon {
+        font-size: 1.25rem;
+        color: var(--warning);
+    }
+
+    .card-title-dashboard {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-sm);
+        line-height: 1.3;
+    }
+
+    .card-description {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: var(--spacing-lg);
     }
 
     .card-value {
         font-size: 2.5rem;
         font-weight: 800;
-        color: #1D1D1F;
-        letter-spacing: -1px;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        line-height: 1;
     }
 
-    .action-btn {
-        margin-top: auto;
-        background: #007AFF;
-        color: white;
-        border: none;
-        padding: 14px;
-        border-radius: 14px;
+    .card-subtitle {
+        font-size: 0.875rem;
+        color: var(--success);
         font-weight: 600;
-        cursor: pointer;
-        width: 100%;
+        margin-top: var(--spacing-sm);
         display: flex;
-        justify-content: center;
         align-items: center;
-        gap: 8px;
-        transition: 0.3s;
-        text-decoration: none;
+        gap: var(--spacing-xs);
     }
 
-    .action-btn:hover { background: #0056b3; }
+    .action-btn-dashboard {
+        margin-top: auto;
+        width: 100%;
+    }
 
-    /* Bilgilendirme Alanı */
+    /* Bilgilendirme Alanı - ALTA TAŞINDI */
     .info-hero {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-        border-radius: 24px;
-        padding: 40px;
-        margin-bottom: 40px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-2xl);
         position: relative;
         overflow: hidden;
-        animation: fadeInUp 0.8s ease;
+        margin-top: var(--spacing-2xl);
     }
 
     .info-hero::before {
@@ -90,78 +124,59 @@
     }
 
     .info-hero h2 {
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 20px;
+        margin-bottom: var(--spacing-md);
         line-height: 1.2;
     }
 
     .info-hero p {
-        font-size: 1.1rem;
-        color: var(--text-gray);
-        line-height: 1.8;
-        margin-bottom: 15px;
+        font-size: 1rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: var(--spacing-md);
     }
 
     .info-features {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        margin-top: 30px;
+        gap: var(--spacing-lg);
+        margin-top: var(--spacing-xl);
     }
 
     .info-feature {
         display: flex;
         align-items: flex-start;
-        gap: 15px;
-        padding: 20px;
-        background: rgba(255, 255, 255, 0.6);
+        gap: var(--spacing-md);
+        padding: var(--spacing-lg);
+        background: var(--bg-glass);
         backdrop-filter: blur(10px);
-        border-radius: 16px;
+        border-radius: var(--radius-md);
         transition: all 0.3s ease;
     }
 
     .info-feature:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
     }
 
     .info-feature-icon {
         font-size: 2rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
         flex-shrink: 0;
     }
 
     .info-feature-content h3 {
-        font-size: 1.1rem;
+        font-size: 1.125rem;
         font-weight: 700;
-        color: var(--text-dark);
-        margin-bottom: 5px;
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-xs);
     }
 
     .info-feature-content p {
-        font-size: 0.9rem;
-        color: var(--text-gray);
+        font-size: 0.875rem;
+        color: var(--text-secondary);
         margin: 0;
         line-height: 1.6;
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
     }
 
     @keyframes pulse {
@@ -175,116 +190,156 @@
         }
     }
 
-    /* Mobilde büyük kartı tek sütun yap */
+    /* Responsive - Mobile First */
     @media (max-width: 768px) {
-        .card-big { grid-column: span 1; }
-        .bento-grid { grid-template-columns: 1fr; }
-        .info-hero { padding: 30px 20px; }
-        .info-hero h2 { font-size: 2rem; }
-        .info-features { grid-template-columns: 1fr; }
+        .dashboard-card-big {
+            grid-column: span 1;
+        }
+        
+        .bento-grid {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+        }
+        
+        .info-hero {
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .info-hero h2 {
+            font-size: 1.75rem;
+        }
+        
+        .info-features {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-md);
+        }
+        
+        .card-value {
+            font-size: 2rem;
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .bento-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .dashboard-card-big {
+            grid-column: span 2;
+        }
     }
 </style>
 
-
-
-<div class="bento-grid">
-
-    <!-- Büyük Aksiyon Kartı -->
-    <div class="card glass card-big">
-        <div class="card-title">
-            <span>🚀 Hızlı İşlem</span>
-            <i class="fa-solid fa-bolt" style="color: #FFD60A; font-size: 1.2rem;"></i>
+<div class="dashboard-container">
+    <!-- Dashboard Kartları (ÜSTTE) -->
+    <div class="bento-grid">
+        <!-- Büyük Aksiyon Kartı -->
+        <div class="glass dashboard-card dashboard-card-big">
+            <div class="card-header-dashboard">
+                <span class="card-header-label">
+                    <i class="fa-solid fa-bolt"></i>
+                    Hızlı İşlem
+                </span>
+                <i class="fa-solid fa-bolt card-icon"></i>
+            </div>
+            <div>
+                <h3 class="card-title-dashboard">Bilgi Paylaştıkça Çoğalır</h3>
+                <p class="card-description">
+                    Ders notlarını yükle, arkadaşlarına yardımcı ol ve toplulukta öne çık.
+                </p>
+            </div>
+            <a href="{% url 'upload_note' %}" class="btn btn-primary action-btn-dashboard">
+                <i class="fa-solid fa-plus"></i> Yeni Not Yükle
+            </a>
         </div>
-        <div>
-            <h3 style="margin-bottom: 8px; font-size: 1.4rem; font-weight: 700;">Bilgi Paylaştıkça Çoğalır</h3>
-            <p style="color: #86868B; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
-                Ders notlarını yükle, arkadaşlarına yardımcı ol ve toplulukta öne çık.
+
+        <!-- Keşfet Kartı -->
+        <div class="glass dashboard-card">
+            <div class="card-header-dashboard">
+                <span class="card-header-label">
+                    <i class="fa-solid fa-book-open"></i>
+                    Kütüphane
+                </span>
+                <i class="fa-solid fa-book-open" style="color: var(--success);"></i>
+            </div>
+            <p class="card-description">
+                Üniversite, fakülte ve bölümlere göre notları incele.
             </p>
+            <a href="{% url 'note_list' %}" class="btn btn-secondary action-btn-dashboard">
+                Notları Keşfet
+            </a>
         </div>
-        <a href="{% url 'upload_note' %}" class="action-btn">
-            <i class="fa-solid fa-plus"></i> Yeni Not Yükle
-        </a>
+
+        <!-- Puan Kartı -->
+        <div class="glass dashboard-card">
+            <div class="card-header-dashboard">
+                <span class="card-header-label">
+                    <i class="fa-solid fa-star"></i>
+                    Puanım
+                </span>
+                <i class="fa-solid fa-star" style="color: var(--warning);"></i>
+            </div>
+            <div class="card-value">0</div>
+            <div class="card-subtitle">
+                <i class="fa-solid fa-arrow-trend-up"></i> Başlangıç Seviyesi
+            </div>
+        </div>
     </div>
 
-    <!-- Keşfet Kartı -->
-    <div class="card glass">
-        <div class="card-title">
-            <span>📚 Kütüphane</span>
-            <i class="fa-solid fa-book-open" style="color: #30D158;"></i>
-        </div>
-        <p style="color: #86868B; font-size: 0.9rem; margin-bottom: 10px;">
-            Üniversite, fakülte ve bölümlere göre notları incele.
-        </p>
-        <a href="{% url 'note_list' %}" class="action-btn" style="background: rgba(0,0,0,0.05); color: #1D1D1F;">
-            Notları Keşfet
-        </a>
-    </div>
-
-    <!-- Puan Kartı -->
-    <div class="card glass">
-        <div class="card-title">
-            <span>🏆 Puanım</span>
-            <i class="fa-solid fa-star" style="color: #FF9500;"></i>
-        </div>
-        <!-- Puan verisi veritabanından gelecek, şimdilik statik -->
-        <div class="card-value">0</div>
-        <div style="color: #34C759; font-size: 0.9rem; margin-top: 5px; font-weight: 600;">
-            <i class="fa-solid fa-arrow-trend-up"></i> Başlangıç Seviyesi
-        </div>
-    </div>
-<!-- Bilgilendirme Alanı -->
-<div class="info-hero">
-    <div class="info-hero-content">
-        <h2>🎓 UniEduNote'a Hoş Geldin!</h2>
-        <p>
-            <strong>UniEduNote</strong>, öğrencilerin ders notlarını paylaştığı, birbirine yardımcı olduğu ve birlikte büyüdüğü bir akademik topluluk platformudur.
-        </p>
-        <p>
-            Burada ders notlarını yükleyebilir, arkadaşlarının notlarını indirebilir, yorum yapabilir ve beğenebilirsin. Her katkın topluluğa değer katar!
-        </p>
-        
-        <div class="info-features">
-            <div class="info-feature">
-                <div class="info-feature-icon">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                </div>
-                <div class="info-feature-content">
-                    <h3>Not Yükle</h3>
-                    <p>Ders notlarını PDF, Word, Excel veya resim formatında yükleyerek topluluğa katkıda bulun.</p>
-                </div>
-            </div>
+    <!-- Bilgilendirme Alanı (ALTA TAŞINDI) -->
+    <div class="glass info-hero">
+        <div class="info-hero-content">
+            <h2 class="gradient-text">🎓 UniEduNote'a Hoş Geldin!</h2>
+            <p>
+                <strong>UniEduNote</strong>, öğrencilerin ders notlarını paylaştığı, birbirine yardımcı olduğu ve birlikte büyüdüğü bir akademik topluluk platformudur.
+            </p>
+            <p>
+                Burada ders notlarını yükleyebilir, arkadaşlarının notlarını indirebilir, yorum yapabilir ve beğenebilirsin. Her katkın topluluğa değer katar!
+            </p>
             
-            <div class="info-feature">
-                <div class="info-feature-icon">
-                    <i class="fa-solid fa-magnifying-glass"></i>
+            <div class="info-features">
+                <div class="info-feature">
+                    <div class="info-feature-icon gradient-text">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div class="info-feature-content">
+                        <h3>Not Yükle</h3>
+                        <p>Ders notlarını PDF, Word, Excel veya resim formatında yükleyerek topluluğa katkıda bulun.</p>
+                    </div>
                 </div>
-                <div class="info-feature-content">
-                    <h3>Keşfet</h3>
-                    <p>Üniversite, fakülte, bölüm ve ders bazında filtreleyerek aradığın notları kolayca bul.</p>
+                
+                <div class="info-feature">
+                    <div class="info-feature-icon gradient-text">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <div class="info-feature-content">
+                        <h3>Keşfet</h3>
+                        <p>Üniversite, fakülte, bölüm ve ders bazında filtreleyerek aradığın notları kolayca bul.</p>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="info-feature">
-                <div class="info-feature-icon">
-                    <i class="fa-solid fa-trophy"></i>
+                
+                <div class="info-feature">
+                    <div class="info-feature-icon gradient-text">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div class="info-feature-content">
+                        <h3>Puan Kazan</h3>
+                        <p>Not yükleyerek ve indirilerek puan kazan, seviye atla ve toplulukta öne çık!</p>
+                    </div>
                 </div>
-                <div class="info-feature-content">
-                    <h3>Puan Kazan</h3>
-                    <p>Not yükleyerek ve indirilerek puan kazan, seviye atla ve toplulukta öne çık!</p>
-                </div>
-            </div>
-            
-            <div class="info-feature">
-                <div class="info-feature-icon">
-                    <i class="fa-solid fa-comments"></i>
-                </div>
-                <div class="info-feature-content">
-                    <h3>Etkileşim</h3>
-                    <p>Notlara yorum yap, beğen ve diğer öğrencilerle bilgi alışverişinde bulun.</p>
+                
+                <div class="info-feature">
+                    <div class="info-feature-icon gradient-text">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <div class="info-feature-content">
+                        <h3>Etkileşim</h3>
+                        <p>Notlara yorum yap, beğen ve diğer öğrencilerle bilgi alışverişinde bulun.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 {% endblock %}

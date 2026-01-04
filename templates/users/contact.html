@@ -1,53 +1,134 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Destek{% endblock %}
+
 {% block content %}
-<div style="max-width: 640px; margin: 0 auto;">
-  <div class="glass" style="padding: 32px 28px; border-radius: 20px;">
-    <h2 style="color: var(--primary); margin-bottom: 10px; display:flex; align-items:center; gap:8px;">
-      <i class="fa-solid fa-headset"></i>
-      Bize Ulaşın
-    </h2>
-    <p style="color: var(--text-gray); margin-bottom: 24px; font-size: 0.95rem;">
-      Hata bildirimi, öneri veya şikayetleriniz için aşağıdaki formu doldurun. En kısa sürede size geri döneceğiz.
-    </p>
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
 
-    <form method="post">
-      {% csrf_token %}
-      {% if not user.is_authenticated %}
-      <div style="margin-bottom: 16px;">
-        <label style="display:block; margin-bottom:6px; font-size:0.9rem; font-weight:600; color:var(--text-dark);">Adınız</label>
-        <input type="text" name="name" required
-               style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,0.5); background:rgba(255,255,255,0.9); font-size:0.95rem;">
-      </div>
-      <div style="margin-bottom: 16px;">
-        <label style="display:block; margin-bottom:6px; font-size:0.9rem; font-weight:600; color:var(--text-dark);">E-posta</label>
-        <input type="email" name="email" required
-               style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,0.5); background:rgba(255,255,255,0.9); font-size:0.95rem;">
-      </div>
-      {% endif %}
+<style>
+    .contact-container {
+        max-width: 640px;
+        margin: 0 auto;
+    }
 
-      <div style="margin-bottom: 16px;">
-        <label style="display:block; margin-bottom:6px; font-size:0.9rem; font-weight:600; color:var(--text-dark);">Konu</label>
-        <select name="subject"
-                style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,0.5); background:rgba(255,255,255,0.9); font-size:0.95rem;">
-          <option value="bug">🐛 Hata Bildirimi</option>
-          <option value="suggestion">💡 Öneri / İstek</option>
-          <option value="copyright">©️ Telif Hakkı</option>
-          <option value="other">Diğer</option>
-        </select>
-      </div>
+    .contact-card {
+        padding: var(--spacing-xl);
+    }
 
-      <div style="margin-bottom: 20px;">
-        <label style="display:block; margin-bottom:6px; font-size:0.9rem; font-weight:600; color:var(--text-dark);">Mesajınız</label>
-        <textarea name="message" rows="5" required
-                  style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(148,163,184,0.5); background:rgba(255,255,255,0.9); font-size:0.95rem; resize:vertical;"></textarea>
-      </div>
+    .contact-header {
+        margin-bottom: var(--spacing-md);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+    }
 
-      <button type="submit" class="btn-primary"
-              style="width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; font-size:1rem;">
-        Gönder
-      </button>
-    </form>
-  </div>
+    .contact-header h2 {
+        color: var(--primary-purple);
+        margin: 0;
+        font-weight: 800;
+    }
+
+    .contact-description {
+        color: var(--text-secondary);
+        margin-bottom: var(--spacing-lg);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .contact-form {
+        display: grid;
+        gap: var(--spacing-md);
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: var(--spacing-xs);
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: var(--bg-glass-light);
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-purple);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: white;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .contact-container {
+            padding: 0 var(--spacing-md);
+        }
+
+        .contact-card {
+            padding: var(--spacing-lg);
+        }
+    }
+</style>
+
+<div class="contact-container">
+    <div class="glass contact-card">
+        <div class="contact-header">
+            <i class="fa-solid fa-headset" style="font-size: 1.5rem; color: var(--primary-purple);"></i>
+            <h2>Bize Ulaşın</h2>
+        </div>
+        <p class="contact-description">
+            Hata bildirimi, öneri veya şikayetleriniz için aşağıdaki formu doldurun. En kısa sürede size geri döneceğiz.
+        </p>
+
+        <form method="post" class="contact-form">
+            {% csrf_token %}
+            {% if not user.is_authenticated %}
+            <div class="form-group">
+                <label>Adınız</label>
+                <input type="text" name="name" required>
+            </div>
+            <div class="form-group">
+                <label>E-posta</label>
+                <input type="email" name="email" required>
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label>Konu</label>
+                <select name="subject">
+                    <option value="bug">🐛 Hata Bildirimi</option>
+                    <option value="suggestion">💡 Öneri / İstek</option>
+                    <option value="copyright">©️ Telif Hakkı</option>
+                    <option value="other">Diğer</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Mesajınız</label>
+                <textarea name="message" rows="5" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-paper-plane"></i> Gönder
+            </button>
+        </form>
+    </div>
 </div>
 {% endblock %}

@@ -3,24 +3,27 @@
 {% block title %}Giriş Yap{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
 <style>
     .auth-container-modern {
         display: flex;
         max-width: 1000px;
         min-height: 600px;
-        margin: 40px auto;
-        border-radius: 24px;
+        margin: var(--spacing-2xl) auto;
+        border-radius: var(--radius-lg);
         overflow: hidden;
         position: relative;
+        box-shadow: var(--shadow-lg);
     }
 
     .auth-visual {
         flex: 1;
-        background: radial-gradient(circle at top left, rgba(102,126,234,0.7), rgba(118,75,162,0.8));
+        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 40px;
+        padding: var(--spacing-2xl);
         position: relative;
         overflow: hidden;
     }
@@ -38,7 +41,7 @@
     .auth-visual::before {
         width: 320px;
         height: 320px;
-        background: #f093fb;
+        background: var(--primary-pink);
         top: -80px;
         left: -80px;
     }
@@ -46,7 +49,7 @@
     .auth-visual::after {
         width: 260px;
         height: 260px;
-        background: #4facfe;
+        background: var(--accent-blue);
         bottom: -60px;
         right: -60px;
     }
@@ -71,35 +74,33 @@
 
     .auth-form-side {
         flex: 1;
-        padding: 50px;
+        padding: var(--spacing-2xl);
         display: flex;
         flex-direction: column;
         justify-content: center;
-        background: rgba(255,255,255,0.85);
+        background: var(--bg-glass-light);
         backdrop-filter: blur(20px);
-        border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.08);
     }
 
     .auth-title {
         font-size: 2rem;
         font-weight: 800;
-        color: var(--text-dark);
-        margin-bottom: 10px;
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-sm);
         text-align: center;
-        letter-spacing: -1px;
+        letter-spacing: -0.02em;
     }
 
     .auth-subtitle {
         text-align: center;
-        color: var(--text-gray);
-        margin-bottom: 30px;
+        color: var(--text-secondary);
+        margin-bottom: var(--spacing-xl);
         font-size: 0.95rem;
     }
 
     .input-group-modern {
         position: relative;
-        margin-bottom: 18px;
+        margin-bottom: var(--spacing-md);
     }
 
     .input-group-modern i {
@@ -107,7 +108,7 @@
         left: 15px;
         top: 50%;
         transform: translateY(-50%);
-        color: #94a3b8;
+        color: var(--text-light);
         font-size: 1.1rem;
         transition: 0.3s;
     }
@@ -115,54 +116,60 @@
     .input-modern {
         width: 100%;
         padding: 15px 15px 15px 45px;
-        border: 2px solid #e2e8f0;
-        border-radius: 14px;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-radius: var(--radius-md);
         font-size: 1rem;
-        transition: 0.3s;
-        background: #f8fafc;
-        color: #334155;
+        transition: all 0.3s ease;
+        background: var(--bg-glass-light);
+        color: var(--text-primary);
+        font-family: inherit;
     }
 
     .input-modern:focus {
-        border-color: #3b82f6;
-        background: #ffffff;
+        border-color: var(--primary-purple);
+        background: white;
         outline: none;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
     }
 
-    .input-modern:focus + i { color: #3b82f6; }
+    .input-modern:focus + i { 
+        color: var(--primary-purple); 
+    }
 
     .btn-modern {
         width: 100%;
         padding: 15px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%);
         color: white;
         border: none;
-        border-radius: 14px;
+        border-radius: var(--radius-md);
         font-size: 1.1rem;
         font-weight: 700;
         cursor: pointer;
-        transition: 0.3s;
-        margin-top: 10px;
-        box-shadow: 0 10px 24px rgba(102,126,234,0.35);
+        transition: all 0.3s ease;
+        margin-top: var(--spacing-sm);
+        box-shadow: var(--shadow-md);
     }
 
     .btn-modern:hover {
         transform: translateY(-2px);
-        box-shadow: 0 14px 32px rgba(102,126,234,0.45);
+        box-shadow: var(--shadow-lg);
     }
 
     .extra-links {
         display: flex;
         justify-content: space-between;
-        margin-top: 20px;
+        margin-top: var(--spacing-md);
         font-size: 0.9rem;
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
     }
 
     .extra-links a {
-        color: #3b82f6;
+        color: var(--primary-purple);
         font-weight: 600;
         text-decoration: none;
+        transition: all 0.3s ease;
     }
 
     .extra-links a:hover {
@@ -171,21 +178,51 @@
 
     .msg {
         text-align: center;
-        margin-top: 15px;
+        margin-top: var(--spacing-md);
         font-weight: 600;
         font-size: 0.95rem;
+        padding: var(--spacing-sm);
+        border-radius: var(--radius-sm);
     }
 
+    .msg.success {
+        color: var(--success);
+        background: rgba(52, 199, 89, 0.1);
+    }
+
+    .msg.error {
+        color: var(--error);
+        background: rgba(255, 59, 48, 0.1);
+    }
+
+    .msg.info {
+        color: var(--primary-purple);
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    /* Responsive - Mobile First */
     @media (max-width: 768px) {
         .auth-container-modern {
             flex-direction: column;
-            margin: 20px;
+            margin: var(--spacing-md);
+            min-height: auto;
         }
+
         .auth-visual {
             display: none;
         }
+
         .auth-form-side {
-            padding: 30px 20px;
+            padding: var(--spacing-xl) var(--spacing-md);
+        }
+
+        .auth-title {
+            font-size: 1.75rem;
+        }
+
+        .extra-links {
+            flex-direction: column;
+            align-items: center;
         }
     }
 </style>
@@ -216,7 +253,9 @@
         <p id="msg" class="msg"></p>
 
         <div class="extra-links">
-            <a href="{% url 'password_reset' %}"><i class="fa-solid fa-key"></i> Şifremi Unuttum</a>
+            <a href="{% url 'password_reset' %}">
+                <i class="fa-solid fa-key"></i> Şifremi Unuttum
+            </a>
             <span>Hesabın yok mu? <a href="{% url 'register' %}">Kayıt Ol</a></span>
         </div>
     </div>
@@ -228,7 +267,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
   const msg = document.getElementById('msg');
-  msg.style.color = '#666';
+  msg.className = 'msg info';
   msg.innerText = '⏳ Giriş yapılıyor...';
 
   try {
@@ -256,15 +295,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             }
         } catch(e) {}
 
-        msg.style.color = '#34C759';
+        msg.className = 'msg success';
         msg.innerText = '✅ Giriş başarılı! Yönlendiriliyorsunuz...';
         setTimeout(() => window.location.href='/dashboard/', 1000);
     } else {
-        msg.style.color = '#FF3B30';
+        msg.className = 'msg error';
         msg.innerText = '⚠️ ' + (dataSession.error || 'Bilgiler hatalı.');
     }
   } catch (err) {
-    msg.style.color = '#FF3B30';
+    msg.className = 'msg error';
     msg.innerText = '⚠️ Sunucu hatası.';
   }
 });
