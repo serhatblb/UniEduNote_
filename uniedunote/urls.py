@@ -57,4 +57,7 @@ urlpatterns = [
     path('api/notifications/read/', user_views.mark_notifications_read, name='mark_notifications_read'),
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Static ve Media dosyaları (Development için)
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
