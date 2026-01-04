@@ -13,110 +13,62 @@
         margin: 0 auto;
     }
 
-    /* Filtre Alanı */
-    /* Filtre Alanı - Yatay Kompakt Versiyon */
+    /* Filtre Alanı - Tam Kompakt Versiyon */
     .filter-section {
         margin-bottom: var(--spacing-lg);
         padding: var(--spacing-md);
         animation: fadeInUp 0.6s ease;
     }
-    
+
     .filter-section h3 {
         margin-bottom: var(--spacing-md);
         color: var(--text-primary);
         font-weight: 800;
-        font-size: 1.1rem;
+        font-size: 1rem;
         display: flex;
         align-items: center;
         gap: var(--spacing-xs);
     }
-    
+
     .filter-form {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-end;
-        gap: var(--spacing-xs);
-        flex-wrap: nowrap;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr) 2fr auto;
+        gap: var(--spacing-sm);
+        align-items: end;
     }
-    
-    /* Arama Input Wrapper - Sonra arama */
-    .search-input-wrapper {
-        position: relative;
-        flex: 1;
-        min-width: 200px;
-        max-width: 300px;
-    }
-    
-    .search-input-wrapper .search-icon {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-light);
-        font-size: 0.9rem;
-        pointer-events: none;
-    }
-    
-    .search-input-wrapper input {
-        width: 100%;
-        padding: 10px 12px 10px 38px;
-        border-radius: var(--radius-md);
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        background: var(--bg-glass-light);
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: var(--text-primary);
-        transition: all 0.3s ease;
-        height: 40px;
-        box-sizing: border-box;
-    }
-    
-    .search-input-wrapper input:focus {
-        outline: none;
-        border-color: var(--primary-purple);
-        background: white;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-    
-    /* Akademik Hiyerarşi Wrapper - Önce dropdown'lar, yan yana */
+
+    /* Akademik Hiyerarşi Wrapper */
     .academic-hierarchy-wrapper {
-        display: flex;
-        flex-direction: row;
-        gap: var(--spacing-xs);
-        flex: 0 0 auto;
-        min-width: 0;
+        display: contents;
     }
-    
-    .academic-hierarchy-wrapper .form-group {
-        flex: 0 0 auto;
-        width: 160px;
-        min-width: 140px;
-    }
-    
+
     .academic-hierarchy-wrapper .form-group {
         margin-bottom: 0;
     }
-    
+
     .academic-hierarchy-wrapper label {
         display: block;
         margin-bottom: 4px;
         font-weight: 600;
         color: var(--text-primary);
-        font-size: 0.8rem;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    
+
     .academic-hierarchy-wrapper label .required {
         color: var(--error);
         margin-left: 2px;
     }
-    
-    /* Select2 Custom Styling - Kompakt */
+
+    /* Select2 Custom Styling */
     .academic-hierarchy-wrapper .select2-container {
         width: 100% !important;
     }
-    
+
     .academic-hierarchy-wrapper .select2-container .select2-selection--single {
-        height: 40px !important;
+        height: 38px !important;
         border: 1px solid rgba(0, 0, 0, 0.1) !important;
         border-radius: var(--radius-md) !important;
         background: var(--bg-glass-light) !important;
@@ -124,42 +76,83 @@
         align-items: center;
         transition: all 0.3s ease;
     }
-    
+
     .academic-hierarchy-wrapper .select2-container--default .select2-selection--single .select2-selection__rendered {
         color: var(--text-primary) !important;
-        font-size: 0.85rem;
-        padding-left: 12px;
+        font-size: 0.8rem;
+        padding-left: 10px;
         font-weight: 500;
-        line-height: 40px;
+        line-height: 38px;
     }
-    
+
     .academic-hierarchy-wrapper .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 38px !important;
-        right: 8px;
+        height: 36px !important;
+        right: 6px;
     }
-    
+
     .academic-hierarchy-wrapper .select2-container--open .select2-selection--single {
         border-color: var(--primary-purple) !important;
         background: white !important;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
-    
+
     .academic-hierarchy-wrapper .select2-container--default .select2-results__option--highlighted[aria-selected] {
         background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%) !important;
     }
-    
-    /* Filtre Butonları - En sağda */
+
+    /* Arama Input Wrapper */
+    .search-input-wrapper {
+        position: relative;
+        min-width: 0;
+    }
+
+    .search-input-wrapper .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-light);
+        font-size: 0.85rem;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .search-input-wrapper input {
+        width: 100%;
+        padding: 9px 10px 9px 34px;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: var(--bg-glass-light);
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+        height: 38px;
+        box-sizing: border-box;
+    }
+
+    .search-input-wrapper input:focus {
+        outline: none;
+        border-color: var(--primary-purple);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-input-wrapper input::placeholder {
+        font-size: 0.8rem;
+    }
+
+    /* Filtre Butonları */
     .filter-buttons {
         display: flex;
-        gap: var(--spacing-xs);
+        gap: 6px;
         flex-shrink: 0;
-        align-items: center;
     }
-    
+
     .filter-btn,
     .filter-btn-reset {
-        padding: 10px 16px;
-        font-size: 0.85rem;
+        padding: 8px 14px;
+        font-size: 0.8rem;
         font-weight: 700;
         border-radius: var(--radius-md);
         transition: all 0.3s ease;
@@ -169,31 +162,35 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
-        height: 40px;
+        gap: 4px;
+        height: 38px;
         white-space: nowrap;
-        min-width: auto;
     }
-    
+
     .filter-btn {
         background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%);
         color: white;
     }
-    
+
     .filter-btn:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow-sm);
     }
-    
+
     .filter-btn-reset {
         background: rgba(255, 59, 48, 0.1);
         color: var(--error);
         border: 1px solid rgba(255, 59, 48, 0.3);
     }
-    
+
     .filter-btn-reset:hover {
         background: var(--error);
         color: white;
+    }
+
+    /* Hidden inputs */
+    input[type="hidden"] {
+        display: none;
     }
 
     /* Sıralama Butonları */
@@ -407,38 +404,47 @@
             gap: var(--spacing-md);
         }
 
+    /* Responsive */
+    @media (max-width: 1200px) {
         .filter-form {
-            flex-direction: column;
-            align-items: stretch;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-sm);
         }
-
+        
         .search-input-wrapper {
-            min-width: 100%;
+            grid-column: 1 / -1;
         }
-
-        .academic-hierarchy-wrapper {
-            flex-direction: column;
-            width: 100%;
-        }
-
-        .academic-hierarchy-wrapper .form-group {
-            min-width: 100%;
-        }
-
+        
         .filter-buttons {
-            width: 100%;
-            justify-content: stretch;
+            grid-column: 1 / -1;
+            justify-content: flex-end;
         }
+    }
 
+    @media (max-width: 768px) {
+        .filter-form {
+            grid-template-columns: 1fr;
+            gap: var(--spacing-sm);
+        }
+        
+        .search-input-wrapper {
+            grid-column: 1;
+        }
+        
+        .academic-hierarchy-wrapper .form-group {
+            width: 100%;
+        }
+        
+        .filter-buttons {
+            grid-column: 1;
+            width: 100%;
+        }
+        
         .filter-btn,
         .filter-btn-reset {
             flex: 1;
         }
-
-        .filter-btn,
-        .filter-btn-reset {
-            width: 100%;
-        }
+    }
 
         .sort-buttons {
             gap: var(--spacing-xs);
