@@ -13,7 +13,8 @@ LOGS_DIR = BASE_DIR / 'logs'
 LOGS_DIR.mkdir(exist_ok=True)
 
 # Logging yapılandırması
-LOGGING_CONFIG = {
+# NOT: Django'nun LOGGING ayarı için dictionary
+LOGGING_DICT = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {

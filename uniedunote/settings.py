@@ -230,8 +230,8 @@ if not DEBUG:
 # ------------------------------------------------------------------
 # LOGGING YAPILANDIRMASI
 # ------------------------------------------------------------------
-from uniedunote.logger_config import LOGGING_CONFIG
-LOGGING = LOGGING_CONFIG
+from uniedunote.logger_config import LOGGING_DICT
+LOGGING = LOGGING_DICT
 
 # SUPPORT EMAIL
 SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", "ai.serhat78@gmail.com")
