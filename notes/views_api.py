@@ -11,7 +11,8 @@ class CommentListCreateAPIView(APIView):
 
     def get(self, request, note_id):
         note = get_object_or_404(Note, id=note_id)
-        comments = note.comments.all().order_by("-created_at")
+        # N+1 query problemini çözmek için select_related kullan
+        comments = note.comments.select_related('user').all().order_by("-created_at")
         data = [
             {
                 "id": c.id,

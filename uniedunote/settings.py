@@ -13,19 +13,49 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------------------------------------------
 # GÜVENLİK
 # ------------------------------------------------------------------
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-varsayilan-anahtar")
+# SECRET_KEY environment variable'dan alınmalı, production'da zorunlu
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    import warnings
+    warnings.warn(
+        "SECRET_KEY environment variable ayarlanmamış! "
+        "Production için mutlaka ayarlanmalı. Geçici olarak default key kullanılıyor.",
+        UserWarning
+    )
+    # Geçici fallback (sadece development için)
+    SECRET_KEY = "django-insecure-temporary-key-change-in-production"
 
-# Canlıda False, Lokalde True
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+# DEBUG: Production'da False olmalı, development'ta True
+# Environment variable "True" string'i ise True, değilse False
+DEBUG_ENV = os.environ.get("DEBUG", "False").lower()
+DEBUG = DEBUG_ENV in ("true", "1", "yes")
 
-# Allowed Hosts
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+# Allowed Hosts: Production'da domain adları, development'ta localhost
+ALLOWED_HOSTS_ENV = os.environ.get("ALLOWED_HOSTS", "")
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(",") if host.strip()]
+else:
+    # Development modunda localhost ve 127.0.0.1 izin ver
+    if DEBUG:
+        ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+    else:
+        # Production'da ALLOWED_HOSTS boşsa uyarı ver ama çalışmaya devam et
+        import warnings
+        warnings.warn(
+            "ALLOWED_HOSTS environment variable ayarlanmamış! "
+            "Production için domain adları ayarlanmalı.",
+            UserWarning
+        )
+        ALLOWED_HOSTS = ["*"]  # Geçici olarak tüm host'lara izin ver (GÜVENLİK RİSKİ!)
 
+# CSRF Trusted Origins: HTTPS için
 CSRF_TRUSTED_ORIGINS = []
-# Alan adın varsa HTTPS için buraya eklenmeli
-if "dersnotlarım.com.tr" in str(ALLOWED_HOSTS):
-    CSRF_TRUSTED_ORIGINS.append("https://dersnotlarım.com.tr")
-    CSRF_TRUSTED_ORIGINS.append("https://www.dersnotlarım.com.tr")
+if not DEBUG:
+    # Production'da HTTPS origin'leri ekle
+    for host in ALLOWED_HOSTS:
+        if host and not host.startswith("127.0.0.1") and not host.startswith("localhost"):
+            CSRF_TRUSTED_ORIGINS.append(f"https://{host}")
+            CSRF_TRUSTED_ORIGINS.append(f"https://www.{host}")
 
 # ------------------------------------------------------------------
 # UYGULAMALAR
@@ -166,3 +196,28 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SESSION_COOKIE_AGE = 1800
 # Her işlemde süreyi sıfırla (Aktifse atmasın)
 SESSION_SAVE_EVERY_REQUEST = True
+
+# ------------------------------------------------------------------
+# GÜVENLİK BAŞLIKLARI (Security Headers)
+# ------------------------------------------------------------------
+# HTTPS için cookie güvenliği (production'da True olmalı)
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# CSRF Cookie güvenliği
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Güvenlik başlıkları
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+# HTTPS yönlendirmesi (production'da True olmalı)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 yıl
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True

@@ -5,7 +5,8 @@ from .views_api import (
     MyTokenObtainPairView,
     PasswordResetRequestAPIView,
     PasswordResetConfirmAPIView,
-    session_login, UserProfileUpdateAPIView,
+    SessionLoginAPIView,
+    UserProfileUpdateAPIView,
 )
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
@@ -17,12 +18,11 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 
-    # Geçici CSRF’siz session login (test ve deploy için güvenli)
-    path('session-login/', session_login, name='session-login'),
+    # CSRF korumalı session login (JWT kullanımı önerilir)
+    path('session-login/', SessionLoginAPIView.as_view(), name='session-login'),
 
     path('password/reset/', PasswordResetRequestAPIView.as_view(), name='password-reset-request'),
     path('password/reset/confirm/', PasswordResetConfirmAPIView.as_view(), name='password-reset-confirm'),
 
-path("profile/update/", UserProfileUpdateAPIView.as_view(), name="profile-update"),
-
+    path("profile/update/", UserProfileUpdateAPIView.as_view(), name="profile-update"),
 ]

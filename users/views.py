@@ -119,16 +119,24 @@ def dashboard(request):
 
 @login_required(login_url="/login/")
 def profile(request):
-    # Kullanıcının notları
-    my_notes = request.user.note_set.all().order_by('-uploaded_at')
+    # Kullanıcının notları - N+1 query problemini çözmek için select_related kullan
+    my_notes = request.user.note_set.select_related(
+        'university', 'faculty', 'department', 'course'
+    ).order_by('-uploaded_at')
 
-    # Beğendikleri (Hata riskine karşı modelden çekiyoruz)
+    # Beğendikleri - prefetch_related ile N+1 query problemini çöz
     from notes.models import Like
-    liked_notes = [l.note for l in Like.objects.filter(user=request.user)]
+    liked_notes = Like.objects.filter(user=request.user).select_related('note', 'note__university', 'note__course')
+    liked_notes_list = [like.note for like in liked_notes]
 
-    # İstatistikler
-    total_downloads = sum(note.download_count for note in my_notes)
-    total_uploads = my_notes.count()
+    # İstatistikler - aggregate kullanarak tek sorguda hesapla
+    from django.db.models import Sum, Count
+    stats = request.user.note_set.aggregate(
+        total_uploads=Count('id'),
+        total_downloads=Sum('download_count')
+    )
+    total_uploads = stats['total_uploads'] or 0
+    total_downloads = stats['total_downloads'] or 0
 
     # --- PUAN HESAPLAMA (XP) ---
     # Formül: (Yükleme Sayısı * 10) + (Toplam İndirilme Sayısı)
@@ -140,9 +148,10 @@ def profile(request):
     context = {
         'user': request.user,
         'uploaded_notes': my_notes,
-        'liked_notes': liked_notes,
+        'liked_notes': liked_notes_list,
         'total_downloads': total_downloads,
-        'total_xp': total_xp,  # Yeni puan değişkeni
+        'total_uploads': total_uploads,
+        'total_xp': total_xp,
         'universities': universities,
     }
     return render(request, "users/profile.html", context)

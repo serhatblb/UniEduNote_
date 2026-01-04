@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Note
 from .forms import NoteForm
-from categories.models import University, Department, Course
+from categories.models import University, Faculty, Department, Course
 from django.views.decorators.http import require_POST
 from django.shortcuts import redirect
 from django.http import JsonResponse
@@ -26,7 +26,9 @@ def upload_note(request):
     return render(request, 'notes/upload_note.html', {'form': form})
 
 
-# 📋 Not listesi (filtreli)
+# 📋 Not listesi (filtreli) - Pagination ile
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 def note_list(request):
     sort_by = request.GET.get('sort', 'newest')
 
@@ -37,7 +39,12 @@ def note_list(request):
     else:
         ordering = '-uploaded_at'  # Varsayılan: En yeni
 
-    notes = Note.objects.all().order_by('-likes', '-uploaded_at')
+    # N+1 query problemini çözmek için select_related ve prefetch_related kullan
+    notes = Note.objects.select_related(
+        'user', 'university', 'faculty', 'department', 'course'
+    ).prefetch_related(
+        'comments', 'likes_set'
+    ).order_by(ordering)
 
     university = request.GET.get('university')
     department = request.GET.get('department')
@@ -50,15 +57,27 @@ def note_list(request):
     if course:
         notes = notes.filter(course__id=course)
 
-    universities = University.objects.all()
-    departments = Department.objects.all()
-    courses = Course.objects.all()
+    # Pagination: Sayfa başına 20 not
+    paginator = Paginator(notes, 20)
+    page = request.GET.get('page', 1)
+    
+    try:
+        notes_page = paginator.page(page)
+    except PageNotAnInteger:
+        notes_page = paginator.page(1)
+    except EmptyPage:
+        notes_page = paginator.page(paginator.num_pages)
+
+    universities = University.objects.all().order_by('name')
+    departments = Department.objects.all().order_by('name')
+    courses = Course.objects.all().order_by('name')
 
     context = {
-        'notes': notes,
+        'notes': notes_page,
         'universities': universities,
         'departments': departments,
         'courses': courses,
+        'sort_by': sort_by,
     }
     request.session['last_notes_list_url'] = request.get_full_path()
     return render(request, 'notes/note_list.html', context)

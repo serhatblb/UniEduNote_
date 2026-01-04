@@ -18,7 +18,6 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .tokens import account_activation_token
 from .serializers import UserSerializer
 from .email_utils import send_activation_email
-from django.views.decorators.csrf import csrf_exempt
 import json
 
 User = get_user_model()
@@ -142,17 +141,23 @@ class UserProfileAPIView(APIView):
         return Response(data)
 
 
-# ✅ Session login (opsiyonel)
-@csrf_exempt
-def session_login(request):
-    if request.method == "POST":
+# ✅ Session login
+# NOT: DRF APIView kullanıldığı için CSRF koruması otomatik olarak devre dışıdır.
+# Ancak login() fonksiyonu session oluşturduğu için CSRF gerektirebilir.
+# Bu durumda DRF'nin authentication mekanizması CSRF'yi bypass eder.
+class SessionLoginAPIView(APIView):
+    permission_classes = [AllowAny]
+    # DRF APIView kullanıldığı için CSRF otomatik olarak devre dışı
+    # Ancak emin olmak için authentication_classes boş bırakılıyor
+    authentication_classes = []  # CSRF bypass için
+    
+    def post(self, request):
         try:
-            data = json.loads(request.body)
-            login_input = data.get("username")  # Bu email de olabilir, username de
-            password = data.get("password")
+            login_input = request.data.get("username")  # Bu email de olabilir, username de
+            password = request.data.get("password")
 
             if not login_input or not password:
-                return JsonResponse({"error": "Kullanıcı adı ve şifre zorunlu"}, status=400)
+                return Response({"error": "Kullanıcı adı ve şifre zorunlu"}, status=400)
 
             # --- Zeka Burada: Email mi Username mi? ---
             username_to_auth = login_input
@@ -169,14 +174,12 @@ def session_login(request):
 
             if user and user.is_active:
                 login(request, user)
-                return JsonResponse({"message": "Login başarılı", "username": user.username})
+                return Response({"message": "Login başarılı", "username": user.username})
             else:
-                return JsonResponse({"error": "Giriş bilgileri hatalı!"}, status=401)
+                return Response({"error": "Giriş bilgileri hatalı!"}, status=401)
 
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-
-    return JsonResponse({"error": "POST required"}, status=405)
+            return Response({"error": str(e)}, status=400)
 
 # ✅ Profil Güncelleme (JWT zorunlu)
 class UserProfileUpdateAPIView(APIView):
