@@ -62,12 +62,183 @@
 
     .action-btn:hover { background: #0056b3; }
 
+    /* Bilgilendirme Alanı */
+    .info-hero {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-radius: 24px;
+        padding: 40px;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.8s ease;
+    }
+
+    .info-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+        animation: pulse 8s ease-in-out infinite;
+    }
+
+    .info-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-hero h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+
+    .info-hero p {
+        font-size: 1.1rem;
+        color: var(--text-gray);
+        line-height: 1.8;
+        margin-bottom: 15px;
+    }
+
+    .info-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .info-feature {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .info-feature:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+    }
+
+    .info-feature-icon {
+        font-size: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        flex-shrink: 0;
+    }
+
+    .info-feature-content h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+    }
+
+    .info-feature-content p {
+        font-size: 0.9rem;
+        color: var(--text-gray);
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.3;
+        }
+    }
+
     /* Mobilde büyük kartı tek sütun yap */
     @media (max-width: 768px) {
         .card-big { grid-column: span 1; }
         .bento-grid { grid-template-columns: 1fr; }
+        .info-hero { padding: 30px 20px; }
+        .info-hero h2 { font-size: 2rem; }
+        .info-features { grid-template-columns: 1fr; }
     }
 </style>
+
+<!-- Bilgilendirme Alanı -->
+<div class="info-hero">
+    <div class="info-hero-content">
+        <h2>🎓 UniEduNote'a Hoş Geldin!</h2>
+        <p>
+            <strong>UniEduNote</strong>, öğrencilerin ders notlarını paylaştığı, birbirine yardımcı olduğu ve birlikte büyüdüğü bir akademik topluluk platformudur.
+        </p>
+        <p>
+            Burada ders notlarını yükleyebilir, arkadaşlarının notlarını indirebilir, yorum yapabilir ve beğenebilirsin. Her katkın topluluğa değer katar!
+        </p>
+        
+        <div class="info-features">
+            <div class="info-feature">
+                <div class="info-feature-icon">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="info-feature-content">
+                    <h3>Not Yükle</h3>
+                    <p>Ders notlarını PDF, Word, Excel veya resim formatında yükleyerek topluluğa katkıda bulun.</p>
+                </div>
+            </div>
+            
+            <div class="info-feature">
+                <div class="info-feature-icon">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div class="info-feature-content">
+                    <h3>Keşfet</h3>
+                    <p>Üniversite, fakülte, bölüm ve ders bazında filtreleyerek aradığın notları kolayca bul.</p>
+                </div>
+            </div>
+            
+            <div class="info-feature">
+                <div class="info-feature-icon">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="info-feature-content">
+                    <h3>Puan Kazan</h3>
+                    <p>Not yükleyerek ve indirilerek puan kazan, seviye atla ve toplulukta öne çık!</p>
+                </div>
+            </div>
+            
+            <div class="info-feature">
+                <div class="info-feature-icon">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <div class="info-feature-content">
+                    <h3>Etkileşim</h3>
+                    <p>Notlara yorum yap, beğen ve diğer öğrencilerle bilgi alışverişinde bulun.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="bento-grid">
 

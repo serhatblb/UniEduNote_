@@ -57,6 +57,27 @@
         box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
     }
 
+    .filter-btn-reset {
+        background: rgba(255, 59, 48, 0.1);
+        color: #FF3B30;
+        border: 1px solid rgba(255, 59, 48, 0.3);
+        padding: 14px 24px;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .filter-btn-reset:hover {
+        background: #FF3B30;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 59, 48, 0.3);
+    }
+
     /* === Sıralama Butonları === */
     .sort-buttons {
         display: flex;
@@ -329,6 +350,9 @@
             <option value="">Ders Seç</option>
         </select>
         <button type="submit" class="filter-btn">Ara</button>
+        <a href="{% url 'note_list' %}" class="filter-btn-reset">
+            <i class="fa-solid fa-rotate-left"></i> Sıfırla
+        </a>
     </form>
 </div>
 

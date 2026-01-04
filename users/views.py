@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
@@ -193,10 +194,51 @@ def contact_view(request):
         name = request.user.username if request.user.is_authenticated else request.POST.get('name')
         email = request.user.email if request.user.is_authenticated else request.POST.get('email')
 
-        Contact.objects.create(
+        # Veritabanına kaydet
+        contact = Contact.objects.create(
             user=request.user if request.user.is_authenticated else None,
             name=name, email=email, subject=subject, message=message
         )
+
+        # E-posta gönder
+        from django.core.mail import send_mail
+        from django.conf import settings
+        
+        subject_display = dict(Contact.SUBJECT_CHOICES).get(subject, subject)
+        email_subject = f"[UniEduNote Destek] {subject_display} - {name}"
+        
+        email_body = f"""
+Yeni bir destek mesajı alındı:
+
+Gönderen: {name}
+E-posta: {email}
+Konu: {subject_display}
+Tarih: {contact.created_at.strftime('%d.%m.%Y %H:%M')}
+Kullanıcı: {'Giriş yapmış' if request.user.is_authenticated else 'Misafir'}
+
+Mesaj:
+{message}
+
+---
+Bu mesaj UniEduNote destek sistemi tarafından otomatik olarak gönderilmiştir.
+        """
+        
+        try:
+            # Destek e-postası alıcı adresi (environment variable'dan al, yoksa default)
+            support_email = os.environ.get('SUPPORT_EMAIL', 'ai.serhat78@gmail.com')
+            send_mail(
+                email_subject,
+                email_body,
+                settings.DEFAULT_FROM_EMAIL,
+                [support_email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            # E-posta gönderilemese bile mesaj kaydedildi, sadece log
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Destek mesajı e-postası gönderilemedi: {str(e)}")
+
         messages.success(request, "Mesajınız alındı! En kısa sürede dönüş yapacağız.")
         return redirect('contact')
 
