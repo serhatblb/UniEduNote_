@@ -88,7 +88,7 @@
         background: rgba(102, 126, 234, 0.05);
     }
 
-    /* Select2 Tasarımı */
+    /* Select2 Tasarımı - X işareti kaldırıldı */
     .select2-container .select2-selection--single {
         height: 52px !important;
         border: 1px solid rgba(0, 0, 0, 0.1) !important;
@@ -102,6 +102,7 @@
 
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 50px !important;
+        right: 12px;
     }
 
     .select2-container--default .select2-selection--single .select2-selection__rendered {
@@ -109,12 +110,22 @@
         font-size: 1rem;
         padding-left: 18px;
         font-weight: 500;
+        line-height: 52px;
     }
 
     .select2-container--open .select2-selection--single {
         border-color: var(--primary-purple) !important;
         background: white !important;
         box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    /* X işaretini gizle */
+    .select2-container--default .select2-selection--single .select2-selection__clear {
+        display: none !important;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%) !important;
     }
 
     .submit-btn {
@@ -224,8 +235,60 @@
         grid-column: span 2;
     }
     
+    .academic-hierarchy-grid label {
+        display: block;
+        margin-bottom: var(--spacing-xs);
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+    }
+    
     .academic-hierarchy-grid label .required {
         color: var(--error);
+        margin-left: 2px;
+    }
+
+    /* Select2 Custom Styling - Upload sayfası için */
+    .academic-hierarchy-grid .select2-container {
+        width: 100% !important;
+    }
+
+    .academic-hierarchy-grid .select2-container .select2-selection--single {
+        height: 52px !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        border-radius: var(--radius-md) !important;
+        background: var(--bg-glass-light) !important;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: var(--text-primary) !important;
+        font-size: 1rem;
+        padding-left: 18px;
+        font-weight: 500;
+        line-height: 52px;
+    }
+
+    .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 50px !important;
+        right: 12px;
+    }
+
+    .academic-hierarchy-grid .select2-container--open .select2-selection--single {
+        border-color: var(--primary-purple) !important;
+        background: white !important;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    /* X işaretini gizle */
+    .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__clear {
+        display: none !important;
+    }
+
+    .academic-hierarchy-grid .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%) !important;
     }
     
     @media (max-width: 768px) {

@@ -105,7 +105,7 @@ class AcademicHierarchySelector {
                     return "Aranıyor...";
                 }
             },
-            allowClear: true
+            allowClear: false  // X işaretini kaldır
         });
     }
     

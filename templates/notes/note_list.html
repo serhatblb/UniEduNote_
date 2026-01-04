@@ -32,14 +32,29 @@
 
     .filter-form {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: var(--spacing-md);
-        align-items: end;
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
     }
 
-    .filter-form select {
+    /* Arama Input Wrapper */
+    .search-input-wrapper {
+        position: relative;
         width: 100%;
-        padding: 12px 16px;
+    }
+
+    .search-input-wrapper .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-light);
+        font-size: 1rem;
+        pointer-events: none;
+    }
+
+    .search-input-wrapper input {
+        width: 100%;
+        padding: 14px 16px 14px 45px;
         border-radius: var(--radius-md);
         border: 1px solid rgba(0, 0, 0, 0.1);
         background: var(--bg-glass-light);
@@ -47,20 +62,82 @@
         font-weight: 500;
         color: var(--text-primary);
         transition: all 0.3s ease;
-        cursor: pointer;
     }
 
-    .filter-form select:focus {
+    .search-input-wrapper input:focus {
         outline: none;
         border-color: var(--primary-purple);
         background: white;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
+    /* Akademik Hiyerarşi Wrapper */
+    .academic-hierarchy-wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--spacing-md);
+    }
+
+    .academic-hierarchy-wrapper .form-group {
+        margin-bottom: 0;
+    }
+
+    .academic-hierarchy-wrapper label {
+        display: block;
+        margin-bottom: var(--spacing-xs);
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    .academic-hierarchy-wrapper label .required {
+        color: var(--error);
+        margin-left: 2px;
+    }
+
+    /* Select2 Custom Styling */
+    .academic-hierarchy-wrapper .select2-container {
+        width: 100% !important;
+    }
+
+    .academic-hierarchy-wrapper .select2-container .select2-selection--single {
+        height: 48px !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        border-radius: var(--radius-md) !important;
+        background: var(--bg-glass-light) !important;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .academic-hierarchy-wrapper .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: var(--text-primary) !important;
+        font-size: 0.95rem;
+        padding-left: 16px;
+        font-weight: 500;
+        line-height: 48px;
+    }
+
+    .academic-hierarchy-wrapper .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 46px !important;
+        right: 12px;
+    }
+
+    .academic-hierarchy-wrapper .select2-container--open .select2-selection--single {
+        border-color: var(--primary-purple) !important;
+        background: white !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .academic-hierarchy-wrapper .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%) !important;
+    }
+
     .filter-buttons {
         display: flex;
-        gap: var(--spacing-sm);
-        grid-column: span 2;
+        gap: var(--spacing-md);
+        margin-top: var(--spacing-md);
+        justify-content: flex-end;
     }
 
     .filter-btn {
@@ -293,9 +370,18 @@
             grid-template-columns: 1fr;
         }
 
+        .academic-hierarchy-wrapper {
+            grid-template-columns: 1fr;
+        }
+
         .filter-buttons {
-            grid-column: span 1;
             flex-direction: column;
+            width: 100%;
+        }
+
+        .filter-btn,
+        .filter-btn-reset {
+            width: 100%;
         }
 
         .filter-btn,
@@ -342,13 +428,15 @@
         </h3>
         <form method="get" class="filter-form" id="filterForm">
             <!-- Arama Input -->
-            <input type="text" name="q" id="search_input" 
-                   placeholder="Başlık, açıklama veya ders adı ara..." 
-                   value="{{ search_query|default:'' }}"
-                   style="width: 100%; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid rgba(0, 0, 0, 0.1); background: var(--bg-glass-light); font-size: 0.95rem; font-weight: 500; color: var(--text-primary);">
+            <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" name="q" id="search_input" 
+                       placeholder="Başlık, açıklama veya ders adı ara..." 
+                       value="{{ search_query|default:'' }}">
+            </div>
             
             <!-- Akademik Hiyerarşi Selector -->
-            <div id="filter-academic-hierarchy-container" style="grid-column: span 4;">
+            <div id="filter-academic-hierarchy-container" class="academic-hierarchy-wrapper">
                 <!-- Component buraya eklenecek -->
             </div>
             
