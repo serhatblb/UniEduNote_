@@ -143,13 +143,9 @@ class UserProfileAPIView(APIView):
 
 # ✅ Session login
 # NOT: DRF APIView kullanıldığı için CSRF koruması otomatik olarak devre dışıdır.
-# Ancak login() fonksiyonu session oluşturduğu için CSRF gerektirebilir.
-# Bu durumda DRF'nin authentication mekanizması CSRF'yi bypass eder.
+# DRF APIView'lar Django'nun CSRF middleware'ini bypass eder.
 class SessionLoginAPIView(APIView):
     permission_classes = [AllowAny]
-    # DRF APIView kullanıldığı için CSRF otomatik olarak devre dışı
-    # Ancak emin olmak için authentication_classes boş bırakılıyor
-    authentication_classes = []  # CSRF bypass için
     
     def post(self, request):
         try:
