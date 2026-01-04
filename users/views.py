@@ -113,7 +113,38 @@ def password_reset_complete_page(request):
 
 @login_required(login_url="/login/")
 def dashboard(request):
-    return render(request, "dashboard.html")
+    """Dashboard - Gamification bilgileri ile"""
+    from rewards.gamification import get_or_create_profile, handle_daily_login
+    from rewards.models import UserProfile
+    
+    # Günlük giriş puanı kontrolü
+    handle_daily_login(request.user)
+    
+    # Gamification profili
+    profile = get_or_create_profile(request.user)
+    xp_progress = profile.get_xp_progress()
+    level_badge = profile.get_level_badge()
+    
+    # Son puan hareketleri (son 5)
+    recent_transactions = profile.user.point_transactions.all()[:5]
+    
+    # İstatistikler
+    stats = {
+        'total_notes': profile.total_notes_created,
+        'total_likes': profile.total_likes_received,
+        'total_downloads': profile.total_downloads_received,
+        'daily_streak': profile.daily_login_streak,
+    }
+    
+    context = {
+        'profile': profile,
+        'xp_progress': xp_progress,
+        'level_badge': level_badge,
+        'recent_transactions': recent_transactions,
+        'stats': stats,
+    }
+    
+    return render(request, "dashboard.html", context)
 
 
 # users/views.py dosyasının en altı:
@@ -139,10 +170,20 @@ def profile(request):
     total_uploads = stats['total_uploads'] or 0
     total_downloads = stats['total_downloads'] or 0
 
-    # --- PUAN HESAPLAMA (XP) ---
-    # Formül: (Yükleme Sayısı * 10) + (Toplam İndirilme Sayısı)
-    total_xp = (total_uploads * 10) + total_downloads
-
+    # --- GAMIFICATION PROFİLİ ---
+    from rewards.gamification import get_or_create_profile
+    from rewards.gamification import handle_profile_completed
+    
+    profile = get_or_create_profile(request.user)
+    
+    # Profil tamamlama kontrolü
+    if not profile.profile_completed:
+        handle_profile_completed(request.user)
+    
+    # XP ve seviye bilgileri
+    xp_progress = profile.get_xp_progress()
+    level_badge = profile.get_level_badge()
+    
     # Üniversiteler
     universities = University.objects.all().order_by('name')
 
@@ -152,7 +193,10 @@ def profile(request):
         'liked_notes': liked_notes_list,
         'total_downloads': total_downloads,
         'total_uploads': total_uploads,
-        'total_xp': total_xp,
+        'total_xp': profile.total_xp,  # Gamification sisteminden
+        'profile': profile,
+        'xp_progress': xp_progress,
+        'level_badge': level_badge,
         'universities': universities,
     }
     return render(request, "users/profile.html", context)

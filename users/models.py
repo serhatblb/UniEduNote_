@@ -18,17 +18,14 @@ class User(AbstractUser):
 
     @property
     def rank(self):
-        """Oyunlaştırma: Puanına göre rütbe getirir"""
-        # Not yükleme 10 puan, İndirilme 1 puan
-        uploads = self.note_set.count()
-        downloads = sum(n.download_count for n in self.note_set.all())
-        score = (uploads * 10) + downloads
-
-        if score < 10: return "🌱 Çaylak"
-        if score < 50: return "✏️ Öğrenci"
-        if score < 100: return "🎓 Mezun"
-        if score < 500: return "👨‍🏫 Asistan"
-        return "🧠 Profesör"
+        """Oyunlaştırma: Seviyeye göre rütbe getirir (Gamification sistemi)"""
+        try:
+            profile = self.gamification_profile
+            badge = profile.get_level_badge()
+            return f"{badge['icon']} {badge['name']}"
+        except:
+            # Profil yoksa eski sistem (geriye dönük uyumluluk)
+            return "🌱 Çaylak"
 
 
 class Notification(models.Model):

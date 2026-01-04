@@ -105,6 +105,10 @@ def download_note(request, pk):
                     user=note.user,  # Notun sahibine
                     message=f"Tebrikler! '{note.title}' başlıklı notun {request.user.username} tarafından indirildi. 🎉"
                 )
+                
+                # GAMIFICATION: İndirme puanı ver
+                from rewards.gamification import handle_download_received
+                handle_download_received(note, request.user)
 
             return redirect(note.file.url)
     except Exception as e:
