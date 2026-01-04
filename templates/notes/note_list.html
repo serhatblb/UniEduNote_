@@ -33,7 +33,7 @@
     .filter-form {
         display: grid;
         grid-template-columns: 1fr;
-        gap: var(--spacing-lg);
+        gap: var(--spacing-md);
     }
 
     /* Arama Input Wrapper */
@@ -71,11 +71,17 @@
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
-    /* Akademik Hiyerarşi Wrapper */
+    /* Akademik Hiyerarşi Wrapper - Yan yana, daha kompakt */
     .academic-hierarchy-wrapper {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: var(--spacing-md);
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--spacing-sm);
+    }
+
+    @media (max-width: 1200px) {
+        .academic-hierarchy-wrapper {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 
     .academic-hierarchy-wrapper .form-group {
@@ -87,7 +93,7 @@
         margin-bottom: var(--spacing-xs);
         font-weight: 700;
         color: var(--text-primary);
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
 
     .academic-hierarchy-wrapper label .required {
@@ -101,7 +107,7 @@
     }
 
     .academic-hierarchy-wrapper .select2-container .select2-selection--single {
-        height: 48px !important;
+        height: 44px !important;
         border: 1px solid rgba(0, 0, 0, 0.1) !important;
         border-radius: var(--radius-md) !important;
         background: var(--bg-glass-light) !important;
@@ -112,15 +118,15 @@
 
     .academic-hierarchy-wrapper .select2-container--default .select2-selection--single .select2-selection__rendered {
         color: var(--text-primary) !important;
-        font-size: 0.95rem;
-        padding-left: 16px;
+        font-size: 0.9rem;
+        padding-left: 14px;
         font-weight: 500;
-        line-height: 48px;
+        line-height: 44px;
     }
 
     .academic-hierarchy-wrapper .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 46px !important;
-        right: 12px;
+        height: 42px !important;
+        right: 10px;
     }
 
     .academic-hierarchy-wrapper .select2-container--open .select2-selection--single {
@@ -372,6 +378,7 @@
 
         .academic-hierarchy-wrapper {
             grid-template-columns: 1fr;
+            gap: var(--spacing-sm);
         }
 
         .filter-buttons {
