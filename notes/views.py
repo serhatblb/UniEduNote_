@@ -149,7 +149,17 @@ def load_faculties(request):
 
 def load_departments(request):
     faculty_id = request.GET.get('faculty')
-    departments = Department.objects.filter(faculty_id=faculty_id).order_by('name')
+    university_id = request.GET.get('university_id')
+    
+    if university_id:
+        # Üniversiteye göre tüm bölümleri getir
+        departments = Department.objects.filter(faculty__university_id=university_id).order_by('name')
+    elif faculty_id:
+        # Fakülteye göre bölümleri getir
+        departments = Department.objects.filter(faculty_id=faculty_id).order_by('name')
+    else:
+        departments = Department.objects.none()
+    
     return JsonResponse(list(departments.values('id', 'name')), safe=False)
 
 def load_courses(request):

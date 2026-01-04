@@ -6,7 +6,7 @@
     /* Profil Header */
     .profile-card { padding: 30px; display: flex; align-items: center; gap: 30px; position: relative; overflow: hidden; }
     .profile-avatar-xl { width: 120px; height: 120px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; border: 5px solid white; box-shadow: 0 10px 30px rgba(0,122,255,0.3); z-index: 2; position: relative; }
-    .profile-avatar-xl img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-avatar-xl img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
     .rank-tag { background: #FFD60A; color: black; font-weight: 700; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; display: inline-block; margin-top: 5px; box-shadow: 0 4px 10px rgba(255, 214, 10, 0.4); }
 
@@ -29,6 +29,43 @@
     .card-actions { position: absolute; top: 15px; right: 15px; opacity: 0; transition: 0.3s; display: flex; gap: 8px; }
     .mini-card:hover .card-actions { opacity: 1; }
 
+    /* Form Stilleri */
+    .profile-form { display: grid; gap: 15px; }
+    .profile-form input, .profile-form select {
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.1);
+        font-size: 1rem;
+        width: 100%;
+    }
+    .profile-form input:focus, .profile-form select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    .profile-form button {
+        padding: 12px 24px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .profile-form button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+    .profile-form .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+    .profile-form .file-input-wrapper input[type="file"] {
+        padding: 8px;
+    }
+
     @media (max-width: 768px) {
         .profile-card { flex-direction: column; text-align: center; padding: 20px; }
         .stats-row { justify-content: center; width: 100%; }
@@ -40,7 +77,7 @@
 <div class="glass profile-card">
     <div class="profile-avatar-xl">
         {% if user.avatar %}
-            <img src="{{ user.avatar.url }}" style="border-radius: 50%;">
+            <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
         {% else %}
             {{ user.username|make_list|first|upper }}
         {% endif %}
@@ -119,36 +156,55 @@
 </div>
 
 <div id="settings" class="tab-content" style="display: none;">
-    <!-- Ayarlar Formu (Eski profile.html'deki form buraya) -->
     <div class="glass" style="padding: 30px;">
-        <h3 style="margin-bottom: 20px;">Profili Düzenle</h3>
-        <!-- Buraya önceki mesajdaki AJAX'lı formunu koyabilirsin veya iframe gibi çağırabiliriz.
-             Şimdilik basitçe düzenleme sayfasına yönlendirelim veya önceki AJAX formunu buraya taşı. -->
-        {% include 'users/profile_edit_form.html' %}
-        <!-- NOT: Aşağıdaki script içinde formu tanımlayacağız -->
+        <h3 style="margin-bottom: 20px; color: var(--text-dark);">Profili Düzenle</h3>
+        <form id="profileForm" class="profile-form" enctype="multipart/form-data">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; color: var(--text-dark);">Kullanıcı Adı</label>
+                <input type="text" id="username" name="username" value="{{ user.username }}" placeholder="Kullanıcı Adı" required>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; color: var(--text-dark);">E-posta</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" placeholder="E-posta" required>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; color: var(--text-dark);">Üniversite</label>
+                <select id="university" name="university">
+                    <option value="">Üniversite Seç</option>
+                    {% for uni in universities %}
+                        <option value="{{ uni.id }}" {% if user.university and user.university.id == uni.id %}selected{% endif %}>{{ uni.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; color: var(--text-dark);">Profil Fotoğrafı</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="avatarInput" name="avatar" accept="image/*">
+                </div>
+            </div>
+            <button type="submit">Kaydet</button>
+            <p id="msg" style="margin-top: 10px; font-weight: 600;"></p>
+        </form>
     </div>
 </div>
 
-<!-- Ayarlar Formu İçin Template (Dosya oluşturmana gerek yok, buraya gömdüm) -->
-<script type="text/template" id="editFormTemplate">
-    <form id="profileForm" enctype="multipart/form-data">
-        <div style="display: grid; gap: 15px;">
-            <input type="text" id="username" value="{{ user.username }}" placeholder="Kullanıcı Adı">
-            <input type="email" id="email" value="{{ user.email }}" placeholder="E-posta">
-            <select id="university">
-                <option value="">Üniversite Seç</option>
-                {% for uni in universities %}
-                    <option value="{{ uni.id }}" {% if user.university.id == uni.id %}selected{% endif %}>{{ uni.name }}</option>
-                {% endfor %}
-            </select>
-            <input type="file" id="avatarInput">
-            <button type="submit" class="btn-primary" style="padding: 12px; border-radius: 10px; border: none; color: white; cursor: pointer;">Kaydet</button>
-        </div>
-        <p id="msg" style="margin-top: 10px;"></p>
-    </form>
-</script>
-
 <script>
+    // CSRF Token al
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     // Tab Geçişleri
     function openTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
@@ -158,39 +214,68 @@
         event.currentTarget.classList.add('active');
     }
 
-    // Settings Tab'ına Formu Yükle
-    const settingsDiv = document.querySelector('#settings .glass');
-    if(settingsDiv && !settingsDiv.querySelector('form')) {
-        settingsDiv.innerHTML += document.getElementById('editFormTemplate').innerHTML;
+    // Profil Güncelleme Formu
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('profileForm');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const msg = document.getElementById('msg');
+                msg.innerText = "⏳ Kaydediliyor...";
+                msg.style.color = "#667eea";
 
-        // Form Event Listener (AJAX Kayıt)
-        setTimeout(() => {
-            const form = settingsDiv.querySelector('form');
-            if(form) {
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const msg = form.querySelector('#msg');
-                    msg.innerText = "⏳ Kaydediliyor...";
+                const formData = new FormData();
+                formData.append('username', document.getElementById('username').value);
+                formData.append('email', document.getElementById('email').value);
+                
+                const universityValue = document.getElementById('university').value;
+                if (universityValue) {
+                    formData.append('university', universityValue);
+                }
+                
+                const file = document.getElementById('avatarInput').files[0];
+                if (file) {
+                    formData.append('avatar', file);
+                }
 
-                    const formData = new FormData();
-                    formData.append('username', form.querySelector('#username').value);
-                    formData.append('email', form.querySelector('#email').value);
-                    if(form.querySelector('#university').value) formData.append('university', form.querySelector('#university').value);
-                    const file = form.querySelector('#avatarInput').files[0];
-                    if(file) formData.append('avatar', file);
+                try {
+                    const token = localStorage.getItem('access');
+                    const csrftoken = getCookie('csrftoken');
+                    
+                    const headers = {
+                        'X-CSRFToken': csrftoken
+                    };
+                    
+                    if (token) {
+                        headers['Authorization'] = 'Bearer ' + token;
+                    }
 
-                    try {
-                        const res = await fetch('/api/auth/profile/update/', {
-                            method: 'POST',
-                            headers: {'Authorization': 'Bearer ' + localStorage.getItem('access'), 'X-CSRFToken': '{{ csrf_token }}'},
-                            body: formData
-                        });
-                        if(res.ok) { msg.innerText = "✅ Kaydedildi!"; setTimeout(() => location.reload(), 1000); }
-                        else { msg.innerText = "⚠️ Hata oluştu."; }
-                    } catch { msg.innerText = "⚠️ Sunucu hatası."; }
-                });
-            }
-        }, 500);
-    }
+                    const res = await fetch('/api/auth/profile/update/', {
+                        method: 'POST',
+                        headers: headers,
+                        body: formData
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        msg.innerText = "✅ Profil başarıyla güncellendi!";
+                        msg.style.color = "#34C759";
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        msg.innerText = "⚠️ " + (data.error || data.message || "Bir hata oluştu.");
+                        msg.style.color = "#FF3B30";
+                        console.error('Hata:', data);
+                    }
+                } catch (error) {
+                    msg.innerText = "⚠️ Sunucu hatası. Lütfen tekrar deneyin.";
+                    msg.style.color = "#FF3B30";
+                    console.error('Hata:', error);
+                }
+            });
+        }
+    });
 </script>
 {% endblock %}

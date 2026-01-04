@@ -98,22 +98,22 @@
         animation: fadeInUp 0.8s ease;
     }
 
-    /* === Not Kartları (Grid) === */
+    /* === Not Kartları (Grid) - Daha Dar === */
     .notes-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 25px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
         animation: fadeInUp 0.9s ease;
     }
 
     .note-card {
-        padding: 25px;
+        padding: 20px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         transition: all 0.3s ease;
         position: relative;
-        min-height: 220px;
+        min-height: 200px;
         animation: floatCard 6s ease-in-out infinite;
     }
 
@@ -133,6 +133,16 @@
     .note-icon {
         font-size: 2.5rem;
         margin-bottom: 12px;
+    }
+
+    .note-icon .fa-file-pdf { color: #dc3545; }
+    .note-icon .fa-file-word { color: #2b579a; }
+    .note-icon .fa-file-excel { color: #1d6f42; }
+    .note-icon .fa-file-powerpoint { color: #d04423; }
+    .note-icon .fa-file-image { color: #34c759; }
+    .note-icon .fa-file-zipper { color: #ff9500; }
+    .note-icon .fa-file-lines { color: #667eea; }
+    .note-icon .fa-file { 
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -140,7 +150,7 @@
     }
 
     .note-title {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 800;
         margin-bottom: 8px;
         color: var(--text-dark);
@@ -198,6 +208,50 @@
         background: #f093fb;
         color: white;
         transform: scale(1.05);
+    }
+
+    /* === Pagination === */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin: 40px 0;
+        flex-wrap: wrap;
+    }
+
+    .pagination a, .pagination span {
+        padding: 10px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .pagination a {
+        background: rgba(255, 255, 255, 0.6);
+        color: var(--text-dark);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .pagination a:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .pagination .current {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .pagination .disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
     }
 
     /* === Boş Durum === */
@@ -258,24 +312,21 @@
     <h3 style="margin-bottom: 18px; color: var(--text-dark); font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px;">
         <i class="fa-solid fa-filter"></i> Notları Filtrele
     </h3>
-    <form method="get" class="filter-form">
-        <select name="university">
+    <form method="get" class="filter-form" id="filterForm">
+        <select name="university" id="filter_university">
             <option value="">Üniversite Seç</option>
             {% for uni in universities %}
             <option value="{{ uni.id }}" {% if request.GET.university == uni.id|stringformat:"s" %}selected{% endif %}>{{ uni.name }}</option>
             {% endfor %}
         </select>
-        <select name="department">
-            <option value="">Bölüm Seç</option>
-            {% for dep in departments %}
-            <option value="{{ dep.id }}" {% if request.GET.department == dep.id|stringformat:"s" %}selected{% endif %}>{{ dep.name }}</option>
-            {% endfor %}
+        <select name="faculty" id="filter_faculty" style="display: none;">
+            <option value="">Fakülte Seç</option>
         </select>
-        <select name="course">
+        <select name="department" id="filter_department">
+            <option value="">Bölüm Seç</option>
+        </select>
+        <select name="course" id="filter_course">
             <option value="">Ders Seç</option>
-            {% for c in courses %}
-            <option value="{{ c.id }}" {% if request.GET.course == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
-            {% endfor %}
         </select>
         <button type="submit" class="filter-btn">Ara</button>
     </form>
@@ -283,9 +334,9 @@
 
 <!-- Sıralama Butonları -->
 <div class="sort-buttons">
-    <a href="?sort=newest" class="glass"><i class="fa-solid fa-clock"></i> En Yeni</a>
-    <a href="?sort=popular" class="glass"><i class="fa-solid fa-fire"></i> Popüler</a>
-    <a href="?sort=liked" class="glass"><i class="fa-solid fa-heart"></i> Beğenilen</a>
+    <a href="?sort=newest{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}" class="glass"><i class="fa-solid fa-clock"></i> En Yeni</a>
+    <a href="?sort=popular{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}" class="glass"><i class="fa-solid fa-fire"></i> Popüler</a>
+    <a href="?sort=liked{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}" class="glass"><i class="fa-solid fa-heart"></i> Beğenilen</a>
 </div>
 
 <!-- Reklam Alanı -->
@@ -298,7 +349,7 @@
     {% for note in notes %}
     <div class="glass note-card" data-note="{{ note.id }}">
         <div>
-            <div class="note-icon"><i class="fa-regular fa-file-lines"></i></div>
+            <div class="note-icon"><i class="fa-solid {{ note.get_file_icon }}"></i></div>
             <div class="note-title">{{ note.title }}</div>
             <div class="note-info">
                 <i class="fa-solid fa-graduation-cap"></i> {{ note.course.name }} <br>
@@ -321,6 +372,31 @@
     </div>
     {% endfor %}
 </div>
+
+<!-- Pagination -->
+{% if notes.has_other_pages %}
+<div class="pagination">
+    {% if notes.has_previous %}
+        <a href="?page=1{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}">&laquo; İlk</a>
+        <a href="?page={{ notes.previous_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}">Önceki</a>
+    {% else %}
+        <span class="disabled">&laquo; İlk</span>
+        <span class="disabled">Önceki</span>
+    {% endif %}
+
+    <span class="current">
+        Sayfa {{ notes.number }} / {{ notes.paginator.num_pages }}
+    </span>
+
+    {% if notes.has_next %}
+        <a href="?page={{ notes.next_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}">Sonraki</a>
+        <a href="?page={{ notes.paginator.num_pages }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}">Son &raquo;</a>
+    {% else %}
+        <span class="disabled">Sonraki</span>
+        <span class="disabled">Son &raquo;</span>
+    {% endif %}
+</div>
+{% endif %}
 
 <!-- Beğeni Scripti -->
 <script>
@@ -353,14 +429,80 @@ async function toggleLike(noteId, btn){
 }
 </script>
 
+<!-- AJAX Filtreleme -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('select').select2({
-        width: '100%',
-        placeholder: "Seçiniz...",
-        minimumResultsForSearch: 0
+    // Üniversite değişince -> Fakülteleri ve Bölümleri Getir
+    $("#filter_university").change(function() {
+        var universityId = $(this).val();
+        var $department = $("#filter_department");
+        var $course = $("#filter_course");
+        
+        // Bölüm ve ders listelerini temizle
+        $department.empty().append('<option value="">Bölüm Seç</option>');
+        $course.empty().append('<option value="">Ders Seç</option>');
+        
+        if (!universityId) return;
+        
+        // Fakülteleri getir (gerekirse)
+        $.ajax({
+            url: "{% url 'ajax_load_faculties' %}",
+            data: { 'university': universityId },
+            success: function(faculties) {
+                // İlk fakültenin bölümlerini getir
+                if (faculties.length > 0) {
+                    loadDepartments(faculties[0].id);
+                }
+            }
+        });
+        
+        // Tüm bölümleri getir (üniversiteye göre)
+        $.ajax({
+            url: "{% url 'ajax_load_departments' %}",
+            data: { 'university_id': universityId },
+            success: function(departments) {
+                $.each(departments, function(key, value) {
+                    $department.append('<option value="' + value.id + '">' + value.name + '</option>');
+                });
+            }
+        });
     });
+    
+    // Bölüm değişince -> Dersleri Getir
+    $("#filter_department").change(function() {
+        var departmentId = $(this).val();
+        var $course = $("#filter_course");
+        
+        $course.empty().append('<option value="">Ders Seç</option>');
+        
+        if (!departmentId) return;
+        
+        $.ajax({
+            url: "{% url 'ajax_load_courses' %}",
+            data: { 'department': departmentId },
+            success: function(courses) {
+                $.each(courses, function(key, value) {
+                    $course.append('<option value="' + value.id + '">' + value.name + '</option>');
+                });
+            }
+        });
+    });
+    
+    // Sayfa yüklendiğinde mevcut filtreleri yükle
+    {% if request.GET.university %}
+        $("#filter_university").trigger('change');
+        {% if request.GET.department %}
+            setTimeout(function() {
+                $("#filter_department").val("{{ request.GET.department }}").trigger('change');
+                {% if request.GET.course %}
+                    setTimeout(function() {
+                        $("#filter_course").val("{{ request.GET.course }}");
+                    }, 500);
+                {% endif %}
+            }, 500);
+        {% endif %}
+    {% endif %}
 });
 </script>
 {% endblock %}

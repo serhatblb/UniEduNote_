@@ -26,6 +26,38 @@ class Note(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.course})"
+    
+    def get_file_icon(self):
+        """Dosya tipine göre ikon döndürür"""
+        if not self.file:
+            return "fa-file"
+        
+        file_name = self.file.name.lower()
+        
+        # PDF
+        if file_name.endswith('.pdf'):
+            return "fa-file-pdf"
+        # Word
+        elif file_name.endswith(('.doc', '.docx')):
+            return "fa-file-word"
+        # Excel
+        elif file_name.endswith(('.xls', '.xlsx')):
+            return "fa-file-excel"
+        # PowerPoint
+        elif file_name.endswith(('.ppt', '.pptx')):
+            return "fa-file-powerpoint"
+        # Resimler
+        elif file_name.endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp')):
+            return "fa-file-image"
+        # Zip/Rar
+        elif file_name.endswith(('.zip', '.rar', '.7z')):
+            return "fa-file-zipper"
+        # Text
+        elif file_name.endswith('.txt'):
+            return "fa-file-lines"
+        # Default
+        else:
+            return "fa-file"
 
 
 # 💬 Yorum Modeli
