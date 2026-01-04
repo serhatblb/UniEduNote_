@@ -185,6 +185,53 @@
     }
 </style>
 
+
+
+<div class="bento-grid">
+
+    <!-- Büyük Aksiyon Kartı -->
+    <div class="card glass card-big">
+        <div class="card-title">
+            <span>🚀 Hızlı İşlem</span>
+            <i class="fa-solid fa-bolt" style="color: #FFD60A; font-size: 1.2rem;"></i>
+        </div>
+        <div>
+            <h3 style="margin-bottom: 8px; font-size: 1.4rem; font-weight: 700;">Bilgi Paylaştıkça Çoğalır</h3>
+            <p style="color: #86868B; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
+                Ders notlarını yükle, arkadaşlarına yardımcı ol ve toplulukta öne çık.
+            </p>
+        </div>
+        <a href="{% url 'upload_note' %}" class="action-btn">
+            <i class="fa-solid fa-plus"></i> Yeni Not Yükle
+        </a>
+    </div>
+
+    <!-- Keşfet Kartı -->
+    <div class="card glass">
+        <div class="card-title">
+            <span>📚 Kütüphane</span>
+            <i class="fa-solid fa-book-open" style="color: #30D158;"></i>
+        </div>
+        <p style="color: #86868B; font-size: 0.9rem; margin-bottom: 10px;">
+            Üniversite, fakülte ve bölümlere göre notları incele.
+        </p>
+        <a href="{% url 'note_list' %}" class="action-btn" style="background: rgba(0,0,0,0.05); color: #1D1D1F;">
+            Notları Keşfet
+        </a>
+    </div>
+
+    <!-- Puan Kartı -->
+    <div class="card glass">
+        <div class="card-title">
+            <span>🏆 Puanım</span>
+            <i class="fa-solid fa-star" style="color: #FF9500;"></i>
+        </div>
+        <!-- Puan verisi veritabanından gelecek, şimdilik statik -->
+        <div class="card-value">0</div>
+        <div style="color: #34C759; font-size: 0.9rem; margin-top: 5px; font-weight: 600;">
+            <i class="fa-solid fa-arrow-trend-up"></i> Başlangıç Seviyesi
+        </div>
+    </div>
 <!-- Bilgilendirme Alanı -->
 <div class="info-hero">
     <div class="info-hero-content">
@@ -239,52 +286,5 @@
         </div>
     </div>
 </div>
-
-<div class="bento-grid">
-
-    <!-- Büyük Aksiyon Kartı -->
-    <div class="card glass card-big">
-        <div class="card-title">
-            <span>🚀 Hızlı İşlem</span>
-            <i class="fa-solid fa-bolt" style="color: #FFD60A; font-size: 1.2rem;"></i>
-        </div>
-        <div>
-            <h3 style="margin-bottom: 8px; font-size: 1.4rem; font-weight: 700;">Bilgi Paylaştıkça Çoğalır</h3>
-            <p style="color: #86868B; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
-                Ders notlarını yükle, arkadaşlarına yardımcı ol ve toplulukta öne çık.
-            </p>
-        </div>
-        <a href="{% url 'upload_note' %}" class="action-btn">
-            <i class="fa-solid fa-plus"></i> Yeni Not Yükle
-        </a>
-    </div>
-
-    <!-- Keşfet Kartı -->
-    <div class="card glass">
-        <div class="card-title">
-            <span>📚 Kütüphane</span>
-            <i class="fa-solid fa-book-open" style="color: #30D158;"></i>
-        </div>
-        <p style="color: #86868B; font-size: 0.9rem; margin-bottom: 10px;">
-            Üniversite, fakülte ve bölümlere göre notları incele.
-        </p>
-        <a href="{% url 'note_list' %}" class="action-btn" style="background: rgba(0,0,0,0.05); color: #1D1D1F;">
-            Notları Keşfet
-        </a>
-    </div>
-
-    <!-- Puan Kartı -->
-    <div class="card glass">
-        <div class="card-title">
-            <span>🏆 Puanım</span>
-            <i class="fa-solid fa-star" style="color: #FF9500;"></i>
-        </div>
-        <!-- Puan verisi veritabanından gelecek, şimdilik statik -->
-        <div class="card-value">0</div>
-        <div style="color: #34C759; font-size: 0.9rem; margin-top: 5px; font-weight: 600;">
-            <i class="fa-solid fa-arrow-trend-up"></i> Başlangıç Seviyesi
-        </div>
-    </div>
-
 </div>
 {% endblock %}
