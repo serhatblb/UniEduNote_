@@ -346,21 +346,18 @@
                    placeholder="Başlık, açıklama veya ders adı ara..." 
                    value="{{ search_query|default:'' }}"
                    style="width: 100%; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid rgba(0, 0, 0, 0.1); background: var(--bg-glass-light); font-size: 0.95rem; font-weight: 500; color: var(--text-primary);">
-            <select name="university" id="filter_university">
-                <option value="">Üniversite Seç</option>
-                {% for uni in universities %}
-                <option value="{{ uni.id }}" {% if request.GET.university == uni.id|stringformat:"s" %}selected{% endif %}>{{ uni.name }}</option>
-                {% endfor %}
-            </select>
-            <select name="faculty" id="filter_faculty" style="display: none;">
-                <option value="">Fakülte Seç</option>
-            </select>
-            <select name="department" id="filter_department">
-                <option value="">Bölüm Seç</option>
-            </select>
-            <select name="course" id="filter_course">
-                <option value="">Ders Seç</option>
-            </select>
+            
+            <!-- Akademik Hiyerarşi Selector -->
+            <div id="filter-academic-hierarchy-container" style="grid-column: span 4;">
+                <!-- Component buraya eklenecek -->
+            </div>
+            
+            <!-- Hidden fields for form submission -->
+            <input type="hidden" name="university" id="filter-form-university" value="{{ request.GET.university|default:'' }}">
+            <input type="hidden" name="faculty" id="filter-form-faculty" value="{{ request.GET.faculty|default:'' }}">
+            <input type="hidden" name="department" id="filter-form-department" value="{{ request.GET.department|default:'' }}">
+            <input type="hidden" name="course" id="filter-form-course" value="{{ request.GET.course|default:'' }}">
+            
             <div class="filter-buttons">
                 <button type="submit" class="btn btn-primary filter-btn">
                     <i class="fa-solid fa-magnifying-glass"></i> Ara
@@ -482,77 +479,32 @@ async function toggleLike(noteId, btn){
 
 <!-- AJAX Filtreleme -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static 'js/academic-hierarchy.js' %}"></script>
 <script>
 $(document).ready(function() {
-    // Üniversite değişince -> Fakülteleri ve Bölümleri Getir
-    $("#filter_university").change(function() {
-        var universityId = $(this).val();
-        var $department = $("#filter_department");
-        var $course = $("#filter_course");
-        
-        // Bölüm ve ders listelerini temizle
-        $department.empty().append('<option value="">Bölüm Seç</option>');
-        $course.empty().append('<option value="">Ders Seç</option>');
-        
-        if (!universityId) return;
-        
-        // Fakülteleri getir (gerekirse)
-        $.ajax({
-            url: "{% url 'ajax_load_faculties' %}",
-            data: { 'university': universityId },
-            success: function(faculties) {
-                // İlk fakültenin bölümlerini getir
-                if (faculties.length > 0) {
-                    loadDepartments(faculties[0].id);
-                }
-            }
-        });
-        
-        // Tüm bölümleri getir (üniversiteye göre)
-        $.ajax({
-            url: "{% url 'ajax_load_departments' %}",
-            data: { 'university_id': universityId },
-            success: function(departments) {
-                $.each(departments, function(key, value) {
-                    $department.append('<option value="' + value.id + '">' + value.name + '</option>');
-                });
-            }
-        });
-    });
-    
-    // Bölüm değişince -> Dersleri Getir
-    $("#filter_department").change(function() {
-        var departmentId = $(this).val();
-        var $course = $("#filter_course");
-        
-        $course.empty().append('<option value="">Ders Seç</option>');
-        
-        if (!departmentId) return;
-        
-        $.ajax({
-            url: "{% url 'ajax_load_courses' %}",
-            data: { 'department': departmentId },
-            success: function(courses) {
-                $.each(courses, function(key, value) {
-                    $course.append('<option value="' + value.id + '">' + value.name + '</option>');
-                });
-            }
-        });
+    // Akademik Hiyerarşi Selector (Filtreleme için)
+    const filterHierarchySelector = new AcademicHierarchySelector({
+        container: '#filter-academic-hierarchy-container',
+        onSelectionChange: function(data) {
+            // Hidden form fields'ı güncelle
+            $('#filter-form-university').val(data.university_id || '');
+            $('#filter-form-faculty').val(data.faculty_id || '');
+            $('#filter-form-department').val(data.department_id || '');
+            $('#filter-form-course').val(data.course_id || '');
+        },
+        required: [], // Filtrelemede zorunlu değil
+        searchEnabled: true
     });
     
     // Sayfa yüklendiğinde mevcut filtreleri yükle
     {% if request.GET.university %}
-        $("#filter_university").trigger('change');
-        {% if request.GET.department %}
-            setTimeout(function() {
-                $("#filter_department").val("{{ request.GET.department }}").trigger('change');
-                {% if request.GET.course %}
-                    setTimeout(function() {
-                        $("#filter_course").val("{{ request.GET.course }}");
-                    }, 500);
-                {% endif %}
-            }, 500);
-        {% endif %}
+        filterHierarchySelector.setValues(
+            {{ request.GET.university|default:'null' }},
+            {{ request.GET.faculty|default:'null' }},
+            {{ request.GET.department|default:'null' }},
+            {{ request.GET.course|default:'null' }}
+        );
     {% endif %}
 });
 </script>

@@ -168,25 +168,20 @@
             {% csrf_token %}
 
             <div class="form-grid">
-                <div class="form-group">
-                    <label>Üniversite</label>
-                    {{ form.university }}
+                <!-- Akademik Hiyerarşi Selector -->
+                <div class="form-group full-width" id="academic-hierarchy-container">
+                    <!-- Component buraya eklenecek -->
                 </div>
-                <div class="form-group">
-                    <label>Fakülte</label>
-                    {{ form.faculty }}
-                </div>
-                <div class="form-group">
-                    <label>Bölüm</label>
-                    {{ form.department }}
-                </div>
+                
+                <!-- Hidden fields for form submission (Django form fields) -->
+                {{ form.university.as_hidden }}
+                {{ form.faculty.as_hidden }}
+                {{ form.department.as_hidden }}
+                {{ form.course.as_hidden }}
+                
                 <div class="form-group">
                     <label>Dönem</label>
                     {{ form.semester }}
-                </div>
-                <div class="form-group full-width">
-                    <label>Ders</label>
-                    {{ form.course }}
                 </div>
                 <div class="form-group full-width">
                     <label>Not Başlığı</label>
@@ -212,82 +207,72 @@
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="{% static 'js/academic-hierarchy.js' %}"></script>
+
+<style>
+    .academic-hierarchy-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-lg);
+    }
+    
+    .academic-hierarchy-grid .form-group {
+        margin-bottom: 0;
+    }
+    
+    .academic-hierarchy-grid .form-group.full-width {
+        grid-column: span 2;
+    }
+    
+    .academic-hierarchy-grid label .required {
+        color: var(--error);
+    }
+    
+    @media (max-width: 768px) {
+        .academic-hierarchy-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .academic-hierarchy-grid .form-group.full-width {
+            grid-column: span 1;
+        }
+    }
+</style>
 
 <script>
     $(document).ready(function () {
-        $('select').select2({
+        // Dönem select2
+        $('#id_semester').select2({
             width: '100%',
-            placeholder: "Seçmek için yazın...",
+            placeholder: "Dönem seçiniz...",
             language: {
                 noResults: function() {
                     return "Sonuç bulunamadı";
                 }
             }
         });
-
-        // Üniversite değişince -> Fakülteleri Getir
-        $("#id_university").change(function () {
-            var url = "{% url 'ajax_load_faculties' %}";
-            var universityId = $(this).val();
-
-            $.ajax({
-                url: url, data: { 'university': universityId },
-                success: function (data) {
-                    var $faculty = $("#id_faculty");
-                    $faculty.empty().append('<option value="">---------</option>');
-
-                    $("#id_department").empty().append('<option value="">---------</option>').trigger('change');
-                    $("#id_course").empty().append('<option value="">---------</option>').trigger('change');
-
-                    $.each(data, function (key, value) {
-                        $faculty.append('<option value="' + value.id + '">' + value.name + '</option>');
-                    });
-
-                    $faculty.trigger('change');
-                }
-            });
+        
+        // Akademik Hiyerarşi Selector
+        const hierarchySelector = new AcademicHierarchySelector({
+            container: '#academic-hierarchy-container',
+            onSelectionChange: function(data) {
+                // Django form fields'ı güncelle
+                $('#id_university').val(data.university_id || '');
+                $('#id_faculty').val(data.faculty_id || '');
+                $('#id_department').val(data.department_id || '');
+                $('#id_course').val(data.course_id || '');
+            },
+            required: ['university', 'faculty', 'department', 'course'],
+            searchEnabled: true
         });
-
-        // Fakülte değişince -> Bölümleri Getir
-        $("#id_faculty").change(function () {
-            var url = "{% url 'ajax_load_departments' %}";
-            var facultyId = $(this).val();
-
-            $.ajax({
-                url: url, data: { 'faculty': facultyId },
-                success: function (data) {
-                    var $dept = $("#id_department");
-                    $dept.empty().append('<option value="">---------</option>');
-
-                    $("#id_course").empty().append('<option value="">---------</option>').trigger('change');
-
-                    $.each(data, function (key, value) {
-                        $dept.append('<option value="' + value.id + '">' + value.name + '</option>');
-                    });
-
-                    $dept.trigger('change');
-                }
-            });
-        });
-
-        // Bölüm değişince -> Dersleri Getir
-        $("#id_department").change(function () {
-            var url = "{% url 'ajax_load_courses' %}";
-            var departmentId = $(this).val();
-
-            $.ajax({
-                url: url, data: { 'department': departmentId },
-                success: function (data) {
-                    var $course = $("#id_course");
-                    $course.empty().append('<option value="">---------</option>');
-
-                    $.each(data, function (key, value) {
-                        $course.append('<option value="' + value.id + '">' + value.name + '</option>');
-                    });
-
-                    $course.trigger('change');
-                }
-            });
+        
+        // Form validation
+        $('#id_upload_form').on('submit', function(e) {
+            if (!hierarchySelector.isValid()) {
+                e.preventDefault();
+                alert('Lütfen tüm akademik bilgileri seçiniz (Üniversite, Fakülte, Bölüm, Ders)');
+                return false;
+            }
         });
     });
 </script>

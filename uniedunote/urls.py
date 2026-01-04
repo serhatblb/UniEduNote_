@@ -42,6 +42,7 @@ urlpatterns = [
     # --- API ---
     path('api/auth/', include('users.urls')),
     path("api/notes/", include("notes.urls")),
+    path('api/academic/', include('categories.urls')),
 
     path('chat/', chat_views.chat_room, name='chat_room'),
     path('chat/get/', chat_views.get_messages, name='get_messages'),
