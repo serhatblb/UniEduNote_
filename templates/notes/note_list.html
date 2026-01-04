@@ -22,7 +22,7 @@
     }
     
     .filter-section h3 {
-        margin-bottom: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
         color: var(--text-primary);
         font-weight: 800;
         font-size: 1.1rem;
@@ -35,15 +35,16 @@
         display: flex;
         flex-direction: row;
         align-items: flex-end;
-        gap: var(--spacing-sm);
-        flex-wrap: wrap;
+        gap: var(--spacing-xs);
+        flex-wrap: nowrap;
     }
     
-    /* Arama Input Wrapper - Yatay */
+    /* Arama Input Wrapper - Sonra arama */
     .search-input-wrapper {
         position: relative;
         flex: 1;
         min-width: 200px;
+        max-width: 300px;
     }
     
     .search-input-wrapper .search-icon {
@@ -77,18 +78,19 @@
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
     
-    /* Akademik Hiyerarşi Wrapper - Yatay, yan yana */
+    /* Akademik Hiyerarşi Wrapper - Önce dropdown'lar, yan yana */
     .academic-hierarchy-wrapper {
         display: flex;
         flex-direction: row;
         gap: var(--spacing-xs);
-        flex: 1;
+        flex: 0 0 auto;
         min-width: 0;
     }
     
     .academic-hierarchy-wrapper .form-group {
-        flex: 1;
-        min-width: 150px;
+        flex: 0 0 auto;
+        width: 160px;
+        min-width: 140px;
     }
     
     .academic-hierarchy-wrapper .form-group {
@@ -100,7 +102,7 @@
         margin-bottom: 4px;
         font-weight: 600;
         color: var(--text-primary);
-        font-size: 0.75rem;
+        font-size: 0.8rem;
     }
     
     .academic-hierarchy-wrapper label .required {
@@ -146,16 +148,17 @@
         background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%) !important;
     }
     
-    /* Filtre Butonları - Yatay */
+    /* Filtre Butonları - En sağda */
     .filter-buttons {
         display: flex;
         gap: var(--spacing-xs);
         flex-shrink: 0;
+        align-items: center;
     }
     
     .filter-btn,
     .filter-btn-reset {
-        padding: 10px 18px;
+        padding: 10px 16px;
         font-size: 0.85rem;
         font-weight: 700;
         border-radius: var(--radius-md);
@@ -165,9 +168,11 @@
         text-decoration: none;
         display: inline-flex;
         align-items: center;
-        gap: var(--spacing-xs);
+        justify-content: center;
+        gap: 6px;
         height: 40px;
         white-space: nowrap;
+        min-width: auto;
     }
     
     .filter-btn {
@@ -473,17 +478,17 @@
             <i class="fa-solid fa-filter"></i> Notları Filtrele
         </h3>
         <form method="get" class="filter-form" id="filterForm">
-            <!-- Arama Input -->
+            <!-- Akademik Hiyerarşi Selector - Önce dropdown'lar -->
+            <div id="filter-academic-hierarchy-container" class="academic-hierarchy-wrapper">
+                <!-- Component buraya eklenecek -->
+            </div>
+            
+            <!-- Arama Input - Sonra arama -->
             <div class="search-input-wrapper">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" name="q" id="search_input" 
                        placeholder="Başlık, açıklama veya ders adı ara..." 
                        value="{{ search_query|default:'' }}">
-            </div>
-            
-            <!-- Akademik Hiyerarşi Selector -->
-            <div id="filter-academic-hierarchy-container" class="academic-hierarchy-wrapper">
-                <!-- Component buraya eklenecek -->
             </div>
             
             <!-- Hidden fields for form submission -->
@@ -492,6 +497,7 @@
             <input type="hidden" name="department" id="filter-form-department" value="{{ request.GET.department|default:'' }}">
             <input type="hidden" name="course" id="filter-form-course" value="{{ request.GET.course|default:'' }}">
             
+            <!-- Butonlar - En sağda -->
             <div class="filter-buttons">
                 <button type="submit" class="btn btn-primary filter-btn">
                     <i class="fa-solid fa-magnifying-glass"></i> Ara
