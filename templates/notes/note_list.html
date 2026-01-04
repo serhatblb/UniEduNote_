@@ -14,100 +14,108 @@
     }
 
     /* Filtre Alanı */
+    /* Filtre Alanı - Kompakt Versiyon */
     .filter-section {
-        margin-bottom: var(--spacing-xl);
-        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+        padding: var(--spacing-md);
         animation: fadeInUp 0.6s ease;
     }
-
+    
     .filter-section h3 {
-        margin-bottom: var(--spacing-md);
+        margin-bottom: var(--spacing-sm);
         color: var(--text-primary);
         font-weight: 800;
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         display: flex;
         align-items: center;
+        gap: var(--spacing-xs);
+    }
+    
+    .filter-form {
+        display: flex;
+        flex-direction: column;
         gap: var(--spacing-sm);
     }
-
-    .filter-form {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: var(--spacing-md);
-    }
-
+    
     /* Arama Input Wrapper */
     .search-input-wrapper {
         position: relative;
         width: 100%;
     }
-
+    
     .search-input-wrapper .search-icon {
         position: absolute;
-        left: 16px;
+        left: 12px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--text-light);
-        font-size: 1rem;
+        font-size: 0.9rem;
         pointer-events: none;
     }
-
+    
     .search-input-wrapper input {
         width: 100%;
-        padding: 14px 16px 14px 45px;
+        padding: 10px 12px 10px 38px;
         border-radius: var(--radius-md);
         border: 1px solid rgba(0, 0, 0, 0.1);
         background: var(--bg-glass-light);
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         font-weight: 500;
         color: var(--text-primary);
         transition: all 0.3s ease;
+        height: 40px;
     }
-
+    
     .search-input-wrapper input:focus {
         outline: none;
         border-color: var(--primary-purple);
         background: white;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
-
-    /* Akademik Hiyerarşi Wrapper - Yan yana, daha kompakt */
+    
+    /* Akademik Hiyerarşi Wrapper - Yan yana, kompakt */
     .academic-hierarchy-wrapper {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: var(--spacing-sm);
+        gap: var(--spacing-xs);
     }
-
+    
     @media (max-width: 1200px) {
         .academic-hierarchy-wrapper {
             grid-template-columns: repeat(2, 1fr);
         }
     }
-
+    
+    @media (max-width: 768px) {
+        .academic-hierarchy-wrapper {
+            grid-template-columns: 1fr;
+        }
+    }
+    
     .academic-hierarchy-wrapper .form-group {
         margin-bottom: 0;
     }
-
+    
     .academic-hierarchy-wrapper label {
         display: block;
-        margin-bottom: var(--spacing-xs);
-        font-weight: 700;
+        margin-bottom: 4px;
+        font-weight: 600;
         color: var(--text-primary);
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
-
+    
     .academic-hierarchy-wrapper label .required {
         color: var(--error);
         margin-left: 2px;
     }
-
-    /* Select2 Custom Styling */
+    
+    /* Select2 Custom Styling - Kompakt */
     .academic-hierarchy-wrapper .select2-container {
         width: 100% !important;
     }
-
+    
     .academic-hierarchy-wrapper .select2-container .select2-selection--single {
-        height: 44px !important;
+        height: 40px !important;
         border: 1px solid rgba(0, 0, 0, 0.1) !important;
         border-radius: var(--radius-md) !important;
         background: var(--bg-glass-light) !important;
@@ -115,50 +123,85 @@
         align-items: center;
         transition: all 0.3s ease;
     }
-
+    
     .academic-hierarchy-wrapper .select2-container--default .select2-selection--single .select2-selection__rendered {
         color: var(--text-primary) !important;
-        font-size: 0.9rem;
-        padding-left: 14px;
+        font-size: 0.85rem;
+        padding-left: 12px;
         font-weight: 500;
-        line-height: 44px;
+        line-height: 40px;
     }
-
+    
     .academic-hierarchy-wrapper .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 42px !important;
-        right: 10px;
+        height: 38px !important;
+        right: 8px;
     }
-
+    
     .academic-hierarchy-wrapper .select2-container--open .select2-selection--single {
         border-color: var(--primary-purple) !important;
         background: white !important;
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
-
+    
     .academic-hierarchy-wrapper .select2-container--default .select2-results__option--highlighted[aria-selected] {
         background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%) !important;
     }
-
+    
+    /* Filtre Butonları */
     .filter-buttons {
         display: flex;
-        gap: var(--spacing-md);
-        margin-top: var(--spacing-md);
+        gap: var(--spacing-sm);
         justify-content: flex-end;
     }
-
-    .filter-btn {
-        flex: 1;
+    
+    .filter-btn,
+    .filter-btn-reset {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border-radius: var(--radius-md);
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+        height: 40px;
     }
-
+    
+    .filter-btn {
+        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%);
+        color: white;
+    }
+    
+    .filter-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+    
     .filter-btn-reset {
         background: rgba(255, 59, 48, 0.1);
         color: var(--error);
         border: 1px solid rgba(255, 59, 48, 0.3);
     }
-
+    
     .filter-btn-reset:hover {
         background: var(--error);
         color: white;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .filter-buttons {
+            flex-direction: column;
+        }
+    
+        .filter-btn,
+        .filter-btn-reset {
+            width: 100%;
+            justify-content: center;
+        }
     }
 
     /* Sıralama Butonları */
