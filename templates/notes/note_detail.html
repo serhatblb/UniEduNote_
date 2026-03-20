@@ -297,7 +297,7 @@
         </p>
 
         <div class="detail-meta">
-            Yükleyen: <strong>{{ note.user.username }}</strong> • {{ note.uploaded_at|date:"d M Y" }}
+            Yükleyen: <a href="{% url 'public_profile' note.user.username %}" style="color: var(--primary-purple); font-weight: 700; text-decoration: none;">{{ note.user.username }}</a> • {{ note.uploaded_at|date:"d M Y" }}
         </div>
 
         <!-- Butonlar -->
@@ -309,6 +309,19 @@
             <button id="likeBtn" class="btn-action btn-sec">
                 <i class="fa-regular fa-heart"></i> Beğen (<span id="likeCount">{{ note.likes }}</span>)
             </button>
+
+            {% if user.is_authenticated %}
+            <button id="bookmarkBtn" class="btn-action btn-sec" onclick="toggleBookmark()">
+                <i class="{% if is_bookmarked %}fa-solid{% else %}fa-regular{% endif %} fa-bookmark"></i>
+                <span id="bookmarkText">{% if is_bookmarked %}Kaydedildi{% else %}Kaydet{% endif %}</span>
+            </button>
+
+            {% if note.user.id != request.user.id %}
+            <button class="btn-action btn-sec" onclick="showReportModal()" style="color: var(--warning);">
+                <i class="fa-solid fa-flag"></i> Raporla
+            </button>
+            {% endif %}
+            {% endif %}
 
             {% if note.user.id == request.user.id %}
                 <a href="{% url 'edit_note' note.id %}" class="btn-action btn-sec">
@@ -487,5 +500,92 @@
     }
 
     loadComments();
+
+    // Bookmark Toggle
+    async function toggleBookmark() {
+        const btn = document.getElementById('bookmarkBtn');
+        const icon = btn.querySelector('i');
+        const text = document.getElementById('bookmarkText');
+        try {
+            const res = await fetch(`/notes/${noteId}/bookmark/`, {
+                method: 'POST',
+                headers: {'X-CSRFToken': getCookie('csrftoken')}
+            });
+            if (res.status === 302 || res.redirected) {
+                window.location.href = '/login/';
+                return;
+            }
+            const data = await res.json();
+            if (data.is_bookmarked) {
+                icon.className = 'fa-solid fa-bookmark';
+                text.textContent = 'Kaydedildi';
+            } else {
+                icon.className = 'fa-regular fa-bookmark';
+                text.textContent = 'Kaydet';
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    // Report Modal
+    function showReportModal() {
+        document.getElementById('reportModal').style.display = 'flex';
+    }
+    function closeReportModal() {
+        document.getElementById('reportModal').style.display = 'none';
+    }
+
+    async function submitReport() {
+        const reason = document.getElementById('reportReason').value;
+        const description = document.getElementById('reportDesc').value;
+        const formData = new FormData();
+        formData.append('reason', reason);
+        formData.append('description', description);
+        try {
+            const res = await fetch(`/notes/${noteId}/report/`, {
+                method: 'POST',
+                headers: {'X-CSRFToken': getCookie('csrftoken')},
+                body: formData
+            });
+            const data = await res.json();
+            closeReportModal();
+            alert(data.success || data.error || 'İşlem tamamlandı.');
+        } catch(e) { alert('Bir hata oluştu.'); }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            for (let cookie of document.cookie.split(';')) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 </script>
+
+<!-- Rapor Modalı -->
+<div id="reportModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+    <div class="glass" style="max-width:420px; width:90%; padding:var(--spacing-xl); border-radius:var(--radius-lg);">
+        <h3 style="margin:0 0 var(--spacing-md); font-weight:800; color:var(--text-primary);">
+            <i class="fa-solid fa-flag" style="color:var(--warning);"></i> Notu Raporla
+        </h3>
+        <select id="reportReason" style="width:100%; padding:12px; border-radius:var(--radius-md); border:1px solid rgba(0,0,0,0.1); background:var(--bg-glass); margin-bottom:var(--spacing-md); font-family:inherit;">
+            <option value="spam">Spam / Gereksiz İçerik</option>
+            <option value="yanlis_bilgi">Yanlış / Yanıltıcı Bilgi</option>
+            <option value="uygunsuz">Uygunsuz İçerik</option>
+            <option value="telif_hakki">Telif Hakkı İhlali</option>
+            <option value="kopya">Kopya / Mükerrer Not</option>
+            <option value="diger">Diğer</option>
+        </select>
+        <textarea id="reportDesc" rows="3" placeholder="Açıklama (opsiyonel)..." style="width:100%; padding:12px; border-radius:var(--radius-md); border:1px solid rgba(0,0,0,0.1); background:var(--bg-glass); font-family:inherit; resize:vertical; margin-bottom:var(--spacing-md);"></textarea>
+        <div style="display:flex; gap:var(--spacing-sm);">
+            <button onclick="submitReport()" class="btn-action btn-danger" style="flex:1; justify-content:center;">Gönder</button>
+            <button onclick="closeReportModal()" class="btn-action btn-sec" style="flex:1; justify-content:center;">İptal</button>
+        </div>
+    </div>
+</div>
 {% endblock %}

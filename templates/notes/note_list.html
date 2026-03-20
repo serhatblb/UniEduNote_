@@ -544,7 +544,7 @@
                 <div class="note-title">{{ note.title }}</div>
                 <div class="note-info">
                     <i class="fa-solid fa-graduation-cap"></i> {{ note.course.name }} <br>
-                    <i class="fa-regular fa-user"></i> {{ note.user.username }} •
+                    <i class="fa-regular fa-user"></i> <a href="{% url 'public_profile' note.user.username %}" style="color: var(--primary-purple); font-weight: 600; text-decoration: none;" onclick="event.stopPropagation();">{{ note.user.username }}</a> •
                     <i class="fa-solid fa-download"></i> {{ note.download_count }}
                 </div>
             </div>

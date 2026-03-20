@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Akış{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<style>
+    .feed-container { max-width: 800px; margin: 0 auto; }
+
+    .note-card {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-md);
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    .note-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .note-card-header {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .author-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-purple), var(--primary-dark-purple));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .author-info { flex: 1; }
+    .author-name { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); }
+    .note-date { font-size: 0.75rem; color: var(--text-light); }
+
+    .note-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin: var(--spacing-sm) 0 var(--spacing-xs);
+        line-height: 1.3;
+    }
+
+    .note-desc {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .note-meta {
+        margin-top: var(--spacing-sm);
+        display: flex;
+        gap: var(--spacing-sm);
+        flex-wrap: wrap;
+    }
+
+    .note-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        background: rgba(102,126,234,0.1);
+        color: var(--primary-purple);
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .note-stats {
+        display: flex;
+        gap: var(--spacing-md);
+        font-size: 0.8rem;
+        color: var(--text-light);
+        font-weight: 600;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-2xl) var(--spacing-lg);
+        color: var(--text-secondary);
+    }
+
+    .empty-state i { font-size: 3.5rem; color: var(--text-light); margin-bottom: var(--spacing-lg); }
+    .empty-state h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: var(--spacing-sm); color: var(--text-primary); }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        margin-top: var(--spacing-xl);
+        flex-wrap: wrap;
+    }
+
+    .page-btn {
+        padding: 10px 18px;
+        border-radius: var(--radius-md);
+        font-weight: 700;
+        font-size: 0.875rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        background: var(--bg-glass);
+        color: var(--text-secondary);
+    }
+
+    .page-btn.active, .page-btn:hover {
+        background: var(--primary-purple);
+        color: white;
+    }
+</style>
+
+<div class="feed-container">
+    <div class="glass" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+        <h2 style="margin: 0 0 var(--spacing-xs); font-weight: 900; font-size: 1.75rem; color: var(--text-primary);">
+            <i class="fa-solid fa-rss" style="color: var(--primary-purple);"></i> Akış
+        </h2>
+        <p style="margin: 0; color: var(--text-secondary);">
+            Takip ettiğin {% if following_count > 0 %}<strong>{{ following_count }}</strong> kişinin{% else %}kişilerin{% endif %} paylaşımları
+        </p>
+    </div>
+
+    {% if notes %}
+        {% for note in notes %}
+        <a href="{% url 'note_detail' note.pk %}" class="note-card glass">
+            <div class="note-card-header">
+                <div class="author-avatar">
+                    {% if note.user.avatar %}
+                        <img src="{{ note.user.avatar.url }}" alt="{{ note.user.username }}">
+                    {% else %}
+                        {{ note.user.username|make_list|first|upper }}
+                    {% endif %}
+                </div>
+                <div class="author-info">
+                    <div class="author-name">{{ note.user.username }}</div>
+                    <div class="note-date">{{ note.uploaded_at|date:"d M Y, H:i" }}</div>
+                </div>
+                <div class="note-stats">
+                    <span><i class="fa-solid fa-download"></i> {{ note.download_count }}</span>
+                    <span><i class="fa-solid fa-heart"></i> {{ note.likes }}</span>
+                </div>
+            </div>
+            <div class="note-title">
+                <i class="fa-solid {{ note.get_file_icon }}" style="color: var(--primary-purple);"></i>
+                {{ note.title }}
+            </div>
+            {% if note.description %}
+            <div class="note-desc">{{ note.description }}</div>
+            {% endif %}
+            <div class="note-meta">
+                <span class="note-tag"><i class="fa-solid fa-building-columns"></i> {{ note.university.name }}</span>
+                <span class="note-tag"><i class="fa-solid fa-book"></i> {{ note.course.name }}</span>
+                <span class="note-tag"><i class="fa-regular fa-calendar"></i> {{ note.semester }}</span>
+            </div>
+        </a>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if notes.has_other_pages %}
+        <div class="pagination">
+            {% if notes.has_previous %}
+            <a href="?page={{ notes.previous_page_number }}" class="page-btn">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            {% endif %}
+            {% for num in notes.paginator.page_range %}
+                {% if notes.number == num %}
+                    <span class="page-btn active">{{ num }}</span>
+                {% elif num > notes.number|add:'-3' and num < notes.number|add:'3' %}
+                    <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if notes.has_next %}
+            <a href="?page={{ notes.next_page_number }}" class="page-btn">
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    {% elif following_count == 0 %}
+        <div class="glass empty-state">
+            <div><i class="fa-solid fa-users"></i></div>
+            <h3>Henüz kimseyi takip etmiyorsun</h3>
+            <p>Notlardan hoşlandığın kişilerin profillerine git ve takip et.<br>Paylaşımları burada görünecek.</p>
+            <a href="{% url 'note_list' %}" class="btn btn-primary" style="margin-top: var(--spacing-lg);">
+                <i class="fa-solid fa-compass"></i> Notları Keşfet
+            </a>
+        </div>
+    {% else %}
+        <div class="glass empty-state">
+            <div><i class="fa-solid fa-rss"></i></div>
+            <h3>Şimdilik yeni paylaşım yok</h3>
+            <p>Takip ettiğin kişiler henüz not yüklemedi.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

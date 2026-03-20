@@ -6,6 +6,7 @@ istismar önleme mekanizmalarını yönetir.
 """
 
 from django.db import transaction
+from django.db.models import Sum
 from django.utils import timezone
 from datetime import timedelta, date
 from rewards.models import UserProfile, PointTransaction, Badge

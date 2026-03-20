@@ -1,11 +1,12 @@
 import os
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.utils.encoding import force_str, force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 
 from .forms import RegisterForm
@@ -15,6 +16,7 @@ from categories.models import University
 from .models import Notification
 from .models import Contact
 from notes.models import Note, Like
+from .models import Follow
 
 User = get_user_model()
 
@@ -295,3 +297,53 @@ Bu mesaj UniEduNote destek sistemi tarafından otomatik olarak gönderilmiştir.
         return redirect('contact')
 
     return render(request, "users/contact.html")
+
+
+# --- TAKİP SİSTEMİ ---
+@login_required
+@require_POST
+def follow_toggle(request, username):
+    target = get_object_or_404(User, username=username)
+    if target == request.user:
+        return JsonResponse({'error': 'Kendinizi takip edemezsiniz.'}, status=400)
+
+    follow_obj = Follow.objects.filter(follower=request.user, following=target).first()
+    if follow_obj:
+        follow_obj.delete()
+        is_following = False
+    else:
+        Follow.objects.create(follower=request.user, following=target)
+        is_following = True
+
+    follower_count = target.followers.count()
+    return JsonResponse({'is_following': is_following, 'follower_count': follower_count})
+
+
+# --- PUBLIC PROFİL ---
+def public_profile(request, username):
+    viewed_user = get_object_or_404(User, username=username)
+    notes = viewed_user.note_set.select_related(
+        'university', 'faculty', 'department', 'course'
+    ).order_by('-uploaded_at')
+
+    is_following = False
+    if request.user.is_authenticated:
+        is_following = Follow.objects.filter(follower=request.user, following=viewed_user).exists()
+
+    follower_count = viewed_user.followers.count()
+    following_count = viewed_user.following.count()
+
+    from rewards.gamification import get_or_create_profile
+    game_profile = get_or_create_profile(viewed_user)
+    level_badge = game_profile.get_level_badge()
+
+    context = {
+        'viewed_user': viewed_user,
+        'notes': notes,
+        'is_following': is_following,
+        'follower_count': follower_count,
+        'following_count': following_count,
+        'game_profile': game_profile,
+        'level_badge': level_badge,
+    }
+    return render(request, 'users/public_profile.html', context)

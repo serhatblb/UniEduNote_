@@ -380,6 +380,15 @@
                 <a href="{% url 'premium' %}" class="menu-item {% if 'premium' in request.path %}active{% endif %}" style="color: var(--warning);">
                     <i class="fa-solid fa-crown"></i> Premium
                 </a>
+                <a href="{% url 'feed' %}" class="menu-item {% if request.path == '/feed/' %}active{% endif %}">
+                    <i class="fa-solid fa-rss"></i> Akış
+                </a>
+                <a href="{% url 'bookmarks' %}" class="menu-item {% if 'bookmarks' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-bookmark"></i> Kaydedilenler
+                </a>
+                <a href="{% url 'leaderboard' %}" class="menu-item {% if 'leaderboard' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-ranking-star"></i> Liderlik
+                </a>
                 <a href="{% url 'chat_room' %}" class="menu-item {% if 'chat' in request.path %}active{% endif %}">
                     <i class="fa-regular fa-comments"></i> Sohbet
                 </a>

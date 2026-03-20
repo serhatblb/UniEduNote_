@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Kaydedilenler{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<style>
+    .bookmarks-container { max-width: 900px; margin: 0 auto; }
+
+    .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--spacing-md);
+        margin-top: var(--spacing-lg);
+    }
+
+    .note-card {
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-md);
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        position: relative;
+    }
+
+    .note-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .note-card-title {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1.3;
+        text-decoration: none;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .note-card-title:hover { color: var(--primary-purple); }
+
+    .note-card-meta {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .note-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: var(--spacing-sm);
+        border-top: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .unbookmark-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--primary-purple);
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 6px 12px;
+        border-radius: var(--radius-md);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .unbookmark-btn:hover {
+        background: rgba(102,126,234,0.1);
+        color: var(--error);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-2xl) var(--spacing-lg);
+        color: var(--text-secondary);
+    }
+
+    .empty-state i { font-size: 3.5rem; color: var(--text-light); margin-bottom: var(--spacing-lg); }
+    .empty-state h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: var(--spacing-sm); color: var(--text-primary); }
+
+    @media (max-width: 640px) {
+        .notes-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="bookmarks-container">
+    <div class="glass" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl); display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <h2 style="margin: 0 0 var(--spacing-xs); font-weight: 900; font-size: 1.75rem; color: var(--text-primary);">
+                <i class="fa-solid fa-bookmark" style="color: var(--primary-purple);"></i> Kaydedilenler
+            </h2>
+            <p style="margin: 0; color: var(--text-secondary);">Kaydettiğin {{ bookmarks|length }} not</p>
+        </div>
+    </div>
+
+    {% if bookmarks %}
+    <div class="notes-grid">
+        {% for bm in bookmarks %}
+        <div class="glass note-card" id="bm-{{ bm.note.pk }}">
+            <a href="{% url 'note_detail' bm.note.pk %}" class="note-card-title">
+                <i class="fa-solid {{ bm.note.get_file_icon }}" style="color: var(--primary-purple); margin-right: 6px;"></i>
+                {{ bm.note.title }}
+            </a>
+            <div class="note-card-meta">
+                <span><i class="fa-solid fa-building-columns"></i> {{ bm.note.university.name }}</span>
+                <span><i class="fa-solid fa-book"></i> {{ bm.note.course.name }}</span>
+                <span><i class="fa-solid fa-user"></i> {{ bm.note.user.username }}</span>
+            </div>
+            <div class="note-card-footer">
+                <div style="font-size: 0.75rem; color: var(--text-light);">
+                    <i class="fa-solid fa-download"></i> {{ bm.note.download_count }}
+                    &nbsp;
+                    <i class="fa-solid fa-heart"></i> {{ bm.note.likes }}
+                </div>
+                <button class="unbookmark-btn" onclick="removeBookmark({{ bm.note.pk }})">
+                    <i class="fa-solid fa-bookmark-slash"></i> Kaldır
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="glass empty-state">
+        <div><i class="fa-regular fa-bookmark"></i></div>
+        <h3>Henüz not kaydetmedin</h3>
+        <p>Not detay sayfasında "Kaydet" butonuna tıklayarak notları buraya ekleyebilirsin.</p>
+        <a href="{% url 'note_list' %}" class="btn btn-primary" style="margin-top: var(--spacing-lg);">
+            <i class="fa-solid fa-compass"></i> Notları Keşfet
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        for (let cookie of document.cookie.split(';')) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+async function removeBookmark(noteId) {
+    try {
+        const res = await fetch(`/notes/${noteId}/bookmark/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': getCookie('csrftoken')}
+        });
+        const data = await res.json();
+        if (!data.is_bookmarked) {
+            const card = document.getElementById(`bm-${noteId}`);
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.9)';
+            card.style.transition = 'all 0.3s ease';
+            setTimeout(() => card.remove(), 300);
+        }
+    } catch(e) { console.error(e); }
+}
+</script>
+{% endblock %}

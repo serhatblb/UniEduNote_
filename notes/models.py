@@ -82,3 +82,43 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.user.username} → {self.note.title}"
+
+
+# 🔖 Bookmark (Kaydedilenler)
+class Bookmark(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookmarks')
+    note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name='bookmarks')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'note')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} ★ {self.note.title}"
+
+
+# 🚩 İçerik Raporlama
+class Report(models.Model):
+    REASONS = [
+        ('spam', 'Spam / Gereksiz İçerik'),
+        ('yanlis_bilgi', 'Yanlış / Yanıltıcı Bilgi'),
+        ('uygunsuz', 'Uygunsuz İçerik'),
+        ('telif_hakki', 'Telif Hakkı İhlali'),
+        ('kopya', 'Kopya / Mükerrer Not'),
+        ('diger', 'Diğer'),
+    ]
+
+    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports_made')
+    note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name='reports')
+    reason = models.CharField(max_length=30, choices=REASONS)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_resolved = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('reporter', 'note')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.reporter.username} → {self.note.title} ({self.reason})"

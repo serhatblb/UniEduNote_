@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import FileResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Note
+from .models import Note, Bookmark, Report
 from .forms import NoteForm
 from categories.models import University, Faculty, Department, Course
 from django.views.decorators.http import require_POST
@@ -111,7 +111,10 @@ def note_list(request):
 # 🔍 Not detay
 def note_detail(request, pk):
     note = get_object_or_404(Note, pk=pk)
-    return render(request, 'notes/note_detail.html', {'note': note})
+    is_bookmarked = False
+    if request.user.is_authenticated:
+        is_bookmarked = Bookmark.objects.filter(user=request.user, note=note).exists()
+    return render(request, 'notes/note_detail.html', {'note': note, 'is_bookmarked': is_bookmarked})
 
 
 # 📥 Not indirme
@@ -205,3 +208,77 @@ def load_courses(request):
     department_id = request.GET.get('department')
     courses = Course.objects.filter(department_id=department_id).order_by('name')
     return JsonResponse(list(courses.values('id', 'name')), safe=False)
+
+
+# 🔖 Bookmark Toggle (AJAX POST)
+@login_required
+@require_POST
+def bookmark_toggle(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    bm = Bookmark.objects.filter(user=request.user, note=note).first()
+    if bm:
+        bm.delete()
+        is_bookmarked = False
+    else:
+        Bookmark.objects.create(user=request.user, note=note)
+        is_bookmarked = True
+    return JsonResponse({'is_bookmarked': is_bookmarked})
+
+
+# 🔖 Kaydedilenler sayfası
+@login_required
+def bookmarks_view(request):
+    bookmarks = Bookmark.objects.filter(user=request.user).select_related(
+        'note', 'note__user', 'note__university', 'note__course'
+    ).order_by('-created_at')
+    return render(request, 'notes/bookmarks.html', {'bookmarks': bookmarks})
+
+
+# 🚩 Not Raporlama
+@login_required
+@require_POST
+def report_note(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    if note.user == request.user:
+        return JsonResponse({'error': 'Kendi notunuzu raporlayamazsınız.'}, status=400)
+
+    reason = request.POST.get('reason')
+    description = request.POST.get('description', '')
+
+    if not reason or reason not in dict(Report.REASONS):
+        return JsonResponse({'error': 'Geçersiz rapor nedeni.'}, status=400)
+
+    _, created = Report.objects.get_or_create(
+        reporter=request.user,
+        note=note,
+        defaults={'reason': reason, 'description': description}
+    )
+    if not created:
+        return JsonResponse({'error': 'Bu notu zaten raporladınız.'}, status=400)
+
+    return JsonResponse({'success': 'Raporunuz alındı. İncelenecektir.'})
+
+
+# 📰 Feed - Takip Edilenlerin Notları
+@login_required
+def feed_view(request):
+    from users.models import Follow
+    following_ids = Follow.objects.filter(follower=request.user).values_list('following_id', flat=True)
+    notes = Note.objects.filter(user_id__in=following_ids).select_related(
+        'user', 'university', 'course'
+    ).order_by('-uploaded_at')
+
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    paginator = Paginator(notes, 20)
+    page = request.GET.get('page', 1)
+    try:
+        notes_page = paginator.page(page)
+    except PageNotAnInteger:
+        notes_page = paginator.page(1)
+    except EmptyPage:
+        notes_page = paginator.page(paginator.num_pages)
+
+    return render(request, 'notes/feed.html', {
+        'notes': notes_page,
+        'following_count': len(following_ids),
+    })

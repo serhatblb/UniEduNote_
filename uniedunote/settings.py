@@ -27,7 +27,7 @@ if not SECRET_KEY:
 
 # DEBUG: Production'da False olmalı, development'ta True
 # Environment variable "True" string'i ise True, değilse False
-DEBUG_ENV = os.environ.get("DEBUG", "False").lower()
+DEBUG_ENV = os.environ.get("DEBUG", "True").lower()
 DEBUG = DEBUG_ENV in ("true", "1", "yes")
 
 # Allowed Hosts: Production'da domain adları, development'ta localhost
