@@ -13,102 +13,157 @@
         margin: 0 auto;
     }
 
-    /* Filtre Alanı - Tam Kompakt Versiyon */
+    /* ── FİLTRE KARTI ── */
     .filter-section {
         margin-bottom: var(--spacing-lg);
-        padding: var(--spacing-md);
-        animation: fadeInUp 0.6s ease;
+        padding: 0;
+        animation: fadeInUp 0.5s ease;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10);
     }
 
-    .filter-section h3 {
-        margin-bottom: var(--spacing-md);
-        color: var(--text-primary);
-        font-weight: 800;
-        font-size: 1rem;
+    .filter-header {
+        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%);
+        padding: 14px 20px;
         display: flex;
         align-items: center;
-        gap: var(--spacing-xs);
+        justify-content: space-between;
+        gap: var(--spacing-md);
+        flex-wrap: wrap;
     }
 
-    .filter-form {
+    .filter-header-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        font-size: 0.95rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .filter-header-title i {
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    .sort-pills {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .sort-pill {
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255,255,255,0.15);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.25);
+        white-space: nowrap;
+    }
+
+    .sort-pill:hover,
+    .sort-pill.active {
+        background: white;
+        color: var(--primary-purple);
+        border-color: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .filter-body {
+        padding: 18px 20px 16px;
+        background: var(--bg-glass);
+    }
+
+    /* Akademik hiyerarşi grid (JS tarafından inject edilir) */
+    .academic-hierarchy-grid {
         display: grid;
-        grid-template-columns: repeat(4, 1fr) 2fr auto;
-        gap: var(--spacing-sm);
-        align-items: end;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 12px;
     }
 
-    /* Akademik Hiyerarşi Wrapper */
-    .academic-hierarchy-wrapper {
-        display: contents;
-    }
-
-    .academic-hierarchy-wrapper .form-group {
+    .academic-hierarchy-grid .form-group {
         margin-bottom: 0;
     }
 
-    .academic-hierarchy-wrapper label {
-        display: block;
-        margin-bottom: 4px;
-        font-weight: 600;
-        color: var(--text-primary);
-        font-size: 0.75rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    .academic-hierarchy-grid label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 5px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
 
-    .academic-hierarchy-wrapper label .required {
-        color: var(--error);
-        margin-left: 2px;
+    .academic-hierarchy-grid label .required {
+        display: none;
     }
 
-    /* Select2 Custom Styling */
-    .academic-hierarchy-wrapper .select2-container {
+    /* Select2 styling */
+    .academic-hierarchy-grid .select2-container {
         width: 100% !important;
     }
 
-    .academic-hierarchy-wrapper .select2-container .select2-selection--single {
-        height: 38px !important;
-        border: 1px solid rgba(0, 0, 0, 0.1) !important;
-        border-radius: var(--radius-md) !important;
-        background: var(--bg-glass-light) !important;
+    .academic-hierarchy-grid .select2-container .select2-selection--single {
+        height: 40px !important;
+        border: 1.5px solid rgba(102,126,234,0.15) !important;
+        border-radius: 10px !important;
+        background: white !important;
         display: flex;
         align-items: center;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
     }
 
-    .academic-hierarchy-wrapper .select2-container--default .select2-selection--single .select2-selection__rendered {
+    .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__rendered {
         color: var(--text-primary) !important;
-        font-size: 0.8rem;
-        padding-left: 10px;
+        font-size: 0.82rem;
+        padding-left: 12px;
         font-weight: 500;
-        line-height: 38px;
+        line-height: 40px;
     }
 
-    .academic-hierarchy-wrapper .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 36px !important;
-        right: 6px;
+    .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 38px !important;
+        right: 8px;
     }
 
-    .academic-hierarchy-wrapper .select2-container--open .select2-selection--single {
+    .academic-hierarchy-grid .select2-container--open .select2-selection--single {
         border-color: var(--primary-purple) !important;
-        background: white !important;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12) !important;
     }
 
-    .academic-hierarchy-wrapper .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    .academic-hierarchy-grid .select2-container--default .select2-results__option--highlighted[aria-selected] {
         background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%) !important;
     }
 
-    /* Arama Input Wrapper */
+    /* Arama + Buton satırı */
+    .filter-search-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
     .search-input-wrapper {
         position: relative;
+        flex: 1;
         min-width: 0;
     }
 
     .search-input-wrapper .search-icon {
         position: absolute;
-        left: 10px;
+        left: 12px;
         top: 50%;
         transform: translateY(-50%);
         color: var(--text-light);
@@ -119,104 +174,71 @@
 
     .search-input-wrapper input {
         width: 100%;
-        padding: 9px 10px 9px 34px;
-        border-radius: var(--radius-md);
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        background: var(--bg-glass-light);
+        padding: 10px 12px 10px 36px;
+        border-radius: 10px;
+        border: 1.5px solid rgba(102,126,234,0.15);
+        background: white;
         font-size: 0.85rem;
         font-weight: 500;
         color: var(--text-primary);
-        transition: all 0.3s ease;
-        height: 38px;
+        transition: all 0.2s ease;
+        height: 40px;
         box-sizing: border-box;
     }
 
     .search-input-wrapper input:focus {
         outline: none;
         border-color: var(--primary-purple);
-        background: white;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
     }
 
     .search-input-wrapper input::placeholder {
-        font-size: 0.8rem;
+        color: var(--text-light);
+        font-size: 0.82rem;
     }
 
-    /* Filtre Butonları */
-    .filter-buttons {
-        display: flex;
-        gap: 6px;
-        flex-shrink: 0;
-    }
+    input[type="hidden"] { display: none; }
 
     .filter-btn,
     .filter-btn-reset {
-        padding: 8px 14px;
-        font-size: 0.8rem;
+        padding: 0 18px;
+        font-size: 0.82rem;
         font-weight: 700;
-        border-radius: var(--radius-md);
-        transition: all 0.3s ease;
+        border-radius: 10px;
+        transition: all 0.2s ease;
         border: none;
         cursor: pointer;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 4px;
-        height: 38px;
+        gap: 6px;
+        height: 40px;
         white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .filter-btn {
         background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%);
         color: white;
+        box-shadow: 0 2px 8px rgba(102,126,234,0.3);
     }
 
     .filter-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-sm);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(102,126,234,0.4);
     }
 
     .filter-btn-reset {
-        background: rgba(255, 59, 48, 0.1);
+        background: rgba(255, 59, 48, 0.08);
         color: var(--error);
-        border: 1px solid rgba(255, 59, 48, 0.3);
+        border: 1.5px solid rgba(255, 59, 48, 0.25);
     }
 
     .filter-btn-reset:hover {
         background: var(--error);
         color: white;
-    }
-
-    /* Hidden inputs */
-    input[type="hidden"] {
-        display: none;
-    }
-
-    /* Sıralama Butonları */
-    .sort-buttons {
-        display: flex;
-        gap: var(--spacing-sm);
-        margin-bottom: var(--spacing-lg);
-        overflow-x: auto;
-        padding-bottom: var(--spacing-xs);
-        animation: fadeInUp 0.7s ease;
-    }
-
-    .sort-buttons a {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        text-decoration: none;
-        white-space: nowrap;
-        transition: all 0.3s ease;
-        border-radius: var(--radius-md);
-    }
-
-    .sort-buttons a:hover {
-        transform: translateY(-2px);
-        color: var(--primary-purple);
+        border-color: var(--error);
     }
 
     /* Reklam Alanı */
@@ -397,62 +419,46 @@
         color: var(--text-primary);
     }
 
+    @media (max-width: 1100px) {
+        .academic-hierarchy-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .filter-header {
+            padding: 12px 14px;
+        }
+        .filter-body {
+            padding: 14px;
+        }
+        .academic-hierarchy-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .filter-search-row {
+            flex-wrap: wrap;
+        }
+        .filter-btn, .filter-btn-reset {
+            flex: 1;
+        }
+        .sort-pill {
+            font-size: 0.74rem;
+            padding: 4px 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .academic-hierarchy-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
     /* Responsive - Mobile First */
     @media (max-width: 768px) {
         .notes-grid {
             grid-template-columns: 1fr;
             gap: var(--spacing-md);
-        }
-
-    /* Responsive */
-    @media (max-width: 1200px) {
-        .filter-form {
-            grid-template-columns: repeat(2, 1fr);
-            gap: var(--spacing-sm);
-        }
-        
-        .search-input-wrapper {
-            grid-column: 1 / -1;
-        }
-        
-        .filter-buttons {
-            grid-column: 1 / -1;
-            justify-content: flex-end;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .filter-form {
-            grid-template-columns: 1fr;
-            gap: var(--spacing-sm);
-        }
-        
-        .search-input-wrapper {
-            grid-column: 1;
-        }
-        
-        .academic-hierarchy-wrapper .form-group {
-            width: 100%;
-        }
-        
-        .filter-buttons {
-            grid-column: 1;
-            width: 100%;
-        }
-        
-        .filter-btn,
-        .filter-btn-reset {
-            flex: 1;
-        }
-    }
-
-        .sort-buttons {
-            gap: var(--spacing-xs);
-        }
-
-        .sort-buttons a {
-            padding: 8px 12px;
-            font-size: 0.85rem;
         }
 
         .note-card {
@@ -479,53 +485,57 @@
 
 <div class="notes-page-container">
     <!-- Filtreleme Alanı -->
-    <div class="glass filter-section">
-        <h3>
-            <i class="fa-solid fa-filter"></i> Notları Filtrele
-        </h3>
-        <form method="get" class="filter-form" id="filterForm">
-            <!-- Akademik Hiyerarşi Selector - Önce dropdown'lar -->
-            <div id="filter-academic-hierarchy-container" class="academic-hierarchy-wrapper">
-                <!-- Component buraya eklenecek -->
-            </div>
-            
-            <!-- Arama Input - Sonra arama -->
-            <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" name="q" id="search_input" 
-                       placeholder="Başlık, açıklama veya ders adı ara..." 
-                       value="{{ search_query|default:'' }}">
-            </div>
-            
-            <!-- Hidden fields for form submission -->
-            <input type="hidden" name="university" id="filter-form-university" value="{{ request.GET.university|default:'' }}">
-            <input type="hidden" name="faculty" id="filter-form-faculty" value="{{ request.GET.faculty|default:'' }}">
-            <input type="hidden" name="department" id="filter-form-department" value="{{ request.GET.department|default:'' }}">
-            <input type="hidden" name="course" id="filter-form-course" value="{{ request.GET.course|default:'' }}">
-            
-            <!-- Butonlar - En sağda -->
-            <div class="filter-buttons">
-                <button type="submit" class="btn btn-primary filter-btn">
-                    <i class="fa-solid fa-magnifying-glass"></i> Ara
-                </button>
-                <a href="{% url 'note_list' %}" class="btn filter-btn-reset">
-                    <i class="fa-solid fa-rotate-left"></i> Sıfırla
+    <div class="filter-section">
+        <!-- Header: başlık + sıralama -->
+        <div class="filter-header">
+            <span class="filter-header-title">
+                <i class="fa-solid fa-compass"></i> Notları Keşfet
+            </span>
+            <div class="sort-pills">
+                <a href="?sort=newest{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}"
+                   class="sort-pill {% if not request.GET.sort or request.GET.sort == 'newest' %}active{% endif %}">
+                    <i class="fa-solid fa-clock"></i> En Yeni
+                </a>
+                <a href="?sort=popular{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}"
+                   class="sort-pill {% if request.GET.sort == 'popular' %}active{% endif %}">
+                    <i class="fa-solid fa-fire"></i> Popüler
+                </a>
+                <a href="?sort=liked{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}"
+                   class="sort-pill {% if request.GET.sort == 'liked' %}active{% endif %}">
+                    <i class="fa-solid fa-heart"></i> Beğenilen
                 </a>
             </div>
-        </form>
-    </div>
+        </div>
 
-    <!-- Sıralama Butonları -->
-    <div class="sort-buttons">
-        <a href="?sort=newest{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}" class="glass">
-            <i class="fa-solid fa-clock"></i> En Yeni
-        </a>
-        <a href="?sort=popular{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}" class="glass">
-            <i class="fa-solid fa-fire"></i> Popüler
-        </a>
-        <a href="?sort=liked{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.university %}&university={{ request.GET.university }}{% endif %}{% if request.GET.department %}&department={{ request.GET.department }}{% endif %}{% if request.GET.course %}&course={{ request.GET.course }}{% endif %}" class="glass">
-            <i class="fa-solid fa-heart"></i> Beğenilen
-        </a>
+        <!-- Body: dropdown'lar + arama -->
+        <div class="filter-body">
+            <form method="get" id="filterForm">
+                <!-- Akademik Hiyerarşi (JS inject eder) -->
+                <div id="filter-academic-hierarchy-container"></div>
+
+                <!-- Hidden fields -->
+                <input type="hidden" name="university" id="filter-form-university" value="{{ request.GET.university|default:'' }}">
+                <input type="hidden" name="faculty" id="filter-form-faculty" value="{{ request.GET.faculty|default:'' }}">
+                <input type="hidden" name="department" id="filter-form-department" value="{{ request.GET.department|default:'' }}">
+                <input type="hidden" name="course" id="filter-form-course" value="{{ request.GET.course|default:'' }}">
+
+                <!-- Arama + Butonlar -->
+                <div class="filter-search-row">
+                    <div class="search-input-wrapper">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" name="q" id="search_input"
+                               placeholder="Başlık, açıklama veya ders adı ara..."
+                               value="{{ search_query|default:'' }}">
+                    </div>
+                    <button type="submit" class="filter-btn">
+                        <i class="fa-solid fa-magnifying-glass"></i> Ara
+                    </button>
+                    <a href="{% url 'note_list' %}" class="filter-btn-reset">
+                        <i class="fa-solid fa-rotate-left"></i> Sıfırla
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Reklam Alanı -->
