@@ -327,24 +327,24 @@ def get_leaderboard(limit=10, period=None):
     if period == 'daily':
         today = timezone.now().date()
         queryset = queryset.filter(
-            point_transactions__created_at__date=today
+            user__point_transactions__created_at__date=today
         ).annotate(
-            daily_xp=Sum('point_transactions__points')
-        ).order_by('-daily_xp')[:limit]
+            daily_xp=Sum('user__point_transactions__points')
+        ).distinct().order_by('-daily_xp')[:limit]
     elif period == 'weekly':
         week_ago = timezone.now() - timedelta(days=7)
         queryset = queryset.filter(
-            point_transactions__created_at__gte=week_ago
+            user__point_transactions__created_at__gte=week_ago
         ).annotate(
-            weekly_xp=Sum('point_transactions__points')
-        ).order_by('-weekly_xp')[:limit]
+            weekly_xp=Sum('user__point_transactions__points')
+        ).distinct().order_by('-weekly_xp')[:limit]
     elif period == 'monthly':
         month_ago = timezone.now() - timedelta(days=30)
         queryset = queryset.filter(
-            point_transactions__created_at__gte=month_ago
+            user__point_transactions__created_at__gte=month_ago
         ).annotate(
-            monthly_xp=Sum('point_transactions__points')
-        ).order_by('-monthly_xp')[:limit]
+            monthly_xp=Sum('user__point_transactions__points')
+        ).distinct().order_by('-monthly_xp')[:limit]
     else:
         # Tüm zamanlar
         queryset = queryset.order_by('-total_xp', '-level')[:limit]
