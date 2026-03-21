@@ -4,7 +4,7 @@ Akademik hiyerarşi API endpoint'leri
 """
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.core.cache import cache
 from django.db.models import Q
 from .models import University, Faculty, Department, Course
@@ -95,6 +95,34 @@ class CourseListView(APIView):
             cache.set(cache_key, courses, 60 * 30)  # 30 dakika cache
         
         return Response(courses)
+
+
+class CourseGetOrCreateView(APIView):
+    """
+    Ders oluştur veya bul (not yüklerken yeni ders eklemek için)
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        name = request.data.get('name', '').strip()
+        department_id = request.data.get('department_id')
+
+        if not name or not department_id:
+            return Response({'error': 'name ve department_id gerekli'}, status=400)
+
+        try:
+            course, created = Course.objects.get_or_create(
+                name__iexact=name,
+                department_id=department_id,
+                defaults={'name': name}
+            )
+        except Course.MultipleObjectsReturned:
+            course = Course.objects.filter(name__iexact=name, department_id=department_id).first()
+
+        # Cache'i temizle ki yeni ders görünsün
+        cache.delete(f'api_courses_{department_id}')
+
+        return Response({'id': course.id, 'name': course.name})
 
 
 class AcademicSearchView(APIView):

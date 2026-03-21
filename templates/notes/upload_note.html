@@ -226,9 +226,10 @@
         grid-template-columns: repeat(2, 1fr);
         gap: var(--spacing-lg);
     }
-    
+
     .academic-hierarchy-grid .form-group {
         margin-bottom: 0;
+        min-width: 0;
     }
     
     .academic-hierarchy-grid .form-group.full-width {
@@ -267,8 +268,12 @@
         color: var(--text-primary) !important;
         font-size: 1rem;
         padding-left: 18px;
+        padding-right: 30px;
         font-weight: 500;
         line-height: 52px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__arrow {
@@ -326,7 +331,8 @@
                 $('#id_course').val(data.course_id || '');
             },
             required: ['university', 'faculty', 'department', 'course'],
-            searchEnabled: true
+            searchEnabled: true,
+            allowCreate: true
         });
         
         // Form validation

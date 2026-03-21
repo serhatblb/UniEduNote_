@@ -24,6 +24,7 @@ class AcademicHierarchySelector {
         this.required = options.required || [];
         this.searchEnabled = options.searchEnabled !== false;
         this.apiBaseUrl = options.apiBaseUrl || '/api/academic/';
+        this.allowCreate = options.allowCreate || false;
         
         // State
         this.selected = {
@@ -251,15 +252,69 @@ class AcademicHierarchySelector {
         try {
             const response = await fetch(`${this.apiBaseUrl}courses/?department_id=${departmentId}`);
             const data = await response.json();
-            
+
             this.cache.courses[departmentId] = data;
-            $course.empty().append('<option value="">Seçiniz...</option>');
-            
-            data.forEach(course => {
-                $course.append(new Option(course.name, course.id, false, false));
-            });
-            
-            $course.prop('disabled', false).trigger('change');
+
+            // Önceki "yeni ders" alanını temizle
+            $('#new-course-wrapper').remove();
+
+            if (data.length === 0 && this.allowCreate) {
+                // Ders yok — yeni ders oluşturma alanı göster
+                $course.closest('.form-group').append(`
+                    <div id="new-course-wrapper" style="margin-top:8px;">
+                        <input type="text" id="new-course-name"
+                            placeholder="Ders adı yazın ve Enter'a basın..."
+                            style="width:100%;padding:10px 14px;border-radius:8px;
+                                   border:1.5px solid rgba(102,126,234,0.4);font-size:0.9rem;
+                                   box-sizing:border-box;outline:none;" />
+                        <small style="color:#888;font-size:0.75rem;margin-top:4px;display:block;">
+                            Bu bölüm için ders bulunamadı. Yeni ders adı girin.
+                        </small>
+                    </div>
+                `);
+
+                const self = this;
+                $('#new-course-name').on('keydown', async function(e) {
+                    if (e.key !== 'Enter') return;
+                    e.preventDefault();
+                    const courseName = $(this).val().trim();
+                    if (!courseName) return;
+
+                    const csrfToken = document.cookie.split(';')
+                        .find(c => c.trim().startsWith('csrftoken='))
+                        ?.split('=')[1] || '';
+
+                    try {
+                        const res = await fetch(`${self.apiBaseUrl}courses/create/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfToken
+                            },
+                            body: JSON.stringify({ name: courseName, department_id: departmentId })
+                        });
+                        const course = await res.json();
+                        if (course.id) {
+                            $('#new-course-wrapper').remove();
+                            $course.empty()
+                                .append(new Option(course.name, course.id, true, true))
+                                .prop('disabled', false)
+                                .trigger('change');
+                            self.selected.course_id = String(course.id);
+                            self.notifyChange();
+                        }
+                    } catch (err) {
+                        console.error('Ders oluşturulamadı:', err);
+                    }
+                });
+                $course.prop('disabled', true);
+            } else {
+                $course.empty().append('<option value="">Seçiniz...</option>');
+                data.forEach(course => {
+                    $course.append(new Option(course.name, course.id, false, false));
+                });
+                $course.prop('disabled', false).trigger('change');
+            }
         } catch (error) {
             console.error('Error loading courses:', error);
         }
