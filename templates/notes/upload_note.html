@@ -252,6 +252,12 @@
     /* Upload sayfasında daha büyük trigger yüksekliği */
     .academic-hierarchy-grid .ss-trigger { height: 52px; }
 
+    /* Dropdown paneli backdrop-filter stacking context'inden çıksın */
+    #academic-hierarchy-container,
+    .academic-hierarchy-grid,
+    .academic-hierarchy-grid .form-group { overflow: visible; }
+    .academic-hierarchy-grid .ss-panel { z-index: 10000; }
+
     @media (max-width: 768px) {
         .academic-hierarchy-grid {
             grid-template-columns: 1fr;
