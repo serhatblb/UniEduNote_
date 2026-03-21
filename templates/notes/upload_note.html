@@ -249,51 +249,35 @@
         margin-left: 2px;
     }
 
-    /* Select2 Custom Styling - Upload sayfası için */
-    .academic-hierarchy-grid .select2-container {
-        width: 100% !important;
-    }
-
-    .academic-hierarchy-grid .select2-container .select2-selection--single {
-        height: 52px !important;
-        border: 1px solid rgba(0, 0, 0, 0.1) !important;
-        border-radius: var(--radius-md) !important;
-        background: var(--bg-glass-light) !important;
-        display: flex;
-        align-items: center;
-        transition: all 0.3s ease;
-    }
-
-    .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: var(--text-primary) !important;
+    /* Native select styling */
+    .hier-select {
+        width: 100%;
+        padding: 0 18px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: var(--radius-md);
+        background: var(--bg-glass-light);
+        backdrop-filter: blur(10px);
         font-size: 1rem;
-        padding-left: 18px;
-        padding-right: 30px;
         font-weight: 500;
-        line-height: 52px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+        height: 52px;
+        box-sizing: border-box;
+        cursor: pointer;
+        appearance: auto;
     }
 
-    .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 50px !important;
-        right: 12px;
-    }
-
-    .academic-hierarchy-grid .select2-container--open .select2-selection--single {
-        border-color: var(--primary-purple) !important;
-        background: white !important;
+    .hier-select:focus {
+        outline: none;
+        border-color: var(--primary-purple);
+        background: white;
         box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
     }
 
-    /* X işaretini gizle */
-    .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__clear {
-        display: none !important;
-    }
-
-    .academic-hierarchy-grid .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%) !important;
+    .hier-select:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        background: rgba(0,0,0,0.03);
     }
     
     @media (max-width: 768px) {

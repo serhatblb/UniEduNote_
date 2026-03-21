@@ -111,41 +111,33 @@
         display: none;
     }
 
-    /* Select2 styling */
-    .academic-hierarchy-grid .select2-container {
-        width: 100% !important;
-    }
-
-    .academic-hierarchy-grid .select2-container .select2-selection--single {
-        height: 40px !important;
-        border: 1.5px solid rgba(102,126,234,0.15) !important;
-        border-radius: 10px !important;
-        background: white !important;
-        display: flex;
-        align-items: center;
-        transition: all 0.2s ease;
-    }
-
-    .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: var(--text-primary) !important;
+    /* Native select styling */
+    .hier-select {
+        width: 100%;
+        padding: 0 12px;
+        border: 1.5px solid rgba(102,126,234,0.15);
+        border-radius: 10px;
+        background: white;
         font-size: 0.82rem;
-        padding-left: 12px;
         font-weight: 500;
-        line-height: 40px;
+        color: var(--text-primary);
+        transition: all 0.2s ease;
+        height: 40px;
+        box-sizing: border-box;
+        cursor: pointer;
+        appearance: auto;
     }
 
-    .academic-hierarchy-grid .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 38px !important;
-        right: 8px;
+    .hier-select:focus {
+        outline: none;
+        border-color: var(--primary-purple);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
     }
 
-    .academic-hierarchy-grid .select2-container--open .select2-selection--single {
-        border-color: var(--primary-purple) !important;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12) !important;
-    }
-
-    .academic-hierarchy-grid .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-dark-purple) 100%) !important;
+    .hier-select:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: rgba(0,0,0,0.03);
     }
 
     /* Arama + Buton satırı */
@@ -633,35 +625,28 @@ async function toggleLike(noteId, btn){
 }
 </script>
 
-<!-- AJAX Filtreleme -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- Filtreleme Scripti -->
 <script src="{% static 'js/academic-hierarchy.js' %}"></script>
 <script>
-$(document).ready(function() {
-    // Akademik Hiyerarşi Selector (Filtreleme için)
     const filterHierarchySelector = new AcademicHierarchySelector({
         container: '#filter-academic-hierarchy-container',
         onSelectionChange: function(data) {
-            // Hidden form fields'ı güncelle
-            $('#filter-form-university').val(data.university_id || '');
-            $('#filter-form-faculty').val(data.faculty_id || '');
-            $('#filter-form-department').val(data.department_id || '');
-            $('#filter-form-course').val(data.course_id || '');
+            document.getElementById('filter-form-university').value = data.university_id || '';
+            document.getElementById('filter-form-faculty').value    = data.faculty_id    || '';
+            document.getElementById('filter-form-department').value = data.department_id || '';
+            document.getElementById('filter-form-course').value     = data.course_id     || '';
         },
-        required: [], // Filtrelemede zorunlu değil
-        searchEnabled: true
+        required: [],
+        onReady: function(selector) {
+            {% if request.GET.university %}
+            selector.setValues(
+                '{{ request.GET.university|default:'' }}',
+                '{{ request.GET.faculty|default:'' }}',
+                '{{ request.GET.department|default:'' }}',
+                '{{ request.GET.course|default:'' }}'
+            );
+            {% endif %}
+        }
     });
-    
-    // Sayfa yüklendiğinde mevcut filtreleri yükle
-    {% if request.GET.university %}
-        filterHierarchySelector.setValues(
-            {{ request.GET.university|default:'null' }},
-            {{ request.GET.faculty|default:'null' }},
-            {{ request.GET.department|default:'null' }},
-            {{ request.GET.course|default:'null' }}
-        );
-    {% endif %}
-});
 </script>
 {% endblock %}
