@@ -17,6 +17,13 @@
         box-shadow: var(--shadow-lg);
     }
 
+    /* Masaüstünde ekranın tam ortası yerine biraz sola yakın olsun */
+    @media (min-width: 992px) {
+        .auth-container-modern {
+            transform: translateX(-40px);
+        }
+    }
+
     .auth-form-side {
         flex: 1;
         padding: var(--spacing-2xl);

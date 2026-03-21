@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Liderlik Tablosu{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<style>
+    .leaderboard-container { max-width: 800px; margin: 0 auto; }
+
+    .period-tabs {
+        display: flex;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-xl);
+        flex-wrap: wrap;
+    }
+
+    .period-tab {
+        padding: 10px 20px;
+        border-radius: var(--radius-full);
+        font-weight: 700;
+        font-size: 0.875rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        background: var(--bg-glass);
+        color: var(--text-secondary);
+        border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    .period-tab.active, .period-tab:hover {
+        background: var(--primary-purple);
+        color: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .leader-row {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md) var(--spacing-lg);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--spacing-sm);
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .leader-row:hover { transform: translateX(4px); box-shadow: var(--shadow-sm); }
+
+    .leader-row.top-1 { background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,215,0,0.05) 100%); border: 1px solid rgba(255,215,0,0.3); }
+    .leader-row.top-2 { background: linear-gradient(135deg, rgba(192,192,192,0.15) 0%, rgba(192,192,192,0.05) 100%); border: 1px solid rgba(192,192,192,0.3); }
+    .leader-row.top-3 { background: linear-gradient(135deg, rgba(205,127,50,0.15) 0%, rgba(205,127,50,0.05) 100%); border: 1px solid rgba(205,127,50,0.3); }
+    .leader-row.is-me { border: 2px solid var(--primary-purple); background: rgba(102,126,234,0.08); }
+
+    .rank-num {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    .rank-1 { background: #FFD700; color: #7a5e00; font-size: 1.2rem; }
+    .rank-2 { background: #C0C0C0; color: #555; font-size: 1.1rem; }
+    .rank-3 { background: #CD7F32; color: white; }
+    .rank-other { background: rgba(0,0,0,0.08); color: var(--text-secondary); }
+
+    .leader-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-purple), var(--primary-dark-purple));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1rem;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .leader-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .leader-info { flex: 1; min-width: 0; }
+    .leader-name { font-weight: 700; color: var(--text-primary); font-size: 0.95rem; }
+    .leader-badge { font-size: 0.8rem; color: var(--text-secondary); }
+
+    .leader-xp {
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--primary-purple);
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .leader-xp small { display: block; font-size: 0.7rem; font-weight: 600; color: var(--text-light); }
+
+    .empty-state {
+        text-align: center;
+        padding: var(--spacing-2xl);
+        color: var(--text-secondary);
+    }
+
+    .empty-state i { font-size: 3rem; color: var(--text-light); margin-bottom: var(--spacing-md); }
+</style>
+
+<div class="leaderboard-container">
+    <div class="glass" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+        <h2 style="margin: 0 0 var(--spacing-xs); font-weight: 900; font-size: 1.75rem; color: var(--text-primary);">
+            <i class="fa-solid fa-ranking-star" style="color: var(--warning);"></i> Liderlik Tablosu
+        </h2>
+        <p style="margin: 0; color: var(--text-secondary);">En çok puan kazanan öğrenciler</p>
+    </div>
+
+    <!-- Dönem Seçici -->
+    <div class="period-tabs">
+        <a href="{% url 'leaderboard' %}" class="period-tab {% if not period %}active{% endif %}">
+            <i class="fa-solid fa-infinity"></i> Tüm Zamanlar
+        </a>
+        <a href="{% url 'leaderboard' %}?period=daily" class="period-tab {% if period == 'daily' %}active{% endif %}">
+            <i class="fa-solid fa-sun"></i> Bugün
+        </a>
+        <a href="{% url 'leaderboard' %}?period=weekly" class="period-tab {% if period == 'weekly' %}active{% endif %}">
+            <i class="fa-solid fa-calendar-week"></i> Bu Hafta
+        </a>
+        <a href="{% url 'leaderboard' %}?period=monthly" class="period-tab {% if period == 'monthly' %}active{% endif %}">
+            <i class="fa-solid fa-calendar"></i> Bu Ay
+        </a>
+    </div>
+
+    <!-- Liderlik Listesi -->
+    <div class="glass" style="padding: var(--spacing-lg);">
+        {% if leaders %}
+            {% for leader in leaders %}
+            <a href="{% url 'public_profile' leader.user.username %}" class="leader-row glass {% if forloop.counter == 1 %}top-1{% elif forloop.counter == 2 %}top-2{% elif forloop.counter == 3 %}top-3{% endif %} {% if leader.user == request.user %}is-me{% endif %}">
+                <div class="rank-num rank-{% if forloop.counter <= 3 %}{{ forloop.counter }}{% else %}other{% endif %}">
+                    {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% else %}{{ forloop.counter }}{% endif %}
+                </div>
+                <div class="leader-avatar">
+                    {% if leader.user.avatar %}
+                        <img src="{{ leader.user.avatar.url }}" alt="{{ leader.user.username }}">
+                    {% else %}
+                        {{ leader.user.username|make_list|first|upper }}
+                    {% endif %}
+                </div>
+                <div class="leader-info">
+                    <div class="leader-name">
+                        {{ leader.user.username }}
+                        {% if leader.user == request.user %}<span style="font-size:0.75rem; color:var(--primary-purple);"> (Sen)</span>{% endif %}
+                    </div>
+                    {% with badge=leader.get_level_badge %}
+                    <div class="leader-badge">{{ badge.icon }} {{ badge.name }} · Seviye {{ leader.level }}</div>
+                    {% endwith %}
+                </div>
+                <div class="leader-xp">
+                    {% if period == 'daily' %}
+                        {{ leader.daily_xp|default:0 }} XP
+                    {% elif period == 'weekly' %}
+                        {{ leader.weekly_xp|default:0 }} XP
+                    {% elif period == 'monthly' %}
+                        {{ leader.monthly_xp|default:0 }} XP
+                    {% else %}
+                        {{ leader.total_xp }} XP
+                    {% endif %}
+                    <small>{{ leader.total_notes_created }} not</small>
+                </div>
+            </a>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div><i class="fa-solid fa-trophy"></i></div>
+                <h3>Henüz veri yok</h3>
+                <p>Bu dönem için sıralama verisi bulunmuyor.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Benim Sıramı Göster -->
+    {% if my_profile %}
+    <div class="glass" style="padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-md); display: flex; align-items: center; justify-content: space-between;">
+        <div style="font-weight: 700; color: var(--text-secondary);">
+            <i class="fa-solid fa-user" style="color: var(--primary-purple);"></i> Senin Puanın
+        </div>
+        <div style="font-weight: 800; color: var(--primary-purple); font-size: 1.1rem;">
+            {{ my_profile.total_xp }} XP · Seviye {{ my_profile.level }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

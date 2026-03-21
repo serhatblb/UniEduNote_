@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from users import views as user_views
 from notes import views as note_views
 from chat import views as chat_views
+from rewards import views as reward_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -56,6 +57,23 @@ urlpatterns = [
     # Bildirimler
     path('api/notifications/get/', user_views.get_notifications, name='get_notifications'),
     path('api/notifications/read/', user_views.mark_notifications_read, name='mark_notifications_read'),
+
+    # Liderlik Tablosu
+    path('leaderboard/', reward_views.leaderboard_view, name='leaderboard'),
+
+    # Feed (Takip edilenlerin notları)
+    path('feed/', note_views.feed_view, name='feed'),
+
+    # Kaydedilenler
+    path('bookmarks/', note_views.bookmarks_view, name='bookmarks'),
+    path('notes/<int:pk>/bookmark/', note_views.bookmark_toggle, name='bookmark_toggle'),
+
+    # Not Raporlama
+    path('notes/<int:pk>/report/', note_views.report_note, name='report_note'),
+
+    # Kullanıcı Profili & Takip
+    path('users/<str:username>/', user_views.public_profile, name='public_profile'),
+    path('users/<str:username>/follow/', user_views.follow_toggle, name='follow_toggle'),
 ]
 
 # Static ve Media dosyaları (Development için)
