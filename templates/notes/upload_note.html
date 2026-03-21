@@ -249,37 +249,9 @@
         margin-left: 2px;
     }
 
-    /* Native select styling */
-    .hier-select {
-        width: 100%;
-        padding: 0 18px;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        border-radius: var(--radius-md);
-        background: var(--bg-glass-light);
-        backdrop-filter: blur(10px);
-        font-size: 1rem;
-        font-weight: 500;
-        color: var(--text-primary);
-        transition: all 0.3s ease;
-        height: 52px;
-        box-sizing: border-box;
-        cursor: pointer;
-        appearance: auto;
-    }
+    /* Upload sayfasında daha büyük trigger yüksekliği */
+    .academic-hierarchy-grid .ss-trigger { height: 52px; }
 
-    .hier-select:focus {
-        outline: none;
-        border-color: var(--primary-purple);
-        background: white;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    }
-
-    .hier-select:disabled {
-        opacity: 0.55;
-        cursor: not-allowed;
-        background: rgba(0,0,0,0.03);
-    }
-    
     @media (max-width: 768px) {
         .academic-hierarchy-grid {
             grid-template-columns: 1fr;
