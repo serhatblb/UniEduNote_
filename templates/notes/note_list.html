@@ -19,7 +19,7 @@
         padding: 0;
         animation: fadeInUp 0.5s ease;
         border-radius: var(--radius-lg);
-        overflow: hidden;
+        /* overflow: hidden kaldırıldı — dropdown panel'i kesiyor */
         box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10);
     }
 
@@ -31,6 +31,7 @@
         justify-content: space-between;
         gap: var(--spacing-md);
         flex-wrap: wrap;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     }
 
     .filter-header-title {
@@ -81,6 +82,7 @@
     .filter-body {
         padding: 18px 20px 16px;
         background: var(--bg-glass);
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     }
 
     /* Akademik hiyerarşi grid (JS tarafından inject edilir) */
