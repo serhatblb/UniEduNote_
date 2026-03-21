@@ -132,12 +132,12 @@ DATABASES = {
     )
 }
 
-# CACHE AYARLARI (Veritabanı Tabanlı)
-# Gunicorn işçilerinin ortak çalışması için şart!
+# CACHE — Her worker kendi belleğinde tutar (DB'ye gitmez, en hızlı)
+# Akademik hiyerarşi verisi (üniversite/fakülte/bölüm/ders) nadiren değişir.
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'my_cache_table',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'uniedunote-cache',
     }
 }
 AUTH_USER_MODEL = "users.User"

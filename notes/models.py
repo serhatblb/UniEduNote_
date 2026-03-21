@@ -24,6 +24,16 @@ class Note(models.Model):
     download_count = models.IntegerField(default=0)
     likes = models.IntegerField(default=0)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['-uploaded_at']),
+            models.Index(fields=['-likes']),
+            models.Index(fields=['-download_count']),
+            models.Index(fields=['university', '-uploaded_at']),
+            models.Index(fields=['department', '-uploaded_at']),
+            models.Index(fields=['course', '-uploaded_at']),
+        ]
+
     def __str__(self):
         return f"{self.title} ({self.course})"
     

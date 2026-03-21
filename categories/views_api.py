@@ -23,7 +23,7 @@ class UniversityListView(APIView):
         if not universities:
             universities = University.objects.all().order_by('name')
             universities = [{'id': u.id, 'name': u.name} for u in universities]
-            cache.set(cache_key, universities, 60 * 60)  # 1 saat cache
+            cache.set(cache_key, universities, 60 * 60 * 24)  # 24 saat
         
         return Response(universities)
 
@@ -46,7 +46,7 @@ class FacultyListView(APIView):
         if not faculties:
             faculties = Faculty.objects.filter(university_id=university_id).order_by('name')
             faculties = [{'id': f.id, 'name': f.name} for f in faculties]
-            cache.set(cache_key, faculties, 60 * 30)  # 30 dakika cache
+            cache.set(cache_key, faculties, 60 * 60 * 12)  # 12 saat
         
         return Response(faculties)
 
@@ -69,7 +69,7 @@ class DepartmentListView(APIView):
         if not departments:
             departments = Department.objects.filter(faculty_id=faculty_id).order_by('name')
             departments = [{'id': d.id, 'name': d.name} for d in departments]
-            cache.set(cache_key, departments, 60 * 30)  # 30 dakika cache
+            cache.set(cache_key, departments, 60 * 60 * 12)  # 12 saat
         
         return Response(departments)
 
@@ -92,7 +92,7 @@ class CourseListView(APIView):
         if not courses:
             courses = Course.objects.filter(department_id=department_id).order_by('name')
             courses = [{'id': c.id, 'name': c.name} for c in courses]
-            cache.set(cache_key, courses, 60 * 30)  # 30 dakika cache
+            cache.set(cache_key, courses, 60 * 60 * 6)  # 6 saat
         
         return Response(courses)
 
