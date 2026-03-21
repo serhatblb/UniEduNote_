@@ -110,14 +110,11 @@ class CourseGetOrCreateView(APIView):
         if not name or not department_id:
             return Response({'error': 'name ve department_id gerekli'}, status=400)
 
-        try:
-            course, created = Course.objects.get_or_create(
-                name__iexact=name,
-                department_id=department_id,
-                defaults={'name': name}
-            )
-        except Course.MultipleObjectsReturned:
-            course = Course.objects.filter(name__iexact=name, department_id=department_id).first()
+        course = Course.objects.filter(
+            name__iexact=name, department_id=department_id
+        ).first()
+        if not course:
+            course = Course.objects.create(name=name, department_id=department_id)
 
         # Cache'i temizle ki yeni ders görünsün
         cache.delete(f'api_courses_{department_id}')
