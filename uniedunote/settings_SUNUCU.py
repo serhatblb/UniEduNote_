@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import timedelta
 import dj_database_url
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 # .env dosyasını yükle
 load_dotenv()
@@ -39,14 +40,11 @@ else:
     if DEBUG:
         ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
     else:
-        # Production'da ALLOWED_HOSTS boşsa uyarı ver ama çalışmaya devam et
-        import warnings
-        warnings.warn(
+        # Production'da ALLOWED_HOSTS boşsa hata ver
+        raise ImproperlyConfigured(
             "ALLOWED_HOSTS environment variable ayarlanmamış! "
-            "Production için domain adları ayarlanmalı.",
-            UserWarning
+            "Production için .env dosyasında domain adları ayarlanmalı."
         )
-        ALLOWED_HOSTS = ["*"]  # Geçici olarak tüm host'lara izin ver (GÜVENLİK RİSKİ!)
 
 # CSRF Trusted Origins: HTTPS için
 CSRF_TRUSTED_ORIGINS = []

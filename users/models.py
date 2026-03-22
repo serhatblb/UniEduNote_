@@ -23,7 +23,7 @@ class User(AbstractUser):
             profile = self.gamification_profile
             badge = profile.get_level_badge()
             return f"{badge['icon']} {badge['name']}"
-        except:
+        except Exception:
             # Profil yoksa eski sistem (geriye dönük uyumluluk)
             return "🌱 Çaylak"
 

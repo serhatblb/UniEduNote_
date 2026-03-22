@@ -239,7 +239,7 @@ class UserProfileUpdateAPIView(APIView):
                 # Veritabanından ID ile bulup atıyoruz
                 from categories.models import University
                 user.university = University.objects.get(id=uni_id)
-            except:
+            except Exception:
                 pass  # Hatalı ID gelirse yoksay
 
         # Avatar Güncelleme (Dosya)

@@ -89,7 +89,7 @@ def chat_room(request):
 
 @login_required
 def get_messages(request):
-    messages = ChatMessage.objects.all().order_by('-created_at')[:50]
+    messages = ChatMessage.objects.select_related('user').order_by('-created_at')[:50]
     data = [{
         'user': m.user.username,
         'avatar_url': m.user.avatar.url if m.user.avatar else None,
