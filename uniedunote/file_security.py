@@ -69,11 +69,10 @@ def validate_file_type(file):
         max_mb = MAX_FILE_SIZE / (1024 * 1024)
         return False, f"Dosya boyutu {max_mb}MB'dan büyük olamaz."
     
-    # 5. Dosya adı güvenliği (basit kontrol)
+    # 5. Dosya adı güvenliği - path traversal kontrolü
     import re
-    safe_name = re.sub(r'[^a-zA-Z0-9._-]', '', file.name)
-    if safe_name != file.name:
-        return False, "Dosya adında özel karakter kullanılamaz."
+    if '..' in file.name or '/' in file.name or '\\' in file.name:
+        return False, "Geçersiz dosya adı."
     
     file.seek(0)  # Tekrar başa dön
     return True, ""
