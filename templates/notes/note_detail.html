@@ -356,23 +356,57 @@
 
 <script>
     const noteId = {{ note.id }};
-    const token = localStorage.getItem('access');
     const currentUserId = {{ request.user.id|default:"null" }};
+
+    // Token yönetimi: gerekirse access token'ı refresh token ile yenile
+    async function getValidToken() {
+        let access = localStorage.getItem('access');
+        if (!access) return null;
+        return access;
+    }
+
+    async function authFetch(url, options = {}) {
+        let access = localStorage.getItem('access');
+        if (!access) return null;
+
+        options.headers = options.headers || {};
+        options.headers['Authorization'] = 'Bearer ' + access;
+
+        let res = await fetch(url, options);
+
+        // Token süresi dolmuşsa refresh dene
+        if (res.status === 401) {
+            const refresh = localStorage.getItem('refresh');
+            if (!refresh) return res;
+
+            const refreshRes = await fetch('/api/auth/token/refresh/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({refresh})
+            });
+
+            if (refreshRes.ok) {
+                const data = await refreshRes.json();
+                localStorage.setItem('access', data.access);
+                options.headers['Authorization'] = 'Bearer ' + data.access;
+                res = await fetch(url, options);
+            }
+        }
+
+        return res;
+    }
 
     // Beğeni İşlemi
     document.getElementById('likeBtn').addEventListener('click', async () => {
-        if (!token) {
+        if (!localStorage.getItem('access')) {
             alert('Lütfen giriş yapın.');
             return;
         }
 
         try {
-            const res = await fetch(`/api/notes/${noteId}/like/`, {
-                method: 'POST',
-                headers: {'Authorization': 'Bearer ' + token}
-            });
+            const res = await authFetch(`/api/notes/${noteId}/like/`, {method: 'POST'});
 
-            if (!res.ok) {
+            if (!res || !res.ok) {
                 alert('Lütfen giriş yapın.');
                 return;
             }
@@ -399,7 +433,8 @@
     async function loadComments(){
       const list = document.getElementById('commentList');
       try{
-        const headers = token ? {'Authorization':'Bearer '+token} : {};
+        const access = localStorage.getItem('access');
+        const headers = access ? {'Authorization':'Bearer '+access} : {};
         const res = await fetch(`/api/notes/${noteId}/comments/`, {headers});
         const data = await res.json();
 
@@ -408,12 +443,14 @@
             return;
         }
 
-        list.innerHTML = data.map(c => `
+        list.innerHTML = data.map(c => {
+            const dateStr = new Date(c.created_at).toLocaleDateString('tr-TR', {day:'2-digit', month:'2-digit', year:'numeric'});
+            return `
           <div class='comment-item' id='comment-${c.id}'>
             <div class='comment-header-item'>
                 <div>
                     <span class='comment-user'>${c.user}</span>
-                    <span class='comment-date'>• ${new Date(c.created_at).toLocaleDateString('tr-TR')}</span>
+                    <span class='comment-date'>• ${dateStr}</span>
                 </div>
                 ${c.user_id == currentUserId ? `
                 <div class='comment-actions'>
@@ -423,7 +460,8 @@
                 ` : ''}
             </div>
             <div class='comment-text' id='text-${c.id}'>${c.content}</div>
-          </div>`).join('');
+          </div>`;
+        }).join('');
 
       } catch(e) {
           console.error(e);
@@ -436,19 +474,23 @@
       const text = document.getElementById('commentText').value.trim();
       if(!text) return;
 
-      if (!token) {
+      if (!localStorage.getItem('access')) {
           alert('Lütfen giriş yapın.');
           return;
       }
 
       try {
-          await fetch(`/api/notes/${noteId}/comments/`,{
+          const res = await authFetch(`/api/notes/${noteId}/comments/`,{
             method:'POST',
-            headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+            headers:{'Content-Type':'application/json'},
             body:JSON.stringify({content:text})
           });
-          document.getElementById('commentText').value='';
-          loadComments();
+          if (res && res.ok) {
+              document.getElementById('commentText').value='';
+              loadComments();
+          } else {
+              alert("Yorum gönderilemedi.");
+          }
       } catch(e) {
           alert("Yorum gönderilemedi.");
       }
@@ -472,12 +514,13 @@
         if(!newText) return;
 
         try {
-            await fetch(`/api/notes/${noteId}/comments/`,{
+            const res = await authFetch(`/api/notes/${noteId}/comments/`,{
                 method:'PUT',
-                headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+                headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({id: id, content: newText})
             });
-            loadComments();
+            if (res && res.ok) loadComments();
+            else alert("Düzenleme başarısız.");
         } catch(e) {
             alert("Düzenleme başarısız.");
         }
@@ -488,12 +531,13 @@
         if(!confirm('Yorumu silmek istediğine emin misin?')) return;
 
         try {
-            await fetch(`/api/notes/${noteId}/comments/`,{
+            const res = await authFetch(`/api/notes/${noteId}/comments/`,{
                 method:'DELETE',
-                headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+                headers:{'Content-Type':'application/json'},
                 body:JSON.stringify({id: id})
             });
-            loadComments();
+            if (res && res.ok) loadComments();
+            else alert("Silme başarısız.");
         } catch(e) {
             alert("Silme başarısız.");
         }

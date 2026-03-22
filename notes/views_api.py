@@ -19,7 +19,7 @@ class CommentListCreateAPIView(APIView):
                 "user": c.user.username,
                 "user_id": c.user.id,
                 "content": c.content,
-                "created_at": c.created_at.strftime("%d.%m.%Y %H:%M"),
+                "created_at": c.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
             }
             for c in comments
         ]
@@ -37,7 +37,7 @@ class CommentListCreateAPIView(APIView):
                 "user": comment.user.username,
                 "user_id": comment.user.id,
                 "content": comment.content,
-                "created_at": comment.created_at.strftime("%d.%m.%Y %H:%M"),
+                "created_at": comment.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
             },
             status=201,
         )

@@ -8,6 +8,8 @@ class Note(models.Model):
         ('GÜZ-2024', 'Güz 2024'),
         ('BAHAR-2025', 'Bahar 2025'),
         ('GÜZ-2025', 'Güz 2025'),
+        ('BAHAR-2026', 'Bahar 2026'),
+        ('GÜZ-2026', 'Güz 2026'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
